@@ -12,7 +12,17 @@
     }
   ],
   "require": {
-    "php": "^7.3",
+    "php": "^7.1",
     "ext-mbstring": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Pechynho\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Pechynho\\Tests\\": "tests/"
+    }
   }
 }
