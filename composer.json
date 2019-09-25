@@ -1,8 +1,10 @@
 {
   "name": "pechynho/php-utils",
   "description": "Utilities for PHP",
+  "type": "library",
   "minimum-stability": "dev",
-  "license": "proprietary",
+  "homepage": "https://github.com/Pechynho/php-utils",
+  "license": "MIT",
   "authors": [
     {
       "name": "Jan Pech",
