@@ -1,0 +1,16 @@
+{
+  "name": "pechynho/php-utils",
+  "description": "Utilities for PHP",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Jan Pech",
+      "email": "pechynho@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^7.3",
+    "ext-mbstring": "*"
+  }
+}
