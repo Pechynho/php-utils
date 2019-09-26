@@ -15,6 +15,12 @@ use Traversable;
 
 class Arrays
 {
+	/** @var string */
+	public const ORDER_DIRECTION_ASCENDING = "order_direction_ascending";
+
+	/** @var string */
+	public const ORDER_DIRECTION_DESCENDING = "order_direction_descending";
+
 	/**
 	 * @param mixed $subject
 	 * @return bool
@@ -238,6 +244,40 @@ class Arrays
 	/**
 	 * @param iterable                                   $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
+	 * @return array
+	 * @throws PropertyAccessException
+	 */
+	public static function itemsWithMin(iterable $subject, $propertyPath = null): array
+	{
+		if (Arrays::isIterableEmpty($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject is empty.');
+		}
+		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
+		{
+			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
+		}
+		$minValue = null;
+		$items = [];
+		foreach ($subject as $item)
+		{
+			$value = $propertyPath === null ? $item : PropertyAccess::getValue($item, $propertyPath);
+			if ($value == $minValue)
+			{
+				$items[] = $item;
+			}
+			if ($value < $minValue)
+			{
+				$minValue = $value;
+				$items = [$item];
+			}
+		}
+		return $items;
+	}
+
+	/**
+	 * @param iterable                                   $subject
+	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return mixed
 	 * @throws PropertyAccessException
 	 */
@@ -261,6 +301,40 @@ class Arrays
 			}
 		}
 		return $maxValue;
+	}
+
+	/**
+	 * @param iterable                                   $subject
+	 * @param callable|string|PropertyPathInterface|null $propertyPath
+	 * @return array
+	 * @throws PropertyAccessException
+	 */
+	public static function itemsWithMax(iterable $subject, $propertyPath = null): array
+	{
+		if (Arrays::isIterableEmpty($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject is empty.');
+		}
+		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
+		{
+			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
+		}
+		$maxValue = null;
+		$items = [];
+		foreach ($subject as $item)
+		{
+			$value = $propertyPath === null ? $item : PropertyAccess::getValue($item, $propertyPath);
+			if ($value == $maxValue)
+			{
+				$items[] = $item;
+			}
+			if ($value > $maxValue)
+			{
+				$maxValue = $value;
+				$items = [$item];
+			}
+		}
+		return $items;
 	}
 
 	/**
@@ -436,6 +510,11 @@ class Arrays
 		return $found ? $lastItem : $defaultValue;
 	}
 
+	/**
+	 * @param array $subject
+	 * @param       $value
+	 * @return int
+	 */
 	public static function keyOf(array $subject, $value): int
 	{
 		foreach ($subject as $index => $item)
@@ -448,6 +527,11 @@ class Arrays
 		return null;
 	}
 
+	/**
+	 * @param array $subject
+	 * @param       $value
+	 * @return int
+	 */
 	public static function lastKeyOf(array $subject, $value): int
 	{
 		$lastKey = null;
@@ -463,12 +547,17 @@ class Arrays
 
 	/**
 	 * @param iterable                                   $subject
+	 * @param string                                     $direction
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @param callable|null                              $comparisonFunction
 	 * @return array
 	 */
-	public static function orderBy(iterable $subject, $propertyPath = null, $comparisonFunction = null): array
+	public static function orderBy(iterable $subject, string $direction = Arrays::ORDER_DIRECTION_ASCENDING, $propertyPath = null, $comparisonFunction = null): array
 	{
+		if (!in_array($direction, [Arrays::ORDER_DIRECTION_ASCENDING, Arrays::ORDER_DIRECTION_DESCENDING], true))
+		{
+			throw new InvalidArgumentException('Invalid value for argument $direction.');
+		}
 		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
 		{
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
@@ -487,65 +576,22 @@ class Arrays
 			});
 			return $subject;
 		}
-		usort($subject, function ($itemA, $itemB) use (&$propertyPath) {
+		usort($subject, function ($itemA, $itemB) use (&$propertyPath, $direction) {
 			$valueA = $propertyPath === null ? $itemA : PropertyAccess::getValue($itemA, $propertyPath);
 			$valueB = $propertyPath === null ? $itemB : PropertyAccess::getValue($itemB, $propertyPath);
 			try
 			{
 				if (is_string($valueA) || is_string($valueB))
 				{
-					return Strings::compare($valueA, $valueB, Strings::COMPARE_CASE_INSENSITIVE);
+					$comparisonResult = Strings::compare($valueA, $valueB, Strings::COMPARE_CASE_INSENSITIVE);
 				}
-				if ($valueA < $valueB) return -1;
-				if ($valueA > $valueB) return 1;
-				return 0;
-			}
-			catch (Exception $exception)
-			{
-				throw new RuntimeException("Exception occurred during default comparison. Please, provide your own one.");
-			}
-		});
-		return $subject;
-	}
-
-	/**
-	 * @param iterable                                   $subject
-	 * @param callable|string|PropertyPathInterface|null $propertyPath
-	 * @param callable|null                              $comparisonFunction
-	 * @return array
-	 */
-	public static function orderByDescending(iterable $subject, $propertyPath = null, $comparisonFunction = null): array
-	{
-		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
-		{
-			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
-		}
-		if ($comparisonFunction !== null && !is_callable($comparisonFunction))
-		{
-			throw new InvalidArgumentException('Parameter $comparisonFunction has to be NULL or callable.');
-		}
-		$subject = Arrays::toArray($subject);
-		if ($comparisonFunction !== null)
-		{
-			usort($subject, function ($itemA, $itemB) use (&$propertyPath, &$comparisonFunction) {
-				$valueA = $propertyPath === null ? $itemA : PropertyAccess::getValue($itemA, $propertyPath);
-				$valueB = $propertyPath === null ? $itemB : PropertyAccess::getValue($itemB, $propertyPath);
-				return $comparisonFunction($valueA, $valueB);
-			});
-			return $subject;
-		}
-		usort($subject, function ($itemA, $itemB) use (&$propertyPath) {
-			$valueA = $propertyPath === null ? $itemA : PropertyAccess::getValue($itemA, $propertyPath);
-			$valueB = $propertyPath === null ? $itemB : PropertyAccess::getValue($itemB, $propertyPath);
-			try
-			{
-				if (is_string($valueA) || is_string($valueB))
+				else
 				{
-					return -1 * Strings::compare($valueA, $valueB, Strings::COMPARE_CASE_INSENSITIVE);
+					$comparisonResult = 0;
+					if ($valueA < $valueB) $comparisonResult = -1;
+					if ($valueA > $valueB) $comparisonResult = 1;
 				}
-				if ($valueA < $valueB) return 1;
-				if ($valueA > $valueB) return -1;
-				return 0;
+				return $direction === Arrays::ORDER_DIRECTION_ASCENDING ? $comparisonResult : -1 * $comparisonResult;
 			}
 			catch (Exception $exception)
 			{
