@@ -612,9 +612,10 @@ class Strings
 	 * @param string $subject
 	 * @param string $separator
 	 * @param string $slugifyType
+	 * @param bool   $toLower
 	 * @return  string
 	 */
-	public static function slugify(string $subject, string $separator = "-", string $slugifyType = Strings::SLUGIFY_NORMAL): string
+	public static function slugify(string $subject, string $separator = "-", string $slugifyType = Strings::SLUGIFY_NORMAL, bool $toLower = true): string
 	{
 		if (!in_array($slugifyType, [Strings::SLUGIFY_NORMAL, Strings::SLUGIFY_FILENAME, Strings::SLUGIFY_URL], true))
 		{
@@ -629,7 +630,10 @@ class Strings
 			Strings::SLUGIFY_FILENAME => '/[\/\\?%*:|"<>. ]+/',
 			Strings::SLUGIFY_URL      => '/[!*\'();:@&=+,?#\[\]\/]+/'
 		];
-		$subject = Strings::toLower($subject);
+		if ($toLower)
+		{
+			$subject = Strings::toLower($subject);
+		}
 		$subject = Strings::replaceCzechSpecialCharsWithASCII($subject);
 		$subject = preg_replace('!\s+!', $separator, $subject);
 		$subject = preg_replace($config[$slugifyType], $separator, $subject);
@@ -668,6 +672,15 @@ class Strings
 			$output .= $char;
 		}
 		return $output;
+	}
+
+	/**
+	 * @param string $subject
+	 * @return string
+	 */
+	public static function reverse(string $subject): string
+	{
+		return strrev($subject);
 	}
 
 	/**

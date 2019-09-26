@@ -307,4 +307,10 @@ class StringsTest extends TestCase
 		self::assertEquals("", Strings::join([], ", "));
 		self::assertEquals("Joe and John", Strings::join(["Joe", "John"], ", ", " and "));
 	}
+
+	public function testReverse()
+	{
+		self::assertEquals("johA", Strings::reverse("Ahoj"));
+		self::assertEquals("", Strings::reverse(""));
+	}
 }
