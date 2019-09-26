@@ -55,12 +55,12 @@ class Strings
 	}
 
 	/**
-	 * @param string|null $strA
-	 * @param string|null $strB
-	 * @param string      $type
+	 * @param string $strA
+	 * @param string $strB
+	 * @param string $type
 	 * @return int
 	 */
-	public static function compare(?string $strA, ?string $strB, string $type = Strings::COMPARE_CASE_SENSITIVE): int
+	public static function compare(string $strA, string $strB, string $type = Strings::COMPARE_CASE_SENSITIVE): int
 	{
 		if (!in_array($type, [Strings::COMPARE_CASE_SENSITIVE, Strings::COMPARE_CASE_INSENSITIVE], true))
 		{
@@ -76,6 +76,10 @@ class Strings
 	 */
 	public static function contains(string $subject, string $value): bool
 	{
+		if ($value === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
+		}
 		return Strings::indexOf($subject, $value) > -1;
 	}
 
@@ -97,6 +101,18 @@ class Strings
 	 */
 	public static function indexOf(string $subject, string $value, int $startIndex = 0): int
 	{
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			return -1;
+		}
+		if ($value === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
+		}
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
+		{
+			throw new OutOfRangeException('Parameter $startIndex is out of range.');
+		}
 		$result = mb_strpos($subject, $value, $startIndex);
 		return $result === false ? -1 : $result;
 	}
@@ -109,6 +125,18 @@ class Strings
 	 */
 	public static function indexOfAny(string $subject, iterable $values, int $startIndex = 0): int
 	{
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			return -1;
+		}
+		if (empty($values))
+		{
+			throw new InvalidArgumentException('Parameter $values cannot be empty array.');
+		}
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
+		{
+			throw new OutOfRangeException('Parameter $startIndex is out of range.');
+		}
 		foreach ($values as $value)
 		{
 			$index = Strings::indexOf($subject, $value, $startIndex);
@@ -128,9 +156,17 @@ class Strings
 	 */
 	public static function insert(string $subject, string $value, int $startIndex): string
 	{
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
+		}
+		if ($value === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
+		}
 		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
 		{
-			throw new OutOfRangeException('Variable $startIndex is out of range.');
+			throw new OutOfRangeException('Parameter $startIndex is out of range.');
 		}
 		return substr_replace($subject, $value, $startIndex, 0);
 	}
@@ -150,8 +186,11 @@ class Strings
 			$parts[] = ["value" => $item, "separator" => $separator];
 			$partsCount++;
 		}
-		$parts[0]["separator"] = Strings::EMPTY_STRING;
-		$parts[$partsCount - 1]["separator"] = $lastSeparator === null ? $separator : $lastSeparator;
+		if ($partsCount != 0)
+		{
+			$parts[$partsCount - 1]["separator"] = $lastSeparator === null ? $separator : $lastSeparator;
+			$parts[0]["separator"] = Strings::EMPTY_STRING;
+		}
 		$output = Strings::EMPTY_STRING;
 		foreach ($parts as $part)
 		{
@@ -166,8 +205,20 @@ class Strings
 	 * @param int    $startIndex
 	 * @return int
 	 */
-	public static function lastIndexOf(string $subject, string $value, int $startIndex): int
+	public static function lastIndexOf(string $subject, string $value, int $startIndex = 0): int
 	{
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			return -1;
+		}
+		if ($value === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
+		}
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
+		{
+			throw new OutOfRangeException('Parameter $startIndex is out of range.');
+		}
 		$result = mb_strrpos($subject, $value, $startIndex);
 		return $result === false ? -1 : $result;
 	}
@@ -180,6 +231,18 @@ class Strings
 	 */
 	public static function lastIndexOfAny(string $subject, iterable $values, int $startIndex = 0): int
 	{
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			return -1;
+		}
+		if (empty($values))
+		{
+			throw new InvalidArgumentException('Parameter $values cannot be empty array.');
+		}
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
+		{
+			throw new OutOfRangeException('Parameter $startIndex is out of range.');
+		}
 		foreach ($values as $value)
 		{
 			$index = Strings::lastIndexOf($subject, $value, $startIndex);
@@ -243,13 +306,26 @@ class Strings
 	/**
 	 * @param string   $subject
 	 * @param int      $startIndex
-	 * @param int|null $count
+	 * @param int|null $length
 	 * @return string
 	 */
-	public static function remove(string $subject, int $startIndex, ?int $count = null): string
+	public static function remove(string $subject, int $startIndex, ?int $length = null): string
 	{
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('$subject $value cannot be empty string.');
+		}
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
+		{
+			throw new OutOfRangeException('Parameter $startIndex is out of range.');
+		}
+		$subjectLength = Strings::length($subject);
+		if ($length !== null && $startIndex + $length > $subjectLength)
+		{
+			throw new OutOfRangeException('Parameter $length is out of range.');
+		}
 		$part1 = $startIndex == 0 ? Strings::EMPTY_STRING : Strings::substring($subject, 0, $startIndex);
-		$part2 = $count === null ? Strings::EMPTY_STRING : Strings::substring($subject, ($startIndex + $count) - 1);
+		$part2 = $length === null || $startIndex + $length == $subjectLength ? Strings::EMPTY_STRING : Strings::substring($subject, $startIndex + $length);
 		return $part1 . $part2;
 	}
 
@@ -261,7 +337,16 @@ class Strings
 	 */
 	public static function replace(string $subject, string $oldValue, string $newValue): string
 	{
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
+		}
+		if ($oldValue === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $oldValue cannot be empty string.');
+		}
 		return str_replace($oldValue, $newValue, $subject);
+
 	}
 
 	/**
@@ -279,9 +364,9 @@ class Strings
 	}
 
 	/**
-	 * @param string $subject
-	 * @param array  $separators
-	 * @param bool   $removeEmptyEntries
+	 * @param string   $subject
+	 * @param string[] $separators
+	 * @param bool     $removeEmptyEntries
 	 * @return array
 	 */
 	public static function split(string $subject, array $separators, bool $removeEmptyEntries = true): array
@@ -290,16 +375,17 @@ class Strings
 		{
 			throw new InvalidArgumentException('Parameter $separators has to contain at least one value.');
 		}
-		$mainSeparator = $separators[0];
 		$separatorsCount = count($separators);
-		if ($separators > 1)
+		for ($i = 0; $i < $separatorsCount; $i++)
 		{
-			for ($i = 1; $i < $separatorsCount; $i++)
+			if (!is_string($separators[$i]) || $separators[$i] === Strings::EMPTY_STRING)
 			{
-				$subject = Strings::replace($subject, $separators[$i], $mainSeparator);
+				throw new InvalidArgumentException("Value on index '{$i}' cannot be used as a separator.");
 			}
+			if ($i == 0) continue;
+			$subject = Strings::replace($subject, $separators[$i], $separators[0]);
 		}
-		return $removeEmptyEntries ? array_diff(explode($mainSeparator, $subject), [Strings::EMPTY_STRING]) : explode($mainSeparator, $subject);
+		return $removeEmptyEntries ? array_diff(explode($separators[0], $subject), [Strings::EMPTY_STRING]) : explode($separators[0], $subject);
 	}
 
 	/**
@@ -320,6 +406,19 @@ class Strings
 	 */
 	public static function substring(string $subject, int $startIndex, ?int $length = null): string
 	{
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
+		}
+		$subjectLength = Strings::length($subject);
+		if ($startIndex < 0 || $startIndex >= $subjectLength)
+		{
+			throw new OutOfRangeException('Parameter $startIndex is out of range.');
+		}
+		if ($length !== null && $startIndex + $length > $subjectLength)
+		{
+			throw new OutOfRangeException('Parameter $length is out of range.');
+		}
 		return mb_substr($subject, $startIndex, $length);
 	}
 
@@ -351,33 +450,45 @@ class Strings
 	}
 
 	/**
-	 * @param string $subject
-	 * @param string $trimChars
+	 * @param string   $subject
+	 * @param string[] $trimChars
 	 * @return string
 	 */
-	public static function trim(string $subject, string $trimChars = Strings::TRIM_WHITE_CHARS_LIST): string
+	public static function trim(string $subject, array $trimChars = Strings::TRIM_WHITE_CHARS_LIST): string
 	{
-		return trim($subject, $trimChars);
+		if (empty($trimChars))
+		{
+			throw new InvalidArgumentException('Parameter $trimChars cannot be empty array.');
+		}
+		return trim($subject, Strings::join($trimChars, ""));
 	}
 
 	/**
-	 * @param string $subject
-	 * @param string $trimChars
+	 * @param string   $subject
+	 * @param string[] $trimChars
 	 * @return string
 	 */
-	public static function trimStart(string $subject, string $trimChars = Strings::TRIM_WHITE_CHARS_LIST): string
+	public static function trimStart(string $subject, array $trimChars = Strings::TRIM_WHITE_CHARS_LIST): string
 	{
-		return ltrim($subject, $trimChars);
+		if (empty($trimChars))
+		{
+			throw new InvalidArgumentException('Parameter $trimChars cannot be empty array.');
+		}
+		return ltrim($subject, Strings::join($trimChars, ""));
 	}
 
 	/**
-	 * @param string $subject
-	 * @param string $trimChars
+	 * @param string   $subject
+	 * @param string[] $trimChars
 	 * @return string
 	 */
-	public static function trimEnd(string $subject, string $trimChars = Strings::TRIM_WHITE_CHARS_LIST): string
+	public static function trimEnd(string $subject, array $trimChars = Strings::TRIM_WHITE_CHARS_LIST): string
 	{
-		return rtrim($subject, $trimChars);
+		if (empty($trimChars))
+		{
+			throw new InvalidArgumentException('Parameter $trimChars cannot be empty array.');
+		}
+		return rtrim($subject, Strings::join($trimChars, ""));
 	}
 
 	/**
@@ -386,6 +497,14 @@ class Strings
 	 */
 	public static function firstToUpper(string $subject): string
 	{
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			return $subject;
+		}
+		if (Strings::length($subject) === 1)
+		{
+			return Strings::toUpper($subject);
+		}
 		return Strings::toUpper(Strings::substring($subject, 0, 1)) . Strings::substring($subject, 1);
 	}
 
@@ -395,6 +514,14 @@ class Strings
 	 */
 	public static function firstToLower(string $subject): string
 	{
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			return $subject;
+		}
+		if (Strings::length($subject) === 1)
+		{
+			return Strings::toLower($subject);
+		}
 		return Strings::toLower(Strings::substring($subject, 0, 1)) . Strings::substring($subject, 1);
 	}
 
@@ -405,6 +532,10 @@ class Strings
 	 */
 	public static function truncate(string $subject, int $maximumLength): string
 	{
+		if ($maximumLength < 4)
+		{
+			throw new InvalidArgumentException('Parameter $maximumLength has to be greater than 3.');
+		}
 		if (Strings::length($subject) > $maximumLength)
 		{
 			$subject = Strings::substring($subject, 0, $maximumLength - 3) . '...';
@@ -415,7 +546,7 @@ class Strings
 	/**
 	 * @param string $subject
 	 * @param string $separator
-	 * @param string   $caseType
+	 * @param string $caseType
 	 * @return string
 	 */
 	private static function convertToCase(string $subject, string $separator, string $caseType = Strings::CASE_PASCAL): string

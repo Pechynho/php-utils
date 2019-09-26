@@ -1,6 +1,6 @@
 {
   "name": "pechynho/php-utils",
-  "description": "Utilities for PHP",
+  "description": "This is a small collection of PHP libraries for easier working with strings and arrays.",
   "type": "library",
   "minimum-stability": "dev",
   "homepage": "https://github.com/Pechynho/php-utils",
@@ -15,14 +15,18 @@
     "php": "^7.1",
     "ext-mbstring": "*"
   },
+  "require-dev": {
+    "phpunit/phpunit": ">=6.0 <8.0",
+    "vladahejda/phpunit-assert-exception": "dev-master"
+  },
   "autoload": {
     "psr-4": {
-      "Pechynho\\": "src/"
+      "Pechynho\\Utility\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Pechynho\\Tests\\": "tests/"
+      "Pechynho\\Test\\": "tests/"
     }
   }
 }

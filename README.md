@@ -1,2 +1,2 @@
 # PHP Utilities
-This project contains simple but powerful utilities for PHP to work with string and arrays.
+This is a small collection of PHP libraries for easier working with strings and arrays.
