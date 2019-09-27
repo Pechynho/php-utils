@@ -7,8 +7,6 @@ namespace Pechynho\Utility;
 use Countable;
 use Exception;
 use InvalidArgumentException;
-use Pechynho\Utility\Exception\ItemNotFoundException;
-use Pechynho\Utility\Exception\PropertyAccessException;
 use RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Traversable;
@@ -56,7 +54,6 @@ class Arrays
 	 * @param iterable $subject
 	 * @param callable $predicate
 	 * @return mixed
-	 * @throws ItemNotFoundException
 	 */
 	public static function first(iterable $subject, callable $predicate)
 	{
@@ -71,7 +68,7 @@ class Arrays
 				return $item;
 			}
 		}
-		throw new ItemNotFoundException("No item was found by given predicate.");
+		throw new RuntimeException("No item was found by given predicate.");
 	}
 
 	/**
@@ -183,7 +180,6 @@ class Arrays
 	 * @param callable|string|PropertyPathInterface $propertyPath
 	 * @param bool                                  $preserveKeys
 	 * @return array
-	 * @throws PropertyAccessException
 	 */
 	public static function select(iterable $subject, $propertyPath, bool $preserveKeys = false): array
 	{
@@ -217,7 +213,6 @@ class Arrays
 	 * @param iterable                                   $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return mixed
-	 * @throws PropertyAccessException
 	 */
 	public static function min(iterable $subject, $propertyPath = null)
 	{
@@ -245,7 +240,6 @@ class Arrays
 	 * @param iterable                                   $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return array
-	 * @throws PropertyAccessException
 	 */
 	public static function itemsWithMin(iterable $subject, $propertyPath = null): array
 	{
@@ -279,7 +273,6 @@ class Arrays
 	 * @param iterable                                   $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return mixed
-	 * @throws PropertyAccessException
 	 */
 	public static function max(iterable $subject, $propertyPath = null)
 	{
@@ -307,7 +300,6 @@ class Arrays
 	 * @param iterable                                   $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return array
-	 * @throws PropertyAccessException
 	 */
 	public static function itemsWithMax(iterable $subject, $propertyPath = null): array
 	{
@@ -341,7 +333,6 @@ class Arrays
 	 * @param iterable                                   $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return float
-	 * @throws PropertyAccessException
 	 */
 	public static function average(iterable $subject, $propertyPath = null): float
 	{
@@ -368,7 +359,6 @@ class Arrays
 	 * @param iterable                                   $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return int|float
-	 * @throws PropertyAccessException
 	 */
 	public static function sum(iterable $subject, $propertyPath = null)
 	{
@@ -411,7 +401,6 @@ class Arrays
 	 * @param iterable                              $subject
 	 * @param callable|string|PropertyPathInterface $propertyPath
 	 * @return array
-	 * @throws PropertyAccessException
 	 */
 	public static function groupBy(iterable $subject, $propertyPath): array
 	{
@@ -468,7 +457,6 @@ class Arrays
 	 * @param iterable $subject
 	 * @param callable $predicate
 	 * @return mixed
-	 * @throws ItemNotFoundException
 	 */
 	public static function last(iterable $subject, callable $predicate)
 	{
@@ -490,7 +478,7 @@ class Arrays
 		{
 			return $lastItem;
 		}
-		throw new ItemNotFoundException("No item was found by given predicate.");
+		throw new RuntimeException("No item was found by given predicate.");
 	}
 
 	/**

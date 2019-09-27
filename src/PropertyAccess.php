@@ -6,11 +6,11 @@ namespace Pechynho\Utility;
 
 use Exception;
 use InvalidArgumentException;
-use Pechynho\Utility\Exception\PropertyAccessException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
 use ReflectionProperty;
+use RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -35,7 +35,6 @@ class PropertyAccess
 	 * @param mixed                                 $defaultValue
 	 * @param bool                                  $tryReflection
 	 * @return mixed
-	 * @throws PropertyAccessException
 	 */
 	public static function getValue($objectOrArray, $propertyPath, bool $throwException = true, $defaultValue = null, bool $tryReflection = false)
 	{
@@ -55,7 +54,7 @@ class PropertyAccess
 			}
 			catch (Exception $exception)
 			{
-				if ($throwException) throw new PropertyAccessException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+				if ($throwException) throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
 				return $defaultValue;
 			}
 		}
@@ -83,11 +82,11 @@ class PropertyAccess
 				}
 				catch (Exception $reflectionException)
 				{
-					if ($throwException) throw new PropertyAccessException($reflectionException->getMessage(), $reflectionException->getCode(), $reflectionException->getPrevious());
+					if ($throwException) throw new RuntimeException($reflectionException->getMessage(), $reflectionException->getCode(), $reflectionException->getPrevious());
 					return $defaultValue;
 				}
 			}
-			if ($throwException) throw new PropertyAccessException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+			if ($throwException) throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
 			return $defaultValue;
 		}
 	}
@@ -98,7 +97,6 @@ class PropertyAccess
 	 * @param mixed                                 $value
 	 * @param bool                                  $throwException
 	 * @param bool                                  $tryReflection
-	 * @throws PropertyAccessException
 	 */
 	public static function setValue($objectOrArray, $propertyPath, $value, bool $throwException = true, bool $tryReflection = false)
 	{
@@ -119,7 +117,7 @@ class PropertyAccess
 			}
 			catch (Exception $exception)
 			{
-				if ($throwException) throw new PropertyAccessException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+				if ($throwException) throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
 			}
 		}
 		try
@@ -147,10 +145,10 @@ class PropertyAccess
 				}
 				catch (Exception $reflectionException)
 				{
-					if ($throwException) throw new PropertyAccessException($reflectionException->getMessage(), $reflectionException->getCode(), $reflectionException->getPrevious());
+					if ($throwException) throw new RuntimeException($reflectionException->getMessage(), $reflectionException->getCode(), $reflectionException->getPrevious());
 				}
 			}
-			if ($throwException) throw new PropertyAccessException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+			if ($throwException) throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
 		}
 	}
 

@@ -5,9 +5,8 @@ namespace Pechynho\Test;
 use InvalidArgumentException;
 use Pechynho\Test\Model\Person;
 use Pechynho\Utility\Arrays;
-use Pechynho\Utility\Exception\ItemNotFoundException;
-use Pechynho\Utility\Exception\PropertyAccessException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use VladaHejda\AssertException;
 
 class ArraysTest extends TestCase
@@ -28,6 +27,9 @@ class ArraysTest extends TestCase
 
 	private $surnames = ["Doe", "Parker", "Smith", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Reed", "Coleman", "Norman"];
 
+	/**
+	 * @inheritDoc
+	 */
 	protected function setUp()
 	{
 		foreach ($this->forenames as $key => $forename)
@@ -45,9 +47,6 @@ class ArraysTest extends TestCase
 		shuffle($this->alphabet);
 	}
 
-	/**
-	 * @throws PropertyAccessException
-	 */
 	public function testSum()
 	{
 		self::assertEquals(351, Arrays::sum($this->numbers));
@@ -63,14 +62,11 @@ class ArraysTest extends TestCase
 		self::assertEquals(null, Arrays::lastOrDefault($this->numbersOrdered, function (int $number) { return $number > 26; }));
 	}
 
-	/**
-	 * @throws ItemNotFoundException
-	 */
 	public function testLast()
 	{
 		self::assertEquals(26, Arrays::last($this->numbersOrdered, function (int $number) { return $number > 15; }));
 		self::assertException(function () { Arrays::last([], function () { }); }, InvalidArgumentException::class);
-		self::assertException(function () { Arrays::last($this->numbersOrdered, function (int $number) { return $number > 100; }); }, ItemNotFoundException::class);
+		self::assertException(function () { Arrays::last($this->numbersOrdered, function (int $number) { return $number > 100; }); }, RuntimeException::class);
 	}
 
 	public function testKeyOf()
@@ -85,9 +81,6 @@ class ArraysTest extends TestCase
 		self::assertEquals(null, Arrays::binarySearch($this->alphabetOrdered, 5));
 	}
 
-	/**
-	 * @throws PropertyAccessException
-	 */
 	public function testItemsWithMin()
 	{
 		self::assertEquals([1], Arrays::itemsWithMin($this->numbers));
@@ -96,9 +89,6 @@ class ArraysTest extends TestCase
 		self::assertException(function () { Arrays::itemsWithMin($this->numbers, 5); }, InvalidArgumentException::class);
 	}
 
-	/**
-	 * @throws PropertyAccessException
-	 */
 	public function testGroupBy()
 	{
 		self::assertEquals([$this->persons[0]], Arrays::groupBy($this->persons, "height")[190]);
@@ -111,9 +101,6 @@ class ArraysTest extends TestCase
 		self::assertEquals(null, Arrays::firstOrDefault($this->numbersOrdered, function (int $number) { return $number > 26; }));
 	}
 
-	/**
-	 * @throws PropertyAccessException
-	 */
 	public function testItemsWithMax()
 	{
 		self::assertEquals([26], Arrays::itemsWithMax($this->numbers));
@@ -133,14 +120,11 @@ class ArraysTest extends TestCase
 		self::assertEquals($this->numbers, Arrays::toArray($this->numbers));
 	}
 
-	/**
-	 * @throws ItemNotFoundException
-	 */
 	public function testFirst()
 	{
 		self::assertEquals(16, Arrays::first($this->numbersOrdered, function (int $number) { return $number > 15; }));
 		self::assertException(function () { Arrays::first([], function () { }); }, InvalidArgumentException::class);
-		self::assertException(function () { Arrays::first($this->numbersOrdered, function (int $number) { return $number > 100; }); }, ItemNotFoundException::class);
+		self::assertException(function () { Arrays::first($this->numbersOrdered, function (int $number) { return $number > 100; }); }, RuntimeException::class);
 	}
 
 	public function testLastValue()
@@ -211,9 +195,6 @@ class ArraysTest extends TestCase
 		self::assertEquals(false, Arrays::isCountable(null));
 	}
 
-	/**
-	 * @throws PropertyAccessException
-	 */
 	public function testMin()
 	{
 		self::assertEquals(1, Arrays::min($this->numbers));
@@ -228,9 +209,6 @@ class ArraysTest extends TestCase
 		self::assertEquals(false, Arrays::contains($this->persons, 5));
 	}
 
-	/**
-	 * @throws PropertyAccessException
-	 */
 	public function testAverage()
 	{
 		self::assertEquals(13.5, Arrays::average($this->numbers));
@@ -240,9 +218,6 @@ class ArraysTest extends TestCase
 		self::assertEquals(184.5, Arrays::average($this->persons, "height"));
 	}
 
-	/**
-	 * @throws PropertyAccessException
-	 */
 	public function testMax()
 	{
 		self::assertEquals(26, Arrays::max($this->numbers));
@@ -257,9 +232,6 @@ class ArraysTest extends TestCase
 		self::assertEquals(count($this->numbersOrdered), Arrays::count($this->numbersOrdered));
 	}
 
-	/**
-	 * @throws PropertyAccessException
-	 */
 	public function testSelect()
 	{
 		self::assertEquals($this->surnames, Arrays::select($this->persons, "surname"));

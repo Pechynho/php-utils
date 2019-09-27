@@ -21,12 +21,18 @@ class FileSystemTest extends TestCase
 		]
 	];
 
+	/**
+	 * @inheritDoc
+	 */
 	protected function setUp()
 	{
 		$this->destroyEnvironment();
 		$this->prepareEnvironment();
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	protected function tearDown()
 	{
 		$this->destroyEnvironment();
