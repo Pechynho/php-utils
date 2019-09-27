@@ -16,10 +16,10 @@ use Traversable;
 class Arrays
 {
 	/** @var string */
-	public const ORDER_DIRECTION_ASCENDING = "order_direction_ascending";
+	public const ORDER_DIRECTION_ASCENDING = "ORDER_DIRECTION_ASCENDING";
 
 	/** @var string */
-	public const ORDER_DIRECTION_DESCENDING = "order_direction_descending";
+	public const ORDER_DIRECTION_DESCENDING = "ORDER_DIRECTION_DESCENDING";
 
 	/**
 	 * @param mixed $subject
@@ -43,7 +43,7 @@ class Arrays
 	 * @param iterable $subject
 	 * @return bool
 	 */
-	public static function isIterableEmpty(iterable $subject): bool
+	public static function isEmpty(iterable $subject): bool
 	{
 		foreach ($subject as $item)
 		{
@@ -60,13 +60,13 @@ class Arrays
 	 */
 	public static function first(iterable $subject, callable $predicate)
 	{
-		if (Arrays::isIterableEmpty($subject))
+		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
 		foreach ($subject as $item)
 		{
-			if ($predicate($subject))
+			if ($predicate($item))
 			{
 				return $item;
 			}
@@ -114,7 +114,7 @@ class Arrays
 	 */
 	public static function firstValue(iterable $subject)
 	{
-		if (Arrays::isIterableEmpty($subject))
+		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
@@ -148,7 +148,7 @@ class Arrays
 	 */
 	public static function lastValue(iterable $subject)
 	{
-		if (Arrays::isIterableEmpty($subject))
+		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
@@ -198,16 +198,16 @@ class Arrays
 		$output = [];
 		if ($preserveKeys)
 		{
-			foreach ($subject as $item)
+			foreach ($subject as $key => $item)
 			{
-				$output[] = PropertyAccess::getValue($item, $propertyPath);
+				$output[$key] = PropertyAccess::getValue($item, $propertyPath);
 			}
 		}
 		else
 		{
-			foreach ($subject as $key => $item)
+			foreach ($subject as $item)
 			{
-				$output[$key] = PropertyAccess::getValue($item, $propertyPath);
+				$output[] = PropertyAccess::getValue($item, $propertyPath);
 			}
 		}
 		return $output;
@@ -221,7 +221,7 @@ class Arrays
 	 */
 	public static function min(iterable $subject, $propertyPath = null)
 	{
-		if (Arrays::isIterableEmpty($subject))
+		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
@@ -233,7 +233,7 @@ class Arrays
 		foreach ($subject as $item)
 		{
 			$value = $propertyPath === null ? $item : PropertyAccess::getValue($item, $propertyPath);
-			if ($value < $minValue)
+			if ($minValue == null || $value < $minValue)
 			{
 				$minValue = $value;
 			}
@@ -249,7 +249,7 @@ class Arrays
 	 */
 	public static function itemsWithMin(iterable $subject, $propertyPath = null): array
 	{
-		if (Arrays::isIterableEmpty($subject))
+		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
@@ -266,7 +266,7 @@ class Arrays
 			{
 				$items[] = $item;
 			}
-			if ($value < $minValue)
+			if ($minValue == null || $value < $minValue)
 			{
 				$minValue = $value;
 				$items = [$item];
@@ -283,7 +283,7 @@ class Arrays
 	 */
 	public static function max(iterable $subject, $propertyPath = null)
 	{
-		if (Arrays::isIterableEmpty($subject))
+		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
@@ -295,7 +295,7 @@ class Arrays
 		foreach ($subject as $item)
 		{
 			$value = $propertyPath === null ? $item : PropertyAccess::getValue($item, $propertyPath);
-			if ($value > $maxValue)
+			if ($maxValue == null || $value > $maxValue)
 			{
 				$maxValue = $value;
 			}
@@ -311,7 +311,7 @@ class Arrays
 	 */
 	public static function itemsWithMax(iterable $subject, $propertyPath = null): array
 	{
-		if (Arrays::isIterableEmpty($subject))
+		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
@@ -328,7 +328,7 @@ class Arrays
 			{
 				$items[] = $item;
 			}
-			if ($value > $maxValue)
+			if ($maxValue == null || $value > $maxValue)
 			{
 				$maxValue = $value;
 				$items = [$item];
@@ -345,7 +345,7 @@ class Arrays
 	 */
 	public static function average(iterable $subject, $propertyPath = null): float
 	{
-		if (Arrays::isIterableEmpty($subject))
+		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
@@ -372,7 +372,7 @@ class Arrays
 	 */
 	public static function sum(iterable $subject, $propertyPath = null)
 	{
-		if (Arrays::isIterableEmpty($subject))
+		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
@@ -395,6 +395,10 @@ class Arrays
 	 */
 	public static function count(iterable $subject): int
 	{
+		if (Arrays::isCountable($subject))
+		{
+			return count($subject);
+		}
 		$count = 0;
 		foreach ($subject as $item)
 		{
@@ -437,7 +441,7 @@ class Arrays
 	 * @param mixed $value
 	 * @return int|null
 	 */
-	public static function binarySearch(array $subject, $value)
+	public static function binarySearch(array $subject, $value): ?int
 	{
 		$left = 0;
 		$right = count($subject) - 1;
@@ -468,7 +472,7 @@ class Arrays
 	 */
 	public static function last(iterable $subject, callable $predicate)
 	{
-		if (Arrays::isIterableEmpty($subject))
+		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
@@ -476,7 +480,7 @@ class Arrays
 		$found = false;
 		foreach ($subject as $item)
 		{
-			if ($predicate($subject))
+			if ($predicate($item))
 			{
 				$lastItem = $item;
 				$found = true;
@@ -511,11 +515,28 @@ class Arrays
 	}
 
 	/**
+	 * @param iterable $subject
+	 * @param mixed    $value
+	 * @return bool
+	 */
+	public static function contains(iterable $subject, $value): bool
+	{
+		foreach ($subject as $item)
+		{
+			if ($item === $value)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * @param array $subject
 	 * @param       $value
-	 * @return int
+	 * @return int|null
 	 */
-	public static function keyOf(array $subject, $value): int
+	public static function keyOf(array $subject, $value): ?int
 	{
 		foreach ($subject as $index => $item)
 		{
@@ -530,9 +551,9 @@ class Arrays
 	/**
 	 * @param array $subject
 	 * @param       $value
-	 * @return int
+	 * @return int|null
 	 */
-	public static function lastKeyOf(array $subject, $value): int
+	public static function lastKeyOf(array $subject, $value): ?int
 	{
 		$lastKey = null;
 		foreach ($subject as $key => $item)
@@ -554,7 +575,7 @@ class Arrays
 	 */
 	public static function orderBy(iterable $subject, string $direction = Arrays::ORDER_DIRECTION_ASCENDING, $propertyPath = null, $comparisonFunction = null): array
 	{
-		if (!in_array($direction, [Arrays::ORDER_DIRECTION_ASCENDING, Arrays::ORDER_DIRECTION_DESCENDING], true))
+		if (!in_array($direction, [Arrays::ORDER_DIRECTION_ASCENDING, Arrays::ORDER_DIRECTION_DESCENDING]))
 		{
 			throw new InvalidArgumentException('Invalid value for argument $direction.');
 		}
@@ -607,16 +628,16 @@ class Arrays
 	 */
 	public static function reverse(iterable $subject): array
 	{
-		if (is_array($subject))
-		{
-			return array_reverse($subject);
-		}
-		$output = [];
-		foreach ($subject as $item)
-		{
-			$output[] = $item;
-		}
-		return array_reverse($output);
+		return array_reverse(is_array($subject) ? $subject : Arrays::toArray($subject));
+	}
+
+	/**
+	 * @param array $subject
+	 * @return array
+	 */
+	public static function flip(array $subject): array
+	{
+		return array_flip($subject);
 	}
 
 	/**

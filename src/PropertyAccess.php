@@ -7,7 +7,10 @@ namespace Pechynho\Utility;
 use Exception;
 use InvalidArgumentException;
 use Pechynho\Utility\Exception\PropertyAccessException;
+use ReflectionClass;
+use ReflectionException;
 use ReflectionObject;
+use ReflectionProperty;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -19,7 +22,7 @@ class PropertyAccess
 	/**
 	 * @return PropertyAccessorInterface
 	 */
-	public static function getPropertyAccessor(): PropertyAccessorInterface
+	private static function getPropertyAccessor(): PropertyAccessorInterface
 	{
 		if (self::$propertyAccessor === null) self::$propertyAccessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
 		return self::$propertyAccessor;
@@ -66,12 +69,7 @@ class PropertyAccess
 			{
 				try
 				{
-					$reflectionObject = new ReflectionObject($objectOrArray);
-					while ($reflectionObject != null && !$reflectionObject->hasProperty($propertyPath))
-					{
-						$reflectionObject = $reflectionObject->getParentClass();
-					}
-					$property = $reflectionObject->getProperty($propertyPath);
+					$property = PropertyAccess::getPropertyFromReflectionClass(new ReflectionObject($objectOrArray), $propertyPath);
 					if ($property->isProtected() || $property->isPrivate())
 					{
 						$property->setAccessible(true);
@@ -117,6 +115,7 @@ class PropertyAccess
 			try
 			{
 				$propertyPath($objectOrArray, $value);
+				return;
 			}
 			catch (Exception $exception)
 			{
@@ -126,6 +125,7 @@ class PropertyAccess
 		try
 		{
 			self::getPropertyAccessor()->setValue($objectOrArray, $propertyPath, $value);
+			return;
 		}
 		catch (Exception $exception)
 		{
@@ -133,12 +133,7 @@ class PropertyAccess
 			{
 				try
 				{
-					$reflectionObject = new ReflectionObject($objectOrArray);
-					while ($reflectionObject != null && !$reflectionObject->hasProperty($propertyPath))
-					{
-						$reflectionObject = $reflectionObject->getParentClass();
-					}
-					$property = $reflectionObject->getProperty($propertyPath);
+					$property = PropertyAccess::getPropertyFromReflectionClass(new ReflectionObject($objectOrArray), $propertyPath);
 					if ($property->isProtected() || $property->isPrivate())
 					{
 						$property->setAccessible(true);
@@ -157,5 +152,21 @@ class PropertyAccess
 			}
 			if ($throwException) throw new PropertyAccessException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
 		}
+	}
+
+	/**
+	 * @param ReflectionClass $reflectionClass
+	 * @param string          $propertyName
+	 * @return ReflectionProperty
+	 * @throws ReflectionException
+	 */
+	private static function getPropertyFromReflectionClass(ReflectionClass $reflectionClass, string $propertyName): ReflectionProperty
+	{
+		while ($reflectionClass != null && !$reflectionClass->hasProperty($propertyName))
+		{
+			$reflectionClass = $reflectionClass->getParentClass();
+		}
+		if (!$reflectionClass instanceof ReflectionClass || !$reflectionClass->hasProperty($propertyName)) throw new ReflectionException("Property was not found in given reflection class.");
+		return $reflectionClass->getProperty($propertyName);
 	}
 }

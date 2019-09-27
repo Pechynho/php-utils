@@ -13,32 +13,33 @@ class Strings
 	public const EMPTY_STRING = "";
 
 	/** @var string */
-	public const COMPARE_CASE_SENSITIVE = "compare_case_sensitive";
+	public const COMPARE_CASE_SENSITIVE = "COMPARE_CASE_SENSITIVE";
 
 	/** @var string */
-	public const COMPARE_CASE_INSENSITIVE = "compare_case_insensitive";
+	public const COMPARE_CASE_INSENSITIVE = "COMPARE_CASE_INSENSITIVE";
 
 	/** @var string[] */
 	public const TRIM_WHITE_CHARS_LIST = [" ", "\t", "\n", "\r", "\0", "\x0B"];
 
 	/** @var string */
-	public const SLUGIFY_NORMAL = "slugify_normal";
+	public const SLUGIFY_NORMAL = "SLUGIFY_NORMAL";
 
 	/** @var string */
-	public const SLUGIFY_FILENAME = "slugify_filename";
+	public const SLUGIFY_FILENAME = "SLUGIFY_FILENAME";
 
 	/** @var string */
-	public const SLUGIFY_URL = "slugify_url";
+	public const SLUGIFY_URL = "SLUGIFY_URL";
 
 	/** @var string */
-	public const CASE_PASCAL = "case_pascal";
+	public const CASE_PASCAL = "CASE_PASCAL";
 
 	/** @var string */
-	public const CASE_CAMEL = "case_camel";
+	public const CASE_CAMEL = "CASE_CAMEL";
 
 	/**
-	 * @param string|null $subject
-	 * @return bool
+	 * Indicates whether the specified string is null or an empty string ("").
+	 * @param string|null $subject The string to test.
+	 * @return bool Returns true if the $subject parameter is null or an empty string (""); otherwise, false.
 	 */
 	public static function isNullOrEmpty(?string $subject): bool
 	{
@@ -46,8 +47,9 @@ class Strings
 	}
 
 	/**
-	 * @param string|null $subject
-	 * @return bool
+	 * Indicates whether a specified string is null, empty, or consists only of white -space characters.
+	 * @param string|null $subject The string to test.
+	 * @return bool Returns true if the $subject parameter is null, empty string ("") or consists exclusively of white-space characters.
 	 */
 	public static function isNullOrWhiteSpace(?string $subject): bool
 	{
@@ -62,7 +64,7 @@ class Strings
 	 */
 	public static function compare(string $strA, string $strB, string $type = Strings::COMPARE_CASE_SENSITIVE): int
 	{
-		if (!in_array($type, [Strings::COMPARE_CASE_SENSITIVE, Strings::COMPARE_CASE_INSENSITIVE], true))
+		if (!in_array($type, [Strings::COMPARE_CASE_SENSITIVE, Strings::COMPARE_CASE_INSENSITIVE]))
 		{
 			throw new InvalidArgumentException('Invalid value for argument $type.');
 		}
@@ -70,9 +72,10 @@ class Strings
 	}
 
 	/**
-	 * @param string $subject
-	 * @param string $value
-	 * @return bool
+	 * Returns a value indicating whether a specified substring occurs within passed string.
+	 * @param string $subject The string to seek in.
+	 * @param string $value The substring to seek.
+	 * @return bool Returns true if the $value parameter occurs within $subject parameter; otherwise false.
 	 */
 	public static function contains(string $subject, string $value): bool
 	{
@@ -617,7 +620,7 @@ class Strings
 	 */
 	public static function slugify(string $subject, string $separator = "-", string $slugifyType = Strings::SLUGIFY_NORMAL, bool $toLower = true): string
 	{
-		if (!in_array($slugifyType, [Strings::SLUGIFY_NORMAL, Strings::SLUGIFY_FILENAME, Strings::SLUGIFY_URL], true))
+		if (!in_array($slugifyType, [Strings::SLUGIFY_NORMAL, Strings::SLUGIFY_FILENAME, Strings::SLUGIFY_URL]))
 		{
 			throw new InvalidArgumentException('Invalid value passed to parameter $slugifyType.');
 		}
