@@ -19,7 +19,7 @@ class Strings
 	public const COMPARE_CASE_INSENSITIVE = "COMPARE_CASE_INSENSITIVE";
 
 	/** @var string[] */
-	public const TRIM_WHITE_CHARS_LIST = [" ", "\t", "\n", "\r", "\0", "\x0B"];
+	public const TRIM_WHITE_SPACE_CHARS_LIST = [" ", "\t", "\n", "\r", "\0", "\x0B"];
 
 	/** @var string */
 	public const SLUGIFY_NORMAL = "SLUGIFY_NORMAL";
@@ -47,7 +47,7 @@ class Strings
 	}
 
 	/**
-	 * Indicates whether a specified string is null, empty, or consists only of white -space characters.
+	 * Indicates whether a specified string is null, empty, or consists only of white-space characters.
 	 * @param string|null $subject The string to test.
 	 * @return bool Returns true if the $subject parameter is null, empty string ("") or consists exclusively of white-space characters.
 	 */
@@ -457,7 +457,7 @@ class Strings
 	 * @param string[] $trimChars
 	 * @return string
 	 */
-	public static function trim(string $subject, array $trimChars = Strings::TRIM_WHITE_CHARS_LIST): string
+	public static function trim(string $subject, array $trimChars = Strings::TRIM_WHITE_SPACE_CHARS_LIST): string
 	{
 		if (empty($trimChars))
 		{
@@ -471,7 +471,7 @@ class Strings
 	 * @param string[] $trimChars
 	 * @return string
 	 */
-	public static function trimStart(string $subject, array $trimChars = Strings::TRIM_WHITE_CHARS_LIST): string
+	public static function trimStart(string $subject, array $trimChars = Strings::TRIM_WHITE_SPACE_CHARS_LIST): string
 	{
 		if (empty($trimChars))
 		{
@@ -485,7 +485,7 @@ class Strings
 	 * @param string[] $trimChars
 	 * @return string
 	 */
-	public static function trimEnd(string $subject, array $trimChars = Strings::TRIM_WHITE_CHARS_LIST): string
+	public static function trimEnd(string $subject, array $trimChars = Strings::TRIM_WHITE_SPACE_CHARS_LIST): string
 	{
 		if (empty($trimChars))
 		{
