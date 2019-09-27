@@ -57,10 +57,11 @@ class Strings
 	}
 
 	/**
-	 * @param string $strA
-	 * @param string $strB
-	 * @param string $type
-	 * @return int
+	 * Compares two strings by their value.
+	 * @param string $strA First string to compare.
+	 * @param string $strB Second string to compare.
+	 * @param string $type Switch between case-sensitive and case-insensitive comparison.
+	 * @return int Return -1 if $strA is lesser than $strB; 1 if $strA is greater than $strB; otherwise 0.
 	 */
 	public static function compare(string $strA, string $strB, string $type = Strings::COMPARE_CASE_SENSITIVE): int
 	{
@@ -87,9 +88,10 @@ class Strings
 	}
 
 	/**
-	 * @param string $subject
-	 * @param string $value
-	 * @return bool
+	 * Indicates if string ends with given value.
+	 * @param string $subject The string to seek in.
+	 * @param string $value The substring to seek at end.
+	 * @return bool Returns true if the $subject parameter ends with $value parameter; otherwise false;
 	 */
 	public static function endsWith(string $subject, string $value): bool
 	{
@@ -97,10 +99,11 @@ class Strings
 	}
 
 	/**
-	 * @param string $subject
-	 * @param string $value
-	 * @param int    $startIndex
-	 * @return int
+	 * Returns integer representing index on which given value occurs in given string.
+	 * @param string $subject The string to seek in.
+	 * @param string $value The value to seek.
+	 * @param int    $startIndex Offset value from start of the string.
+	 * @return int Returns value indicating on which index occurs $value in $subject; if $subject doesn't contain $value, then it returns -1.
 	 */
 	public static function indexOf(string $subject, string $value, int $startIndex = 0): int
 	{
