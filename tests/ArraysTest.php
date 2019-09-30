@@ -171,12 +171,6 @@ class ArraysTest extends TestCase
 		self::assertEquals(true, Arrays::isEmpty([]));
 	}
 
-	public function testLastKeyOf()
-	{
-		self::assertEquals(0, Arrays::lastKeyOf($this->alphabetOrdered, "A"));
-		self::assertEquals(null, Arrays::lastKeyOf($this->alphabetOrdered, 5));
-	}
-
 	public function testReverse()
 	{
 		self::assertEquals(array_reverse($this->numbers), Arrays::reverse($this->numbers));

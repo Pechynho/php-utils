@@ -362,11 +362,14 @@ class Strings
 	 */
 	public static function replaceMultiple(string $subject, array $replacements): string
 	{
-		foreach ($replacements as $oldValue => $newValue)
+		if ($subject === Strings::EMPTY_STRING)
 		{
-			$subject = Strings::replace($subject, $oldValue, $newValue);
+			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
 		}
-		return $subject;
+		$oldValues = array_keys($replacements);
+		$newValues = array_values($replacements);
+		if (in_array("", $oldValues)) throw new InvalidArgumentException('Keys in parameter $replacements should be non-empty string values which should be replaced.');
+		return str_replace($oldValues, $newValues, $subject);
 	}
 
 	/**

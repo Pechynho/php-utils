@@ -99,10 +99,7 @@ class Arrays
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		foreach ($subject as $key => $item)
-		{
-			return $key;
-		}
+		return array_key_first($subject);
 	}
 
 	/**
@@ -131,12 +128,7 @@ class Arrays
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		$lastKey = null;
-		foreach ($subject as $key => $item)
-		{
-			$lastKey = $key;
-		}
-		return $lastKey;
+		return array_key_last($subject);
 	}
 
 	/**
@@ -509,6 +501,10 @@ class Arrays
 	 */
 	public static function contains(iterable $subject, $value): bool
 	{
+		if (is_array($subject))
+		{
+			return in_array($value, $subject, true);
+		}
 		foreach ($subject as $item)
 		{
 			if ($item === $value)
@@ -522,36 +518,12 @@ class Arrays
 	/**
 	 * @param array $subject
 	 * @param       $value
-	 * @return int|null
+	 * @return string|int|null
 	 */
-	public static function keyOf(array $subject, $value): ?int
+	public static function keyOf(array $subject, $value)
 	{
-		foreach ($subject as $index => $item)
-		{
-			if ($item === $value)
-			{
-				return $index;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * @param array $subject
-	 * @param       $value
-	 * @return int|null
-	 */
-	public static function lastKeyOf(array $subject, $value): ?int
-	{
-		$lastKey = null;
-		foreach ($subject as $key => $item)
-		{
-			if ($item === $value)
-			{
-				$lastKey = $key;
-			}
-		}
-		return $lastKey;
+		$key = array_search($value, $subject, true);
+		return $key === false ? null : $key;
 	}
 
 	/**
