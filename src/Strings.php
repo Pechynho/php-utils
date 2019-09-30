@@ -385,6 +385,7 @@ class Strings
 			throw new InvalidArgumentException('Parameter $separators has to contain at least one value.');
 		}
 		$separatorsCount = count($separators);
+		$replacements = [];
 		for ($i = 0; $i < $separatorsCount; $i++)
 		{
 			if (!is_string($separators[$i]) || $separators[$i] === Strings::EMPTY_STRING)
@@ -392,8 +393,9 @@ class Strings
 				throw new InvalidArgumentException("Value on index '{$i}' cannot be used as a separator.");
 			}
 			if ($i == 0) continue;
-			$subject = Strings::replace($subject, $separators[$i], $separators[0]);
+			$replacements[$separators[$i]] = $separators[0];
 		}
+		if (!empty($replacements)) $subject = Strings::replaceMultiple($subject, $replacements);
 		return $removeEmptyEntries ? array_diff(explode($separators[0], $subject), [Strings::EMPTY_STRING]) : explode($separators[0], $subject);
 	}
 
