@@ -2,7 +2,7 @@
   "name": "pechynho/php-utils",
   "description": "This is a small collection of PHP libraries for easier working with strings, arrays, files and accessing properties.",
   "type": "library",
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "homepage": "https://github.com/Pechynho/php-utils",
   "license": "MIT",
   "authors": [
@@ -14,7 +14,7 @@
   "require": {
     "php": "^7.1",
     "ext-mbstring": "*",
-    "symfony/property-access": "^5.0@dev"
+    "symfony/property-access": "^4.3"
   },
   "require-dev": {
     "phpunit/phpunit": ">=6.0 <8.0",

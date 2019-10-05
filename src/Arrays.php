@@ -99,7 +99,11 @@ class Arrays
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		return array_key_first($subject);
+		if (function_exists("array_key_first")) return array_key_first($subject);
+		foreach ($subject as $key => $item)
+		{
+			return $key;
+		}
 	}
 
 	/**
@@ -128,7 +132,13 @@ class Arrays
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		return array_key_last($subject);
+		if (function_exists("array_key_last")) return array_key_last($subject);
+		$lastKey = null;
+		foreach ($subject as $key => $item)
+		{
+			$lastKey = $key;
+		}
+		return $lastKey;
 	}
 
 	/**
