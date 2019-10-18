@@ -9,18 +9,30 @@ use InvalidArgumentException;
 class FileSystem
 {
 	/** @var string[] */
-	public const SIZE_SI_UNITS = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
+	const SIZE_SI_UNITS = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
 
 	/** @var string[] */
-	public const SIZE_BINARY_UNITS = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
+	const SIZE_BINARY_UNITS = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
 
 	/**
 	 * @param string $source
 	 * @param string $destination
 	 * @param bool   $overwrite
 	 */
-	public static function copy(string $source, string $destination, bool $overwrite = false)
+	public static function copy($source, $destination, $overwrite = false)
 	{
+		if (!is_string($source))
+		{
+			throw new InvalidArgumentException('Parameter $source has to be type of string.');
+		}
+		if (!is_string($destination))
+		{
+			throw new InvalidArgumentException('Parameter $destination has to be type of string.');
+		}
+		if (!is_bool($overwrite))
+		{
+			throw new InvalidArgumentException('Parameter $overwrite has to be type of boolean.');
+		}
 		if (Strings::isNullOrWhiteSpace($destination))
 		{
 			throw new InvalidArgumentException("Given value '$destination' is not valid path.");
@@ -51,8 +63,20 @@ class FileSystem
 	 * @param string $destination
 	 * @param bool   $overwrite
 	 */
-	public static function rename(string $source, string $destination, bool $overwrite = false)
+	public static function rename($source, $destination, $overwrite = false)
 	{
+		if (!is_string($source))
+		{
+			throw new InvalidArgumentException('Parameter $source has to be type of string.');
+		}
+		if (!is_string($destination))
+		{
+			throw new InvalidArgumentException('Parameter $destination has to be type of string.');
+		}
+		if (!is_bool($overwrite))
+		{
+			throw new InvalidArgumentException('Parameter $overwrite has to be type of boolean.');
+		}
 		if (Strings::isNullOrWhiteSpace($destination))
 		{
 			throw new InvalidArgumentException("Given value '$destination' is not valid path.");
@@ -70,11 +94,19 @@ class FileSystem
 
 	/**
 	 * @param string $filename
-	 * @param string $text
+	 * @param mixed  $content
 	 * @param bool   $overwrite
 	 */
-	public static function write(string $filename, string $text, bool $overwrite = false)
+	public static function write($filename, $content, $overwrite = false)
 	{
+		if (!is_string($filename))
+		{
+			throw new InvalidArgumentException('Parameter $filename has to be type of string.');
+		}
+		if (!is_bool($overwrite))
+		{
+			throw new InvalidArgumentException('Parameter $overwrite has to be type of boolean.');
+		}
 		if (Strings::isNullOrWhiteSpace($filename))
 		{
 			throw new InvalidArgumentException("Given value '$filename' is not valid filename.");
@@ -85,17 +117,25 @@ class FileSystem
 		}
 		if (FileSystem::isFile($filename)) FileSystem::delete($filename);
 		$file = fopen($filename, "w");
-		fwrite($file, $text);
+		fwrite($file, $content);
 		fclose($file);
 	}
 
 	/**
 	 * @param string $filename
-	 * @param string $text
+	 * @param mixed  $content
 	 * @param bool   $newLine
 	 */
-	public static function append(string $filename, string $text, bool $newLine = true)
+	public static function append($filename, $content, $newLine = true)
 	{
+		if (!is_string($filename))
+		{
+			throw new InvalidArgumentException('Parameter $filename has to be type of string.');
+		}
+		if (!is_bool($newLine))
+		{
+			throw new InvalidArgumentException('Parameter $newLine has to be type of boolean.');
+		}
 		if (Strings::isNullOrWhiteSpace($filename))
 		{
 			throw new InvalidArgumentException("Given value '$filename' is not valid filename.");
@@ -103,13 +143,13 @@ class FileSystem
 		$file = fopen($filename, "a");
 		if (FileSystem::isEmpty($filename))
 		{
-			fwrite($file, $text);
+			fwrite($file, $content);
 		}
 		else if (!$newLine)
 		{
-			fwrite($file, $text);
+			fwrite($file, $content);
 		}
-		else fwrite($file, PHP_EOL . $text);
+		else fwrite($file, PHP_EOL . $content);
 		fclose($file);
 	}
 
@@ -118,8 +158,16 @@ class FileSystem
 	 * @param bool   $trimEndOfLine
 	 * @return array
 	 */
-	public static function readAllLines(string $filename, bool $trimEndOfLine = true): array
+	public static function readAllLines($filename, $trimEndOfLine = true): array
 	{
+		if (!is_string($filename))
+		{
+			throw new InvalidArgumentException('Parameter $filename has to be type of string.');
+		}
+		if (!is_bool($trimEndOfLine))
+		{
+			throw new InvalidArgumentException('Parameter $trimEndOfLine has to be type of boolean.');
+		}
 		if (!FileSystem::isFile($filename))
 		{
 			throw new InvalidArgumentException("File '$filename' does not exist.");
@@ -139,8 +187,16 @@ class FileSystem
 	 * @param bool   $trimEndOfLine
 	 * @return iterable
 	 */
-	public static function readLineByLine(string $filename, bool $trimEndOfLine = true): iterable
+	public static function readLineByLine($filename, $trimEndOfLine = true)
 	{
+		if (!is_string($filename))
+		{
+			throw new InvalidArgumentException('Parameter $filename has to be type of string.');
+		}
+		if (!is_bool($trimEndOfLine))
+		{
+			throw new InvalidArgumentException('Parameter $trimEndOfLine has to be type of boolean.');
+		}
 		if (!FileSystem::isFile($filename))
 		{
 			throw new InvalidArgumentException("File '$filename' does not exist.");
@@ -154,11 +210,15 @@ class FileSystem
 	}
 
 	/**
-	 * @param string $filename
+	 * @param $filename
 	 * @return string
 	 */
-	public static function readAllText(string $filename): string
+	public static function readAllText($filename)
 	{
+		if (!is_string($filename))
+		{
+			throw new InvalidArgumentException('Parameter $filename has to be type of string.');
+		}
 		if (!FileSystem::isFile($filename))
 		{
 			throw new InvalidArgumentException("File '$filename' does not exist.");
@@ -175,8 +235,12 @@ class FileSystem
 	 * @param string $filename
 	 * @return bool
 	 */
-	public static function isEmpty(string $filename): bool
+	public static function isEmpty($filename)
 	{
+		if (!is_string($filename))
+		{
+			throw new InvalidArgumentException('Parameter $filename has to be type of string.');
+		}
 		if (!FileSystem::isFile($filename))
 		{
 			throw new InvalidArgumentException("File '$filename' does not exist.");
@@ -188,8 +252,12 @@ class FileSystem
 	 * @param string $path
 	 * @return int
 	 */
-	public static function size(string $path): int
+	public static function size($path)
 	{
+		if (!is_string($path))
+		{
+			throw new InvalidArgumentException('Parameter $path has to be type of string.');
+		}
 		if (!file_exists($path))
 		{
 			throw new InvalidArgumentException("Path '$path' does not exist.");
@@ -212,8 +280,20 @@ class FileSystem
 	 * @param bool        $useSI
 	 * @return string
 	 */
-	public static function formatSize(int $bytes, ?string $unit = null, ?string $format = null, bool $useSI = true)
+	public static function formatSize($bytes, $unit = null, $format = null, $useSI = true)
 	{
+		if (!is_int($bytes))
+		{
+			throw new InvalidArgumentException('Parameter $bytes has to be type of int.');
+		}
+		if ($format != null && !is_string($format))
+		{
+			throw new InvalidArgumentException('Parameter $format has to be type of string or NULL.');
+		}
+		if (!is_bool($useSI))
+		{
+			throw new InvalidArgumentException('Parameter $useSI ha to be type of boolean.');
+		}
 		if ($bytes < 0)
 		{
 			throw new InvalidArgumentException('Parameter $bytes has to be greater or equal to 0.');
@@ -242,7 +322,7 @@ class FileSystem
 	 * @param string[] ...$paths
 	 * @return string
 	 */
-	public static function combinePath(...$paths): string
+	public static function combinePath(...$paths)
 	{
 		if (Arrays::isEmpty($paths))
 		{
@@ -260,8 +340,12 @@ class FileSystem
 	/**
 	 * @param string $path
 	 */
-	public static function delete(string $path)
+	public static function delete($path)
 	{
+		if (!is_string($path))
+		{
+			throw new InvalidArgumentException('Parameter $path has to be type of string.');
+		}
 		if (!file_exists($path))
 		{
 			throw new InvalidArgumentException("Path '$path' does not exist.");
@@ -284,11 +368,15 @@ class FileSystem
 	 * @param string $directory
 	 * @param int    $mode
 	 */
-	public static function createDirectory(string $directory, int $mode = 0777)
+	public static function createDirectory($directory, $mode = 0777)
 	{
 		if (Strings::isNullOrWhiteSpace($directory))
 		{
-			throw new InvalidArgumentException("Given value '$directory' is not valid directory.");
+			throw new InvalidArgumentException("Given value '$directory' is not valid directory name.");
+		}
+		if (!is_int($mode))
+		{
+			throw new InvalidArgumentException('Parameter $mode has to be type of int.');
 		}
 		if (!FileSystem::isDirectory($directory))
 		{
@@ -300,8 +388,12 @@ class FileSystem
 	 * @param string $directory
 	 * @return bool
 	 */
-	public static function isDirectory(string $directory): bool
+	public static function isDirectory($directory)
 	{
+		if (!is_string($directory))
+		{
+			throw new InvalidArgumentException('Parameter $directory has to be type of string.');
+		}
 		return file_exists($directory) && is_dir($directory);
 	}
 
@@ -309,8 +401,12 @@ class FileSystem
 	 * @param string $filename
 	 * @return bool
 	 */
-	public static function isFile(string $filename): bool
+	public static function isFile($filename)
 	{
+		if (!is_string($filename))
+		{
+			throw new InvalidArgumentException('Parameter $filename has to be type of string.');
+		}
 		return file_exists($filename) && !is_dir($filename);
 	}
 }

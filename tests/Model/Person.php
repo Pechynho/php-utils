@@ -24,7 +24,7 @@ class Person
 	 * @param int    $age
 	 * @param int    $height
 	 */
-	public function __construct(string $forename, string $surname, int $age, int $height)
+	public function __construct($forename, $surname, $age, $height)
 	{
 		$this->forename = $forename;
 		$this->surname = $surname;
@@ -35,16 +35,16 @@ class Person
 	/**
 	 * @return string
 	 */
-	public function getForename(): string
+	public function getForename()
 	{
 		return $this->forename;
 	}
 
 	/**
 	 * @param string $forename
-	 * @return Person
+	 * @return self
 	 */
-	public function setForename(string $forename): Person
+	public function setForename($forename)
 	{
 		$this->forename = $forename;
 		return $this;
@@ -53,16 +53,16 @@ class Person
 	/**
 	 * @return string
 	 */
-	public function getSurname(): string
+	public function getSurname()
 	{
 		return $this->surname;
 	}
 
 	/**
 	 * @param string $surname
-	 * @return Person
+	 * @return self
 	 */
-	public function setSurname(string $surname): Person
+	public function setSurname($surname)
 	{
 		$this->surname = $surname;
 		return $this;
@@ -71,16 +71,16 @@ class Person
 	/**
 	 * @return int
 	 */
-	public function getHeight(): int
+	public function getHeight()
 	{
 		return $this->height;
 	}
 
 	/**
 	 * @param int $height
-	 * @return Person
+	 * @return self
 	 */
-	public function setHeight(int $height): Person
+	public function setHeight($height)
 	{
 		$this->height = $height;
 		return $this;

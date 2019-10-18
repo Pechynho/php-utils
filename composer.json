@@ -11,23 +11,31 @@
       "email": "pechynho@gmail.com"
     }
   ],
+  "config": {
+    "platform": {
+      "php": "5.6.40"
+    },
+    "require": {
+      "php": "^5.6",
+      "ext-mbstring": "*"
+    },
+    "require-dev": {
+      "phpunit/phpunit": "^5.7",
+      "vladahejda/phpunit-assert-exception": "^1.0"
+    },
+    "autoload": {
+      "psr-4": {
+        "Pechynho\\Utility\\": "src/"
+      }
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "Pechynho\\Test\\": "tests/"
+      }
+    }
+  },
   "require": {
-    "php": "^7.1",
-    "ext-mbstring": "*",
-    "symfony/property-access": "^4.3"
-  },
-  "require-dev": {
-    "phpunit/phpunit": ">=6.0 <8.0",
-    "vladahejda/phpunit-assert-exception": "dev-master"
-  },
-  "autoload": {
-    "psr-4": {
-      "Pechynho\\Utility\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Pechynho\\Test\\": "tests/"
-    }
+    "symfony/property-access": "^3.4",
+    "ext-mbstring": "*"
   }
 }

@@ -14,16 +14,16 @@ use Traversable;
 class Arrays
 {
 	/** @var string */
-	public const ORDER_DIRECTION_ASCENDING = "ORDER_DIRECTION_ASCENDING";
+	const ORDER_DIRECTION_ASCENDING = "ORDER_DIRECTION_ASCENDING";
 
 	/** @var string */
-	public const ORDER_DIRECTION_DESCENDING = "ORDER_DIRECTION_DESCENDING";
+	const ORDER_DIRECTION_DESCENDING = "ORDER_DIRECTION_DESCENDING";
 
 	/**
 	 * @param mixed $subject
 	 * @return bool
 	 */
-	public static function isCountable($subject): bool
+	public static function isCountable($subject)
 	{
 		return is_array($subject) || $subject instanceof Countable;
 	}
@@ -32,17 +32,21 @@ class Arrays
 	 * @param mixed $value
 	 * @return bool
 	 */
-	public static function isIterable($value): bool
+	public static function isIterable($value)
 	{
 		return is_array($value) || $value instanceof Traversable;
 	}
 
 	/**
-	 * @param iterable $subject
+	 * @param array|Traversable $subject
 	 * @return bool
 	 */
-	public static function isEmpty(iterable $subject): bool
+	public static function isEmpty($subject)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		foreach ($subject as $item)
 		{
 			return false;
@@ -51,12 +55,20 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable $subject
-	 * @param callable $predicate
+	 * @param array|Traversable $subject
+	 * @param callable          $predicate
 	 * @return mixed
 	 */
-	public static function first(iterable $subject, callable $predicate)
+	public static function first($subject, $predicate)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
+		if (!is_callable($predicate))
+		{
+			throw new InvalidArgumentException('Parameter $predicate has to be type of callable.');
+		}
 		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -72,13 +84,21 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable $subject
-	 * @param callable $predicate
-	 * @param mixed    $defaultValue
+	 * @param array|Traversable $subject
+	 * @param callable          $predicate
+	 * @param mixed             $defaultValue
 	 * @return mixed
 	 */
-	public static function firstOrDefault(iterable $subject, callable $predicate, $defaultValue = null)
+	public static function firstOrDefault($subject, $predicate, $defaultValue = null)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
+		if (!is_callable($predicate))
+		{
+			throw new InvalidArgumentException('Parameter $predicate has to be type of callable.');
+		}
 		foreach ($subject as $item)
 		{
 			if ($predicate($item))
@@ -90,11 +110,15 @@ class Arrays
 	}
 
 	/**
-	 * @param $subject
+	 * @param array $subject
 	 * @return int|string
 	 */
-	public static function firstKey(array $subject)
+	public static function firstKey($subject)
 	{
+		if (!is_array($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
+		}
 		if (empty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -107,11 +131,15 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable $subject
+	 * @param array|Traversable $subject
 	 * @return mixed
 	 */
-	public static function firstValue(iterable $subject)
+	public static function firstValue($subject)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -126,8 +154,12 @@ class Arrays
 	 * @param array $subject
 	 * @return int|string
 	 */
-	public static function lastKey(array $subject)
+	public static function lastKey($subject)
 	{
+		if (!is_array($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
+		}
 		if (empty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -142,11 +174,15 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable $subject
+	 * @param array|Traversable $subject
 	 * @return mixed
 	 */
-	public static function lastValue(iterable $subject)
+	public static function lastValue($subject)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -160,12 +196,20 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable $subject
-	 * @param callable $predicate
+	 * @param array|Traversable $subject
+	 * @param callable          $predicate
 	 * @return array
 	 */
-	public static function where(iterable $subject, callable $predicate): array
+	public static function where($subject, $predicate)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
+		if (!is_callable($predicate))
+		{
+			throw new InvalidArgumentException('Parameter $predicate has to be type of callable.');
+		}
 		$output = [];
 		foreach ($subject as $item)
 		{
@@ -178,13 +222,21 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable                              $subject
+	 * @param array|Traversable                     $subject
 	 * @param callable|string|PropertyPathInterface $propertyPath
 	 * @param bool                                  $preserveKeys
 	 * @return array
 	 */
-	public static function select(iterable $subject, $propertyPath, bool $preserveKeys = false): array
+	public static function select($subject, $propertyPath, $preserveKeys = false)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
+		if (!is_bool($preserveKeys))
+		{
+			throw new InvalidArgumentException('Parameter $preserveKeys has to be type of boolean.');
+		}
 		if (!is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
 		{
 			throw new InvalidArgumentException('Parameter $propertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
@@ -212,12 +264,16 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable                                   $subject
+	 * @param array|iterable                             $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return mixed
 	 */
-	public static function min(iterable $subject, $propertyPath = null)
+	public static function min($subject, $propertyPath = null)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -239,12 +295,16 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable                                   $subject
+	 * @param array|Traversable                          $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return array
 	 */
-	public static function itemsWithMin(iterable $subject, $propertyPath = null): array
+	public static function itemsWithMin($subject, $propertyPath = null)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -272,12 +332,16 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable                                   $subject
+	 * @param array|Traversable                          $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return mixed
 	 */
-	public static function max(iterable $subject, $propertyPath = null)
+	public static function max($subject, $propertyPath = null)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -299,12 +363,16 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable                                   $subject
+	 * @param array|Traversable                          $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return array
 	 */
-	public static function itemsWithMax(iterable $subject, $propertyPath = null): array
+	public static function itemsWithMax($subject, $propertyPath = null)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -332,12 +400,16 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable                                   $subject
+	 * @param array|Traversable                          $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return float
 	 */
-	public static function average(iterable $subject, $propertyPath = null): float
+	public static function average($subject, $propertyPath = null)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -358,12 +430,16 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable                                   $subject
+	 * @param array|Traversable                          $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return int|float
 	 */
-	public static function sum(iterable $subject, $propertyPath = null)
+	public static function sum($subject, $propertyPath = null)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -382,11 +458,15 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable $subject
+	 * @param array|Traversable $subject
 	 * @return int
 	 */
-	public static function count(iterable $subject): int
+	public static function count($subject)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (Arrays::isCountable($subject))
 		{
 			return count($subject);
@@ -400,12 +480,16 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable                              $subject
+	 * @param array|Traversable                     $subject
 	 * @param callable|string|PropertyPathInterface $propertyPath
 	 * @return array
 	 */
-	public static function groupBy(iterable $subject, $propertyPath): array
+	public static function groupBy($subject, $propertyPath)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (!is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
 		{
 			throw new InvalidArgumentException('Parameter $propertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
@@ -432,8 +516,12 @@ class Arrays
 	 * @param mixed $value
 	 * @return int|null
 	 */
-	public static function binarySearch(array $subject, $value): ?int
+	public static function binarySearch(array $subject, $value)
 	{
+		if (!is_array($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
+		}
 		$left = 0;
 		$right = count($subject) - 1;
 		while ($left <= $right)
@@ -456,12 +544,20 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable $subject
-	 * @param callable $predicate
+	 * @param array|Traversable $subject
+	 * @param callable          $predicate
 	 * @return mixed
 	 */
-	public static function last(iterable $subject, callable $predicate)
+	public static function last($subject, $predicate)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
+		if (!is_callable($predicate))
+		{
+			throw new InvalidArgumentException('Parameter $predicate has ty pe type of callable.');
+		}
 		if (Arrays::isEmpty($subject))
 		{
 			throw new InvalidArgumentException('Parameter $subject is empty.');
@@ -484,13 +580,21 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable $subject
-	 * @param callable $predicate
-	 * @param mixed    $defaultValue
+	 * @param array|Traversable $subject
+	 * @param callable          $predicate
+	 * @param mixed             $defaultValue
 	 * @return mixed
 	 */
-	public static function lastOrDefault(iterable $subject, callable $predicate, $defaultValue = null)
+	public static function lastOrDefault($subject, $predicate, $defaultValue = null)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
+		if (!is_callable($predicate))
+		{
+			throw new InvalidArgumentException('Parameter $predicate has ty pe type of callable.');
+		}
 		$lastItem = null;
 		$found = false;
 		foreach ($subject as $item)
@@ -505,12 +609,16 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable $subject
-	 * @param mixed    $value
+	 * @param array|Traversable $subject
+	 * @param mixed             $value
 	 * @return bool
 	 */
-	public static function contains(iterable $subject, $value): bool
+	public static function contains($subject, $value)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (is_array($subject))
 		{
 			return in_array($value, $subject, true);
@@ -530,21 +638,29 @@ class Arrays
 	 * @param       $value
 	 * @return string|int|null
 	 */
-	public static function keyOf(array $subject, $value)
+	public static function keyOf($subject, $value)
 	{
+		if (!is_array($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
+		}
 		$key = array_search($value, $subject, true);
 		return $key === false ? null : $key;
 	}
 
 	/**
-	 * @param iterable                                   $subject
+	 * @param array|Traversable                          $subject
 	 * @param string                                     $direction
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @param callable|null                              $comparisonFunction
 	 * @return array
 	 */
-	public static function orderBy(iterable $subject, string $direction = Arrays::ORDER_DIRECTION_ASCENDING, $propertyPath = null, $comparisonFunction = null): array
+	public static function orderBy($subject, $direction = Arrays::ORDER_DIRECTION_ASCENDING, $propertyPath = null, $comparisonFunction = null)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (!in_array($direction, [Arrays::ORDER_DIRECTION_ASCENDING, Arrays::ORDER_DIRECTION_DESCENDING]))
 		{
 			throw new InvalidArgumentException('Invalid value for argument $direction.');
@@ -593,11 +709,15 @@ class Arrays
 	}
 
 	/**
-	 * @param iterable $subject
+	 * @param array|Traversable $subject
 	 * @return array
 	 */
-	public static function reverse(iterable $subject): array
+	public static function reverse($subject)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		return array_reverse(is_array($subject) ? $subject : Arrays::toArray($subject));
 	}
 
@@ -605,17 +725,25 @@ class Arrays
 	 * @param array $subject
 	 * @return array
 	 */
-	public static function flip(array $subject): array
+	public static function flip($subject)
 	{
+		if (!is_array($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
+		}
 		return array_flip($subject);
 	}
 
 	/**
-	 * @param iterable $subject
+	 * @param array|Traversable $subject
 	 * @return array
 	 */
-	public static function toArray(iterable $subject): array
+	public static function toArray($subject)
 	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
 		if (is_array($subject))
 		{
 			return $subject;

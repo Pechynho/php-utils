@@ -22,9 +22,12 @@ class PropertyAccess
 	/**
 	 * @return PropertyAccessorInterface
 	 */
-	private static function getPropertyAccessor(): PropertyAccessorInterface
+	private static function getPropertyAccessor()
 	{
-		if (self::$propertyAccessor === null) self::$propertyAccessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
+		if (self::$propertyAccessor === null)
+		{
+			self::$propertyAccessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
+		}
 		return self::$propertyAccessor;
 	}
 
@@ -36,8 +39,16 @@ class PropertyAccess
 	 * @param bool                                  $tryReflection
 	 * @return mixed
 	 */
-	public static function getValue($objectOrArray, $propertyPath, bool $throwException = true, $defaultValue = null, bool $tryReflection = false)
+	public static function getValue($objectOrArray, $propertyPath, $throwException = true, $defaultValue = null, $tryReflection = false)
 	{
+		if (!is_bool($throwException))
+		{
+			throw new InvalidArgumentException('Parameter $throwException has to be boolean type.');
+		}
+		if (!is_bool($tryReflection))
+		{
+			throw new InvalidArgumentException('Parameter $tryReflection has to be boolean type.');
+		}
 		if (!is_object($objectOrArray) && !is_array($objectOrArray))
 		{
 			throw new InvalidArgumentException('Parameter $objectOrArray has to be object or array.');
@@ -98,8 +109,16 @@ class PropertyAccess
 	 * @param bool                                  $throwException
 	 * @param bool                                  $tryReflection
 	 */
-	public static function setValue($objectOrArray, $propertyPath, $value, bool $throwException = true, bool $tryReflection = false)
+	public static function setValue($objectOrArray, $propertyPath, $value, $throwException = true, $tryReflection = false)
 	{
+		if (!is_bool($throwException))
+		{
+			throw new InvalidArgumentException('Parameter $throwException has to be boolean type.');
+		}
+		if (!is_bool($tryReflection))
+		{
+			throw new InvalidArgumentException('Parameter $tryReflection has to be boolean type.');
+		}
 		if (!is_object($objectOrArray) && !is_array($objectOrArray))
 		{
 			throw new InvalidArgumentException('Parameter $objectOrArray has to be object or array.');
@@ -158,7 +177,7 @@ class PropertyAccess
 	 * @return ReflectionProperty
 	 * @throws ReflectionException
 	 */
-	private static function getPropertyFromReflectionClass(ReflectionClass $reflectionClass, string $propertyName): ReflectionProperty
+	private static function getPropertyFromReflectionClass($reflectionClass, $propertyName)
 	{
 		while ($reflectionClass != null && !$reflectionClass->hasProperty($propertyName))
 		{

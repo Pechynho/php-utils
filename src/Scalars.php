@@ -10,15 +10,15 @@ use RuntimeException;
 
 class Scalars
 {
-	public const INTEGER = "INTEGER";
+	const INTEGER = "INTEGER";
 
-	public const FLOAT = "FLOAT";
+	const FLOAT = "FLOAT";
 
-	public const STRING = "STRING";
+	const STRING = "STRING";
 
-	public const BOOLEAN = "BOOLEAN";
+	const BOOLEAN = "BOOLEAN";
 
-	public static function isScalarTypeValid(string $scalarType)
+	public static function isScalarTypeValid($scalarType)
 	{
 		return in_array($scalarType, [Scalars::BOOLEAN, Scalars::INTEGER, Scalars::FLOAT, Scalars::STRING]);
 	}
@@ -28,7 +28,7 @@ class Scalars
 	 * @param string                   $scalarType
 	 * @return string|int|float|boolean
 	 */
-	public static function parse($scalarValue, string $scalarType)
+	public static function parse($scalarValue, $scalarType)
 	{
 		if (!is_scalar($scalarValue))
 		{
@@ -74,7 +74,7 @@ class Scalars
 	 * @param string $scalarType
 	 * @return bool
 	 */
-	public static function tryParse($scalarValue, &$result, string $scalarType)
+	public static function tryParse($scalarValue, &$result, $scalarType)
 	{
 		try
 		{
