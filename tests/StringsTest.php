@@ -103,7 +103,7 @@ class StringsTest extends TestCase
 	{
 		self::assertEquals("J...", Strings::truncate("Johanesburg", 4));
 		self::assertException(function () { Strings::truncate("Johanesburg", 3); }, InvalidArgumentException::class);
-		self::assertEquals("Joe", Strings::truncate("Joe", "5"));
+		self::assertEquals("Joe", Strings::truncate("Joe", 5));
 	}
 
 	public function testIndexOf()
@@ -277,7 +277,7 @@ class StringsTest extends TestCase
 		self::assertEquals("", Strings::dashesToCase(""));
 		self::assertEquals("", Strings::dashesToCase("", Strings::CASE_CAMEL));
 		self::assertEquals("", Strings::dashesToCase("-"));
-		self::assertEquals("", Strings::dashesToCase("-"), Strings::CASE_CAMEL);
+		self::assertEquals("", Strings::dashesToCase("-", Strings::CASE_CAMEL));
 	}
 
 	public function testIsNullOrWhiteSpace()
