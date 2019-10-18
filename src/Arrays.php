@@ -627,4 +627,47 @@ class Arrays
 		}
 		return $output;
 	}
+
+	/**
+	 * @param iterable                              $subject
+	 * @param string|callable|PropertyPathInterface $keyPropertyPath
+	 * @param string|callable|PropertyPathInterface $valuePropertyPath
+	 * @return array
+	 */
+	public static function mapToPairs(iterable $subject, $keyPropertyPath, $valuePropertyPath)
+	{
+		if (!is_callable($keyPropertyPath) && !is_string($keyPropertyPath) && !$keyPropertyPath instanceof PropertyPathInterface)
+		{
+			throw new InvalidArgumentException('Parameter $keyPropertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
+		}
+		if (!is_callable($valuePropertyPath) && !is_string($valuePropertyPath) && !$valuePropertyPath instanceof PropertyPathInterface)
+		{
+			throw new InvalidArgumentException('Parameter $valuePropertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
+		}
+		$output = [];
+		foreach ($subject as $item)
+		{
+			$output[PropertyAccess::getValue($item, $keyPropertyPath)] = PropertyAccess::getValue($item, $valuePropertyPath);
+		}
+		return $output;
+	}
+
+	/**
+	 * @param iterable                              $subject
+	 * @param string|callable|PropertyPathInterface $keyPropertyPath
+	 * @return array
+	 */
+	public static function mapByProperty(iterable $subject, $keyPropertyPath)
+	{
+		if (!is_callable($keyPropertyPath) && !is_string($keyPropertyPath) && !$keyPropertyPath instanceof PropertyPathInterface)
+		{
+			throw new InvalidArgumentException('Parameter $keyPropertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
+		}
+		$output = [];
+		foreach ($subject as $item)
+		{
+			$output[PropertyAccess::getValue($item, $keyPropertyPath)] = $item;
+		}
+		return $output;
+	}
 }

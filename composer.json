@@ -1,6 +1,6 @@
 {
   "name": "pechynho/php-utils",
-  "description": "This is a small collection of PHP libraries for easier working with strings, arrays, files and accessing properties.",
+  "description": "This is a small collection of PHP libraries for easier working with strings, arrays, files, scalars, formatting and accessing properties.",
   "type": "library",
   "minimum-stability": "stable",
   "homepage": "https://github.com/Pechynho/php-utils",

@@ -13,6 +13,7 @@ class ArraysTest extends TestCase
 {
 	use AssertException;
 
+	/** @var Person[] */
 	private $persons;
 
 	private $numbersOrdered;
@@ -230,11 +231,34 @@ class ArraysTest extends TestCase
 	{
 		self::assertEquals($this->surnames, Arrays::select($this->persons, "surname"));
 		self::assertEquals($this->surnames, Arrays::select($this->persons, "surname", true));
-		self::assertException(function () {  Arrays::select($this->persons, 5); }, InvalidArgumentException::class);
+		self::assertException(function () { Arrays::select($this->persons, 5); }, InvalidArgumentException::class);
 	}
 
 	public function testFlip()
 	{
 		self::assertEquals(array_flip($this->forenames), Arrays::flip($this->forenames));
+	}
+
+	public function testMapToPairs()
+	{
+		$testCase = [];
+		foreach ($this->persons as $person)
+		{
+			$testCase[$person->getHeight()] = $person->getSurname();
+		}
+		self::assertEquals($testCase, Arrays::mapToPairs($this->persons, "height", "surname"));
+		self::assertException(function () { Arrays::mapToPairs($this->persons, null, "surname"); }, InvalidArgumentException::class);
+		self::assertException(function () { Arrays::mapToPairs($this->persons, "height", null); }, InvalidArgumentException::class);
+	}
+
+	public function testMapByProperty()
+	{
+		$testCase = [];
+		foreach ($this->persons as $person)
+		{
+			$testCase[$person->getHeight()] = $person;
+		}
+		self::assertEquals($testCase, Arrays::mapByProperty($this->persons, "height"));
+		self::assertException(function () { Arrays::mapByProperty($this->persons, null); }, InvalidArgumentException::class);
 	}
 }

@@ -270,14 +270,4 @@ class FileSystemTest extends TestCase
 		self::assertEquals(10, FileSystem::size($path));
 		self::assertException(function () { FileSystem::size(""); }, InvalidArgumentException::class);
 	}
-
-	public function testFormatSize()
-	{
-		self::assertEquals("10.21 MB", FileSystem::formatSize(10207519));
-		self::assertEquals("9.73 MiB", FileSystem::formatSize(10207519, null, null, false));
-		self::assertEquals("10207.52 kB", FileSystem::formatSize(10207519, "kB"));
-		self::assertEquals("9968.28 KiB", FileSystem::formatSize(10207519, "KiB"));
-		self::assertEquals("0.00 B", FileSystem::formatSize(0));
-		self::assertException(function () { FileSystem::formatSize(-5); }, InvalidArgumentException::class);
-	}
 }
