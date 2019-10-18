@@ -74,7 +74,7 @@ class Scalars
 	 * @param string $scalarType
 	 * @return bool
 	 */
-	public static function tryParse($scalarValue, &$result, string $scalarType)
+	public static function tryParse($scalarValue, &$result, string $scalarType) : bool
 	{
 		try
 		{

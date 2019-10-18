@@ -22,7 +22,7 @@ class Formatting
 	 * @param bool      $removeTrailingZeroes
 	 * @return string
 	 */
-	public static function formatNumber($number, int $decimals = 0, string $decimalPoint = ",", string $thousandsSeparator = " ", bool $removeTrailingZeroes = false)
+	public static function formatNumber($number, int $decimals = 0, string $decimalPoint = ",", string $thousandsSeparator = " ", bool $removeTrailingZeroes = false) : string
 	{
 		if (!is_int($number) && !is_float($number))
 		{
@@ -56,7 +56,7 @@ class Formatting
 	 * @param bool        $useSI
 	 * @return string
 	 */
-	public static function formatFileSize(int $bytes, ?string $unit = null, ?string $format = null, bool $useSI = true)
+	public static function formatFileSize(int $bytes, ?string $unit = null, ?string $format = null, bool $useSI = true) : string
 	{
 		if ($bytes < 0)
 		{

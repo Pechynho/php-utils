@@ -277,7 +277,7 @@ class StringsTest extends TestCase
 		self::assertEquals("", Strings::dashesToCase(""));
 		self::assertEquals("", Strings::dashesToCase("", Strings::CASE_CAMEL));
 		self::assertEquals("", Strings::dashesToCase("-"));
-		self::assertEquals("", Strings::dashesToCase("-"), Strings::CASE_CAMEL);
+		self::assertEquals("", Strings::dashesToCase("-", Strings::CASE_CAMEL));
 	}
 
 	public function testIsNullOrWhiteSpace()

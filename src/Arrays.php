@@ -634,7 +634,7 @@ class Arrays
 	 * @param string|callable|PropertyPathInterface $valuePropertyPath
 	 * @return array
 	 */
-	public static function mapToPairs(iterable $subject, $keyPropertyPath, $valuePropertyPath)
+	public static function mapToPairs(iterable $subject, $keyPropertyPath, $valuePropertyPath) : array
 	{
 		if (!is_callable($keyPropertyPath) && !is_string($keyPropertyPath) && !$keyPropertyPath instanceof PropertyPathInterface)
 		{
@@ -657,7 +657,7 @@ class Arrays
 	 * @param string|callable|PropertyPathInterface $keyPropertyPath
 	 * @return array
 	 */
-	public static function mapByProperty(iterable $subject, $keyPropertyPath)
+	public static function mapByProperty(iterable $subject, $keyPropertyPath) : array
 	{
 		if (!is_callable($keyPropertyPath) && !is_string($keyPropertyPath) && !$keyPropertyPath instanceof PropertyPathInterface)
 		{
