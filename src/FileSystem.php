@@ -8,12 +8,6 @@ use InvalidArgumentException;
 
 class FileSystem
 {
-	/** @var string[] */
-	const SIZE_SI_UNITS = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
-
-	/** @var string[] */
-	const SIZE_BINARY_UNITS = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
-
 	/**
 	 * @param string $source
 	 * @param string $destination
@@ -158,7 +152,7 @@ class FileSystem
 	 * @param bool   $trimEndOfLine
 	 * @return array
 	 */
-	public static function readAllLines($filename, $trimEndOfLine = true): array
+	public static function readAllLines($filename, $trimEndOfLine = true)
 	{
 		if (!is_string($filename))
 		{
@@ -271,51 +265,6 @@ class FileSystem
 			$size = $size + FileSystem::size($item);
 		}
 		return $size;
-	}
-
-	/**
-	 * @param int         $bytes
-	 * @param string|null $unit
-	 * @param string|null $format
-	 * @param bool        $useSI
-	 * @return string
-	 */
-	public static function formatSize($bytes, $unit = null, $format = null, $useSI = true)
-	{
-		if (!is_int($bytes))
-		{
-			throw new InvalidArgumentException('Parameter $bytes has to be type of int.');
-		}
-		if ($format != null && !is_string($format))
-		{
-			throw new InvalidArgumentException('Parameter $format has to be type of string or NULL.');
-		}
-		if (!is_bool($useSI))
-		{
-			throw new InvalidArgumentException('Parameter $useSI ha to be type of boolean.');
-		}
-		if ($bytes < 0)
-		{
-			throw new InvalidArgumentException('Parameter $bytes has to be greater or equal to 0.');
-		}
-		if ($unit !== null && !in_array($unit, self::SIZE_SI_UNITS, true) && !in_array($unit, self::SIZE_BINARY_UNITS, true))
-		{
-			throw new InvalidArgumentException('Invalid value of parameter $unit.');
-		}
-		$format = $format === null ? '%01.2f %s' : (string)$format;
-		if ($useSI == false || (!Strings::isNullOrWhiteSpace($unit) && Strings::contains($unit, "i")))
-		{
-			$units = FileSystem::SIZE_BINARY_UNITS;
-			$mod = 1024;
-		}
-		else
-		{
-			$units = FileSystem::SIZE_SI_UNITS;
-			$mod = 1000;
-		}
-		$power = Arrays::keyOf($units, $unit);
-		if ($power === null) $power = ($bytes > 0) ? floor(log($bytes, $mod)) : 0;
-		return sprintf($format, $bytes / pow($mod, $power), $units[$power]);
 	}
 
 	/**
