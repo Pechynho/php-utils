@@ -8,6 +8,15 @@ use InvalidArgumentException;
 
 class FileSystem
 {
+	/** @var string */
+	const SCAN_ALL = "SCAN_ALL";
+
+	/** @var string */
+	const SCAN_FILES = "SCAN_FILES";
+
+	/** @var string */
+	const SCAN_DIRECTORIES = "SCAN_DIRECTORIES";
+
 	/**
 	 * @param string $source
 	 * @param string $destination
@@ -358,15 +367,6 @@ class FileSystem
 		}
 		return file_exists($filename) && !is_dir($filename);
 	}
-
-	/** @var string */
-	const SCAN_ALL = "SCAN_ALL";
-
-	/** @var string */
-	const SCAN_FILES = "SCAN_FILES";
-
-	/** @var string */
-	const SCAN_DIRECTORIES = "SCAN_DIRECTORIES";
 
 	/**
 	 * @param string $directory

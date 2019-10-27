@@ -808,9 +808,9 @@ class Arrays
 	}
 
 	/**
-	 * @param $subject
-	 * @param $keyPath
-	 * @param $value
+	 * @param array $subject
+	 * @param string $keyPath
+	 * @param mixed $value
 	 * @return boolean
 	 */
 	public static function extract($subject, $keyPath, &$value = null)
