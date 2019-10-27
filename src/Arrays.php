@@ -634,7 +634,7 @@ class Arrays
 	 * @param string|callable|PropertyPathInterface $valuePropertyPath
 	 * @return array
 	 */
-	public static function mapToPairs(iterable $subject, $keyPropertyPath, $valuePropertyPath) : array
+	public static function mapToPairs(iterable $subject, $keyPropertyPath, $valuePropertyPath): array
 	{
 		if (!is_callable($keyPropertyPath) && !is_string($keyPropertyPath) && !$keyPropertyPath instanceof PropertyPathInterface)
 		{
@@ -657,7 +657,7 @@ class Arrays
 	 * @param string|callable|PropertyPathInterface $keyPropertyPath
 	 * @return array
 	 */
-	public static function mapByProperty(iterable $subject, $keyPropertyPath) : array
+	public static function mapByProperty(iterable $subject, $keyPropertyPath): array
 	{
 		if (!is_callable($keyPropertyPath) && !is_string($keyPropertyPath) && !$keyPropertyPath instanceof PropertyPathInterface)
 		{
@@ -669,5 +669,35 @@ class Arrays
 			$output[PropertyAccess::getValue($item, $keyPropertyPath)] = $item;
 		}
 		return $output;
+	}
+
+	/**
+	 * @param array  $subject
+	 * @param string $keyPath
+	 * @param mixed  $value
+	 * @return boolean
+	 */
+	public static function extract(array $subject, string $keyPath, &$value = null)
+	{
+		if (Strings::isNullOrWhiteSpace($keyPath))
+		{
+			throw new InvalidArgumentException('Parameter $keyPath has to be non empty ("") and non-whitespace string.');
+		}
+		$keys = Strings::split($keyPath, ["[", "]"], true);
+		$count = count($keys);
+		foreach ($keys as $index => $key)
+		{
+			if (!isset($subject[$key]))
+			{
+				break;
+			}
+			$subject = $subject[$key];
+			if ($count == $index + 1)
+			{
+				$value = $subject;
+				return true;
+			}
+		}
+		return false;
 	}
 }

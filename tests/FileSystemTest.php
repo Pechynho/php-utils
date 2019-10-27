@@ -270,4 +270,17 @@ class FileSystemTest extends TestCase
 		self::assertEquals(10, FileSystem::size($path));
 		self::assertException(function () { FileSystem::size(""); }, InvalidArgumentException::class);
 	}
+
+	public function testScanDirectory()
+	{
+		$path = $this->baseDir . "/var";
+		self::assertEquals(5, count(FileSystem::scanDirectory($path, FileSystem::SCAN_FILES, true)));
+		self::assertEquals(0, count(FileSystem::scanDirectory($path, FileSystem::SCAN_FILES)));
+		self::assertEquals(7, count(FileSystem::scanDirectory($path, FileSystem::SCAN_DIRECTORIES, true)));
+		self::assertEquals(2, count(FileSystem::scanDirectory($path, FileSystem::SCAN_DIRECTORIES)));
+		self::assertEquals(2, count(FileSystem::scanDirectory($path, FileSystem::SCAN_ALL)));
+		self::assertEquals(12, count(FileSystem::scanDirectory($path, FileSystem::SCAN_ALL, true)));
+		self::assertException(function () use ($path) { FileSystem::scanDirectory(""); }, InvalidArgumentException::class);
+		self::assertException(function () use ($path) { FileSystem::scanDirectory($path, ""); }, InvalidArgumentException::class);
+	}
 }

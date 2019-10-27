@@ -396,7 +396,8 @@ class Strings
 			$replacements[$separators[$i]] = $separators[0];
 		}
 		if (!empty($replacements)) $subject = Strings::replaceMultiple($subject, $replacements);
-		return $removeEmptyEntries ? array_diff(explode($separators[0], $subject), [Strings::EMPTY_STRING]) : explode($separators[0], $subject);
+		$values = $removeEmptyEntries ? array_diff(explode($separators[0], $subject), [Strings::EMPTY_STRING]) : explode($separators[0], $subject);
+		return array_values($values);
 	}
 
 	/**
