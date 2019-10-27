@@ -261,4 +261,14 @@ class ArraysTest extends TestCase
 		self::assertEquals($testCase, Arrays::mapByProperty($this->persons, "height"));
 		self::assertException(function () { Arrays::mapByProperty($this->persons, null); }, InvalidArgumentException::class);
 	}
+
+	public function testExtract()
+	{
+		$testCase = ["foo" => ["bar" => ["john" => ["doe" => [4 => 15]]]]];
+		self::assertTrue(Arrays::extract($testCase, "[foo][bar][john][doe][4]", $value));
+		self::assertEquals(15, $value);
+		self::assertFalse(Arrays::extract($testCase, "[foo][bar][lewis]"));
+		self::assertException(function () use ($testCase) { Arrays::extract($testCase, "   "); }, InvalidArgumentException::class);
+		self::assertFalse(Arrays::extract([], "[foo][bar]"));
+	}
 }

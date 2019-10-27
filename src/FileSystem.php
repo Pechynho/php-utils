@@ -358,4 +358,54 @@ class FileSystem
 		}
 		return file_exists($filename) && !is_dir($filename);
 	}
+
+	/** @var string */
+	const SCAN_ALL = "SCAN_ALL";
+
+	/** @var string */
+	const SCAN_FILES = "SCAN_FILES";
+
+	/** @var string */
+	const SCAN_DIRECTORIES = "SCAN_DIRECTORIES";
+
+	/**
+	 * @param string $directory
+	 * @param string $mode
+	 * @param bool   $recursively
+	 * @return string[]
+	 */
+	public static function scanDirectory($directory, $mode = FileSystem::SCAN_ALL, $recursively = false)
+	{
+		if (!FileSystem::isDirectory($directory))
+		{
+			throw new InvalidArgumentException("Given value '$directory' is not valid directory name.");
+		}
+		if (!in_array($mode, [FileSystem::SCAN_ALL, FileSystem::SCAN_DIRECTORIES, FileSystem::SCAN_FILES]))
+		{
+			throw new InvalidArgumentException('Invalid value passed to parameter $mode.');
+		}
+		if (!is_bool($recursively))
+		{
+			throw new InvalidArgumentException('Parameter $recursively has to be type of boolean.');
+		}
+		$output = [];
+		$items = array_diff(scandir($directory), [".", ".."]);
+		foreach ($items as $item)
+		{
+			$item = FileSystem::combinePath($directory, $item);
+			if (FileSystem::isFile($item) && ($mode == FileSystem::SCAN_FILES || $mode == FileSystem::SCAN_ALL))
+			{
+				$output[] = $item;
+			}
+			else if (FileSystem::isDirectory($item) && ($mode == FileSystem::SCAN_DIRECTORIES || $mode == FileSystem::SCAN_ALL))
+			{
+				$output[] = $item;
+			}
+			if ($recursively && FileSystem::isDirectory($item))
+			{
+				$output = array_merge($output, FileSystem::scanDirectory($item, $mode, $recursively));
+			}
+		}
+		return $output;
+	}
 }

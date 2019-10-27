@@ -806,4 +806,38 @@ class Arrays
 		}
 		return $output;
 	}
+
+	/**
+	 * @param $subject
+	 * @param $keyPath
+	 * @param $value
+	 * @return boolean
+	 */
+	public static function extract($subject, $keyPath, &$value = null)
+	{
+		if (!is_array($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
+		}
+		if (!is_string($keyPath) || Strings::isNullOrWhiteSpace($keyPath))
+		{
+			throw new InvalidArgumentException('Parameter $keyPath has to be non empty ("") and non-whitespace string.');
+		}
+		$keys = Strings::split($keyPath, ["[", "]"], true);
+		$count = count($keys);
+		foreach ($keys as $index => $key)
+		{
+			if (!isset($subject[$key]))
+			{
+				break;
+			}
+			$subject = $subject[$key];
+			if ($count == $index + 1)
+			{
+				$value = $subject;
+				return true;
+			}
+		}
+		return false;
+	}
 }
