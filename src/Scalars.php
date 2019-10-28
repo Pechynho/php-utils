@@ -59,7 +59,7 @@ class Scalars
 		{
 			$scalarValue = Strings::trim($scalarValue);
 		}
-		if ($scalarType == Scalars::BOOLEAN && ($scalarValue === "0" || Strings::toLower($scalarValue) === "false" || $scalarValue === 0))
+		if ($scalarType == Scalars::BOOLEAN && ($scalarValue === "0" || Strings::toLower($scalarValue) === "false" || $scalarValue === 0 || $scalarValue === 0.0))
 		{
 			return false;
 		}
