@@ -29,6 +29,8 @@ class ScalarsTest extends TestCase
 		self::assertSame(5.5, Scalars::parse("5.5", Scalars::FLOAT));
 		self::assertSame(true, Scalars::parse("1", Scalars::BOOLEAN));
 		self::assertSame(false, Scalars::parse(0, Scalars::BOOLEAN));
+		self::assertSame(false, Scalars::parse(0.0, Scalars::BOOLEAN));
+		self::assertSame(false, Scalars::parse(0.000000, Scalars::BOOLEAN));
 		self::assertSame(true, Scalars::parse("true", Scalars::BOOLEAN));
 		self::assertSame(false, Scalars::parse("false", Scalars::BOOLEAN));
 		self::assertException(function () {  Scalars::parse(new Person("John", "Doe", 18, 180), Scalars::INTEGER); }, InvalidArgumentException::class);
