@@ -90,6 +90,7 @@ class FileSystem
 		$file = fopen($filename, "w");
 		fwrite($file, $text);
 		fclose($file);
+		clearstatcache();
 	}
 
 	/**
@@ -103,9 +104,8 @@ class FileSystem
 		{
 			throw new InvalidArgumentException("Given value '$filename' is not valid filename.");
 		}
-		$isEmpty = !(FileSystem::isFile($filename) && FileSystem::size($filename) > 0);
 		$file = fopen($filename, "a");
-		if ($isEmpty)
+		if (FileSystem::isEmpty($filename))
 		{
 			fwrite($file, $text);
 		}
@@ -118,6 +118,7 @@ class FileSystem
 			fwrite($file, PHP_EOL . $text);
 		}
 		fclose($file);
+		clearstatcache();
 	}
 
 	/**
@@ -138,6 +139,7 @@ class FileSystem
 			$lines[] = $trimEndOfLine ? Strings::trimEnd(fgets($file), [PHP_EOL]) : fgets($file);
 		}
 		fclose($file);
+		clearstatcache();
 		return $lines;
 	}
 
@@ -158,6 +160,7 @@ class FileSystem
 			yield $trimEndOfLine ? Strings::trimEnd(fgets($file), [PHP_EOL]) : fgets($file);
 		}
 		fclose($file);
+		clearstatcache();
 	}
 
 	/**
