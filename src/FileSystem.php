@@ -143,8 +143,9 @@ class FileSystem
 		{
 			throw new InvalidArgumentException("Given value '$filename' is not valid filename.");
 		}
+		$isEmpty = !FileSystem::isFile($filename) || FileSystem::isEmpty($filename);
 		$file = fopen($filename, "a");
-		if (FileSystem::isEmpty($filename))
+		if ($isEmpty)
 		{
 			fwrite($file, $content);
 		}
@@ -152,7 +153,10 @@ class FileSystem
 		{
 			fwrite($file, $content);
 		}
-		else fwrite($file, PHP_EOL . $content);
+		else
+		{
+			fwrite($file, PHP_EOL . $content);
+		}
 		fclose($file);
 	}
 
