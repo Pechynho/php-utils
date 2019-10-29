@@ -103,7 +103,7 @@ class FileSystem
 		{
 			throw new InvalidArgumentException("Given value '$filename' is not valid filename.");
 		}
-		$isEmpty = FileSystem::isEmpty($filename);
+		$isEmpty = !FileSystem::isFile($filename) || FileSystem::isEmpty($filename);
 		$file = fopen($filename, "a");
 		if ($isEmpty)
 		{
