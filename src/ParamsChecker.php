@@ -93,7 +93,7 @@ class ParamsChecker
 	public static function types(string $parameter, &$value, array $types, ?string $methodOrFunction = null)
 	{
 		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
-		self::isNotEmptyArray('$types', $types, __METHOD__, __CLASS__);
+		self::isNotEmptyArray('$types', $types, __METHOD__);
 		$success = false;
 		foreach ($types as $type)
 		{
