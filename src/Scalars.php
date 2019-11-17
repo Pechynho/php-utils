@@ -8,19 +8,37 @@ use Exception;
 use InvalidArgumentException;
 use RuntimeException;
 
+/**
+ * @author Jan Pech <pechynho@gmail.com>
+ */
 class Scalars
 {
+	/** @var string */
 	const INTEGER = "INTEGER";
 
+	/** @var string */
 	const FLOAT = "FLOAT";
 
+	/** @var string */
 	const STRING = "STRING";
 
+	/** @var string */
 	const BOOLEAN = "BOOLEAN";
 
+	/** @var string */
+	const BOOL = "BOOL";
+
+	/** @var string */
+	const INT = "INT";
+
+	/**
+	 * @param string $scalarType
+	 * @return bool
+	 */
 	public static function isScalarTypeValid($scalarType)
 	{
-		return in_array($scalarType, [Scalars::BOOLEAN, Scalars::INTEGER, Scalars::FLOAT, Scalars::STRING]);
+		$scalarType = Strings::toUpper($scalarType);
+		return in_array($scalarType, [Scalars::BOOLEAN, Scalars::INTEGER, Scalars::FLOAT, Scalars::STRING, Scalars::BOOL, Scalars::INT]);
 	}
 
 	/**
@@ -38,10 +56,13 @@ class Scalars
 		{
 			throw new InvalidArgumentException('Unknown value given to parameter $scalarType.');
 		}
+		$scalarType = Strings::toUpper($scalarType);
 		$config = [
 			Scalars::INTEGER => FILTER_VALIDATE_INT,
 			Scalars::FLOAT   => FILTER_VALIDATE_FLOAT,
-			Scalars::BOOLEAN => FILTER_VALIDATE_BOOLEAN
+			Scalars::BOOLEAN => FILTER_VALIDATE_BOOLEAN,
+			Scalars::BOOL    => FILTER_VALIDATE_BOOLEAN,
+			Scalars::INT     => FILTER_VALIDATE_INT
 		];
 		if ($scalarType == Scalars::STRING)
 		{
@@ -59,12 +80,15 @@ class Scalars
 		{
 			$scalarValue = Strings::trim($scalarValue);
 		}
-		if ($scalarType == Scalars::BOOLEAN && ($scalarValue === "0" || Strings::toLower($scalarValue) === "false" || $scalarValue === 0 || $scalarValue === 0.0))
+		if (($scalarType == Scalars::BOOLEAN || $scalarType == Scalars::BOOL) && ($scalarValue === "0" || Strings::toLower($scalarValue) === "false" || $scalarValue === 0 || $scalarValue === 0.0 || $scalarValue === false))
 		{
 			return false;
 		}
 		$parsedValue = filter_var($scalarValue, $config[$scalarType]);
-		if ($parsedValue === false) throw new RuntimeException(sprintf("Parameter %s containing value '%s' couldn't be parsed to given scalar type '%s'.", '$scalarTypeValue', $scalarValue, $scalarType));
+		if ($parsedValue === false)
+		{
+			throw new RuntimeException(sprintf("Parameter %s containing value '%s' couldn't be parsed to given scalar type '%s'.", '$scalarTypeValue', $scalarValue, $scalarType));
+		}
 		return $parsedValue;
 	}
 

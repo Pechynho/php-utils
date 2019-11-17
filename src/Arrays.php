@@ -11,6 +11,9 @@ use RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Traversable;
 
+/**
+ * @author Jan Pech <pechynho@gmail.com>
+ */
 class Arrays
 {
 	/** @var string */
@@ -305,13 +308,13 @@ class Arrays
 		{
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject is empty.');
-		}
 		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
 		{
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
+		}
+		if (Arrays::isEmpty($subject))
+		{
+			return [];
 		}
 		$minValue = null;
 		$items = [];
@@ -373,13 +376,13 @@ class Arrays
 		{
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject is empty.');
-		}
 		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
 		{
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
+		}
+		if (Arrays::isEmpty($subject))
+		{
+			return [];
 		}
 		$maxValue = null;
 		$items = [];
@@ -518,10 +521,6 @@ class Arrays
 	 */
 	public static function binarySearch(array $subject, $value)
 	{
-		if (!is_array($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
-		}
 		$left = 0;
 		$right = count($subject) - 1;
 		while ($left <= $right)
@@ -638,12 +637,8 @@ class Arrays
 	 * @param       $value
 	 * @return string|int|null
 	 */
-	public static function keyOf($subject, $value)
+	public static function keyOf(array $subject, $value)
 	{
-		if (!is_array($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
-		}
 		$key = array_search($value, $subject, true);
 		return $key === false ? null : $key;
 	}
@@ -725,12 +720,8 @@ class Arrays
 	 * @param array $subject
 	 * @return array
 	 */
-	public static function flip($subject)
+	public static function flip(array $subject)
 	{
-		if (!is_array($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
-		}
 		return array_flip($subject);
 	}
 
@@ -813,12 +804,8 @@ class Arrays
 	 * @param mixed $value
 	 * @return boolean
 	 */
-	public static function extract($subject, $keyPath, &$value = null)
+	public static function extract(array $subject, $keyPath, &$value = null)
 	{
-		if (!is_array($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
-		}
 		if (!is_string($keyPath) || Strings::isNullOrWhiteSpace($keyPath))
 		{
 			throw new InvalidArgumentException('Parameter $keyPath has to be non empty ("") and non-whitespace string.');

@@ -6,6 +6,9 @@ namespace Pechynho\Utility;
 
 use InvalidArgumentException;
 
+/**
+ * @author Jan Pech <pechynho@gmail.com>
+ */
 class FileSystem
 {
 	/** @var string */

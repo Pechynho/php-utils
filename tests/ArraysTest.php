@@ -86,7 +86,7 @@ class ArraysTest extends TestCase
 	{
 		self::assertEquals([1], Arrays::itemsWithMin($this->numbers));
 		self::assertEquals([$this->persons[Arrays::count($this->persons) - 1]], Arrays::itemsWithMin($this->persons, "height"));
-		self::assertException(function () { Arrays::itemsWithMin([]); }, InvalidArgumentException::class);
+		self::assertEquals([], Arrays::itemsWithMin([]));
 		self::assertException(function () { Arrays::itemsWithMin($this->numbers, 5); }, InvalidArgumentException::class);
 	}
 
@@ -106,7 +106,7 @@ class ArraysTest extends TestCase
 	{
 		self::assertEquals([26], Arrays::itemsWithMax($this->numbers));
 		self::assertEquals([$this->persons[0]], Arrays::itemsWithMax($this->persons, "height"));
-		self::assertException(function () { Arrays::itemsWithMax([]); }, InvalidArgumentException::class);
+		self::assertEquals([], Arrays::itemsWithMax([]));
 		self::assertException(function () { Arrays::itemsWithMax($this->numbers, 5); }, InvalidArgumentException::class);
 	}
 
