@@ -11,6 +11,9 @@ use RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Traversable;
 
+/**
+ * @author Jan Pech <pechynho@gmail.com>
+ */
 class Arrays
 {
 	/** @var string */
@@ -245,13 +248,13 @@ class Arrays
 	 */
 	public static function itemsWithMin(iterable $subject, $propertyPath = null): array
 	{
-		if (Arrays::isEmpty($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject is empty.');
-		}
 		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
 		{
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
+		}
+		if (Arrays::isEmpty($subject))
+		{
+			return [];
 		}
 		$minValue = null;
 		$items = [];
@@ -305,13 +308,13 @@ class Arrays
 	 */
 	public static function itemsWithMax(iterable $subject, $propertyPath = null): array
 	{
-		if (Arrays::isEmpty($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject is empty.');
-		}
 		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
 		{
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
+		}
+		if (Arrays::isEmpty($subject))
+		{
+			return [];
 		}
 		$maxValue = null;
 		$items = [];

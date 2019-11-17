@@ -3,6 +3,9 @@
 
 namespace Pechynho\Test\Model;
 
+/**
+ * @MyAnnotation
+ */
 class Person
 {
 	/** @var string */
@@ -51,6 +54,7 @@ class Person
 	}
 
 	/**
+	 * @MyAnnotation
 	 * @return string
 	 */
 	public function getSurname(): string

@@ -6,14 +6,13 @@ namespace Pechynho\Utility;
 
 use Exception;
 use InvalidArgumentException;
-use ReflectionClass;
-use ReflectionException;
-use ReflectionObject;
-use ReflectionProperty;
 use RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * @author Jan Pech <pechynho@gmail.com>
+ */
 class PropertyAccess
 {
 	/** @var PropertyAccessorInterface */
@@ -24,7 +23,10 @@ class PropertyAccess
 	 */
 	private static function getPropertyAccessor(): PropertyAccessorInterface
 	{
-		if (self::$propertyAccessor === null) self::$propertyAccessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
+		if (self::$propertyAccessor === null)
+		{
+			self::$propertyAccessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
+		}
 		return self::$propertyAccessor;
 	}
 
@@ -54,7 +56,10 @@ class PropertyAccess
 			}
 			catch (Exception $exception)
 			{
-				if ($throwException) throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+				if ($throwException)
+				{
+					throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+				}
 				return $defaultValue;
 			}
 		}
@@ -68,7 +73,7 @@ class PropertyAccess
 			{
 				try
 				{
-					$property = PropertyAccess::getPropertyFromReflectionClass(new ReflectionObject($objectOrArray), $propertyPath);
+					$property = Reflections::getProperty(get_class($objectOrArray), $propertyPath);
 					if ($property->isProtected() || $property->isPrivate())
 					{
 						$property->setAccessible(true);
@@ -82,11 +87,17 @@ class PropertyAccess
 				}
 				catch (Exception $reflectionException)
 				{
-					if ($throwException) throw new RuntimeException($reflectionException->getMessage(), $reflectionException->getCode(), $reflectionException->getPrevious());
+					if ($throwException)
+					{
+						throw new RuntimeException($reflectionException->getMessage(), $reflectionException->getCode(), $reflectionException->getPrevious());
+					}
 					return $defaultValue;
 				}
 			}
-			if ($throwException) throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+			if ($throwException)
+			{
+				throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+			}
 			return $defaultValue;
 		}
 	}
@@ -117,7 +128,10 @@ class PropertyAccess
 			}
 			catch (Exception $exception)
 			{
-				if ($throwException) throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+				if ($throwException)
+				{
+					throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+				}
 			}
 		}
 		try
@@ -131,7 +145,7 @@ class PropertyAccess
 			{
 				try
 				{
-					$property = PropertyAccess::getPropertyFromReflectionClass(new ReflectionObject($objectOrArray), $propertyPath);
+					$property = Reflections::getProperty(get_class($objectOrArray), $propertyPath);
 					if ($property->isProtected() || $property->isPrivate())
 					{
 						$property->setAccessible(true);
@@ -145,26 +159,16 @@ class PropertyAccess
 				}
 				catch (Exception $reflectionException)
 				{
-					if ($throwException) throw new RuntimeException($reflectionException->getMessage(), $reflectionException->getCode(), $reflectionException->getPrevious());
+					if ($throwException)
+					{
+						throw new RuntimeException($reflectionException->getMessage(), $reflectionException->getCode(), $reflectionException->getPrevious());
+					}
 				}
 			}
-			if ($throwException) throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+			if ($throwException)
+			{
+				throw new RuntimeException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+			}
 		}
-	}
-
-	/**
-	 * @param ReflectionClass $reflectionClass
-	 * @param string          $propertyName
-	 * @return ReflectionProperty
-	 * @throws ReflectionException
-	 */
-	private static function getPropertyFromReflectionClass(ReflectionClass $reflectionClass, string $propertyName): ReflectionProperty
-	{
-		while ($reflectionClass != null && !$reflectionClass->hasProperty($propertyName))
-		{
-			$reflectionClass = $reflectionClass->getParentClass();
-		}
-		if (!$reflectionClass instanceof ReflectionClass || !$reflectionClass->hasProperty($propertyName)) throw new ReflectionException("Property was not found in given reflection class.");
-		return $reflectionClass->getProperty($propertyName);
 	}
 }

@@ -32,7 +32,7 @@ class StringsTest extends TestCase
 	public function testReplace()
 	{
 		self::assertEquals("PHP", Strings::replace("C#", "C#", "PHP"));
-		self::assertException(function () { Strings::replace("", "a", "b"); }, InvalidArgumentException::class);
+		self::assertEquals("", Strings::replace("", "a", "b"));
 		self::assertException(function () { Strings::replace("a", "", "b"); }, InvalidArgumentException::class);
 
 	}
@@ -54,7 +54,7 @@ class StringsTest extends TestCase
 	public function testReplaceMultiple()
 	{
 		self::assertEquals("Yes No Maybe", Strings::replaceMultiple("1 2 3", ["1" => "Yes", "2" => "No", "3" => "Maybe"]));
-		self::assertException(function () { Strings::replaceMultiple("", ["1" => "Yes", "2" => "No", "3" => "Maybe"]); }, InvalidArgumentException::class);
+		self::assertEquals("", Strings::replaceMultiple("", ["1" => "Yes", "2" => "No", "3" => "Maybe"]));
 		self::assertException(function () { Strings::replaceMultiple("1 2 3", ["1" => "Yes", "" => "No", "3" => "Maybe"]); }, InvalidArgumentException::class);
 	}
 
@@ -312,5 +312,10 @@ class StringsTest extends TestCase
 	{
 		self::assertEquals("johA", Strings::reverse("Ahoj"));
 		self::assertEquals("", Strings::reverse(""));
+	}
+
+	public function testSplitCase()
+	{
+		self::assertEquals(["find", "By", "ID"], Strings::splitByCase("findByID"));
 	}
 }

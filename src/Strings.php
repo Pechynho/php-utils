@@ -7,6 +7,9 @@ namespace Pechynho\Utility;
 use InvalidArgumentException;
 use OutOfRangeException;
 
+/**
+ * @author Jan Pech <pechynho@gmail.com>
+ */
 class Strings
 {
 	/** @var string */
@@ -343,16 +346,11 @@ class Strings
 	 */
 	public static function replace(string $subject, string $oldValue, string $newValue): string
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
-			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
-		}
 		if ($oldValue === Strings::EMPTY_STRING)
 		{
 			throw new InvalidArgumentException('Parameter $oldValue cannot be empty string.');
 		}
 		return str_replace($oldValue, $newValue, $subject);
-
 	}
 
 	/**
@@ -362,13 +360,16 @@ class Strings
 	 */
 	public static function replaceMultiple(string $subject, array $replacements): string
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
-			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
-		}
 		$oldValues = array_keys($replacements);
 		$newValues = array_values($replacements);
-		if (in_array("", $oldValues)) throw new InvalidArgumentException('Keys in parameter $replacements should be non-empty string values which should be replaced.');
+		if (empty($replacements))
+		{
+			return $subject;
+		}
+		if (in_array("", $oldValues))
+		{
+			throw new InvalidArgumentException('Keys in parameter $replacements should be non-empty string values which should be replaced.');
+		}
 		return str_replace($oldValues, $newValues, $subject);
 	}
 
@@ -398,6 +399,23 @@ class Strings
 		if (!empty($replacements)) $subject = Strings::replaceMultiple($subject, $replacements);
 		$values = $removeEmptyEntries ? array_diff(explode($separators[0], $subject), [Strings::EMPTY_STRING]) : explode($separators[0], $subject);
 		return array_values($values);
+	}
+
+	/**
+	 * @param string $subject
+	 * @return string[]
+	 */
+	public static function splitByCase(string $subject)
+	{
+		$pattern = '/(?#! splitCamelCase Rev:20140412)
+    			# Split camelCase "words". Two global alternatives. Either g1of2:
+      			(?<=[a-z])      # Position is after a lowercase,
+      			(?=[A-Z])       # and before an uppercase letter.
+    			| (?<=[A-Z])    # Or g2of2; Position is after uppercase,
+      			(?=[A-Z][a-z])  # and before upper-then-lower case.
+    			/x';
+		$values = preg_split($pattern, $subject);
+		return $values;
 	}
 
 	/**

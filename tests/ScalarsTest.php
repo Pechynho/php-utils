@@ -16,7 +16,8 @@ class ScalarsTest extends TestCase
 	public function testIsScalarTypeValid()
 	{
 		self::assertTrue(Scalars::isScalarTypeValid("BOOLEAN"));
-		self::assertFalse(Scalars::isScalarTypeValid("bool"));
+		self::assertFalse(Scalars::isScalarTypeValid("date"));
+		self::assertTrue(Scalars::isScalarTypeValid("bool"));
 	}
 
 	public function testParseToScalarType()
@@ -32,9 +33,10 @@ class ScalarsTest extends TestCase
 		self::assertSame(false, Scalars::parse(0.0, Scalars::BOOLEAN));
 		self::assertSame(false, Scalars::parse(0.000000, Scalars::BOOLEAN));
 		self::assertSame(true, Scalars::parse("true", Scalars::BOOLEAN));
+		self::assertSame(true, Scalars::parse("true", "bool"));
 		self::assertSame(false, Scalars::parse("false", Scalars::BOOLEAN));
 		self::assertException(function () {  Scalars::parse(new Person("John", "Doe", 18, 180), Scalars::INTEGER); }, InvalidArgumentException::class);
-		self::assertException(function () {  Scalars::parse("true", "bool"); }, InvalidArgumentException::class);
+		self::assertException(function () {  Scalars::parse("true", "date"); }, InvalidArgumentException::class);
 		self::assertException(function () {  Scalars::parse("true", Scalars::INTEGER); }, RuntimeException::class);
 	}
 
