@@ -80,7 +80,7 @@ class Scalars
 		{
 			$scalarValue = Strings::trim($scalarValue);
 		}
-		if (($scalarType == Scalars::BOOLEAN || $scalarType == Scalars::BOOL) && ($scalarValue === "0" || Strings::toLower($scalarValue) === "false" || $scalarValue === 0 || $scalarValue === 0.0))
+		if (($scalarType == Scalars::BOOLEAN || $scalarType == Scalars::BOOL) && ($scalarValue === "0" || Strings::toLower($scalarValue) === "false" || $scalarValue === 0 || $scalarValue === 0.0 || $scalarValue === false))
 		{
 			return false;
 		}
