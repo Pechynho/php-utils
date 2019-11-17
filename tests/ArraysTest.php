@@ -59,15 +59,15 @@ class ArraysTest extends TestCase
 
 	public function testLastOrDefault()
 	{
-		self::assertEquals(26, Arrays::lastOrDefault($this->numbersOrdered, function (int $number) { return $number > 15; }));
-		self::assertEquals(null, Arrays::lastOrDefault($this->numbersOrdered, function (int $number) { return $number > 26; }));
+		self::assertEquals(26, Arrays::lastOrDefault($this->numbersOrdered, function ($number) { return $number > 15; }));
+		self::assertEquals(null, Arrays::lastOrDefault($this->numbersOrdered, function ($number) { return $number > 26; }));
 	}
 
 	public function testLast()
 	{
-		self::assertEquals(26, Arrays::last($this->numbersOrdered, function (int $number) { return $number > 15; }));
+		self::assertEquals(26, Arrays::last($this->numbersOrdered, function ($number) { return $number > 15; }));
 		self::assertException(function () { Arrays::last([], function () { }); }, InvalidArgumentException::class);
-		self::assertException(function () { Arrays::last($this->numbersOrdered, function (int $number) { return $number > 100; }); }, RuntimeException::class);
+		self::assertException(function () { Arrays::last($this->numbersOrdered, function ($number) { return $number > 100; }); }, RuntimeException::class);
 	}
 
 	public function testKeyOf()
@@ -98,8 +98,8 @@ class ArraysTest extends TestCase
 
 	public function testFirstOrDefault()
 	{
-		self::assertEquals(16, Arrays::firstOrDefault($this->numbersOrdered, function (int $number) { return $number > 15; }));
-		self::assertEquals(null, Arrays::firstOrDefault($this->numbersOrdered, function (int $number) { return $number > 26; }));
+		self::assertEquals(16, Arrays::firstOrDefault($this->numbersOrdered, function ($number) { return $number > 15; }));
+		self::assertEquals(null, Arrays::firstOrDefault($this->numbersOrdered, function ($number) { return $number > 26; }));
 	}
 
 	public function testItemsWithMax()
@@ -123,9 +123,9 @@ class ArraysTest extends TestCase
 
 	public function testFirst()
 	{
-		self::assertEquals(16, Arrays::first($this->numbersOrdered, function (int $number) { return $number > 15; }));
+		self::assertEquals(16, Arrays::first($this->numbersOrdered, function ($number) { return $number > 15; }));
 		self::assertException(function () { Arrays::first([], function () { }); }, InvalidArgumentException::class);
-		self::assertException(function () { Arrays::first($this->numbersOrdered, function (int $number) { return $number > 100; }); }, RuntimeException::class);
+		self::assertException(function () { Arrays::first($this->numbersOrdered, function ($number) { return $number > 100; }); }, RuntimeException::class);
 	}
 
 	public function testLastValue()
@@ -148,7 +148,7 @@ class ArraysTest extends TestCase
 		$persons = $this->persons;
 		usort($persons, function (Person $personA, Person $personB) { return strcmp($personA->getForename(), $personB->getForename()); });
 		self::assertEquals($persons, Arrays::orderBy($this->persons, Arrays::ORDER_DIRECTION_ASCENDING, "forename"));
-		self::assertEquals($persons, Arrays::orderBy($this->persons, Arrays::ORDER_DIRECTION_ASCENDING, "forename", function (string $forenameA, string $forenameB) { return strcmp($forenameA, $forenameB); }));
+		self::assertEquals($persons, Arrays::orderBy($this->persons, Arrays::ORDER_DIRECTION_ASCENDING, "forename", function ($forenameA, $forenameB) { return strcmp($forenameA, $forenameB); }));
 		self::assertException(function () { Arrays::orderBy($this->numbers, "something"); }, InvalidArgumentException::class);
 		self::assertException(function () { Arrays::orderBy($this->numbers, Arrays::ORDER_DIRECTION_ASCENDING, 5); }, InvalidArgumentException::class);
 		self::assertException(function () { Arrays::orderBy($this->numbers, Arrays::ORDER_DIRECTION_ASCENDING, null, 5); }, InvalidArgumentException::class);
@@ -180,8 +180,8 @@ class ArraysTest extends TestCase
 
 	public function testWhere()
 	{
-		self::assertEquals([25, 26], Arrays::where($this->numbersOrdered, function (int $number) { return $number > 24; }));
-		self::assertEquals([], Arrays::where([], function (int $number) { return $number > 24; }));
+		self::assertEquals([25, 26], Arrays::where($this->numbersOrdered, function ($number) { return $number > 24; }));
+		self::assertEquals([], Arrays::where([], function ($number) { return $number > 24; }));
 	}
 
 	public function testIsCountable()

@@ -68,7 +68,7 @@ class FileSystemTest extends TestCase
 	/**
 	 * @param string $directory
 	 */
-	private function removeDirectory(string $directory)
+	private function removeDirectory($directory)
 	{
 		if (!file_exists($directory))
 		{
