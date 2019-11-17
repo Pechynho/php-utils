@@ -327,7 +327,6 @@ class ParamsChecker
 	 * @param string      $parameter
 	 * @param string      $message
 	 * @param string|null $methodOrFunction
-	 * @param string|null $class
 	 * @return InvalidArgumentException
 	 */
 	private static function createException(string $parameter, string $message, ?string $methodOrFunction = null)
