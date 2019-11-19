@@ -271,4 +271,25 @@ class ArraysTest extends TestCase
 		self::assertException(function () use ($testCase) { Arrays::extract($testCase, "   "); }, InvalidArgumentException::class);
 		self::assertFalse(Arrays::extract([], "[foo][bar]"));
 	}
+
+	public function testMergeArrayConfig()
+	{
+		$defaultConfig = [
+			"value1" => ["value1_1" => 5, "value1_2"=> ["value1_2_1" => 5, "value1_2_2" => [5, 6, 7]]],
+			"value2" => [4, 3, 5],
+			"value3" => null
+		];
+		$config = [
+			"value1" => ["value1_2"=> ["value1_2_2" => [8, 7]]],
+			"value2" => 5
+		];
+		$result = [
+			"value1" => ["value1_1" => 5, "value1_2"=> ["value1_2_1" => 5, "value1_2_2" => [8, 7]]],
+			"value2" => 5,
+			"value3" => null
+		];
+		self::assertEquals($result, Arrays::mergeArrayConfig($defaultConfig, $config, true));
+		self::assertEquals(["value1" => ["value1_2"=> ["value1_2_2" => [8, 7]]], "value2" => 5, "value3" => null], Arrays::mergeArrayConfig($defaultConfig, $config, false));
+		self::assertException(function () use ($defaultConfig, $config) { Arrays::mergeArrayConfig($defaultConfig, $config, "blue"); }, InvalidArgumentException::class);
+	}
 }
