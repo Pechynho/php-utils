@@ -827,4 +827,31 @@ class Arrays
 		}
 		return false;
 	}
+
+	/**
+	 * @param array $config
+	 * @param array $defaultConfig
+	 * @param bool  $deep
+	 * @return array
+	 */
+	public static function mergeArrayConfig(array $defaultConfig, array $config = null, $deep = true)
+	{
+		ParamsChecker::isBool('$deep', $deep, __METHOD__);
+		if (!is_array($config))
+		{
+			$config = [];
+		}
+		foreach ($defaultConfig as $option => $value)
+		{
+			if (!isset($config[$option]))
+			{
+				$config[$option] = $defaultConfig[$option];
+			}
+			else if ($deep && isset($config[$option]) && is_array($config[$option]) && (empty($config[$option]) || is_string(Arrays::firstKey($config[$option]))))
+			{
+				$config[$option] = Arrays::mergeArrayConfig($defaultConfig[$option], $config[$option], $deep);
+			}
+		}
+		return $config;
+	}
 }
