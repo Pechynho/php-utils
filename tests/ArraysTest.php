@@ -288,9 +288,9 @@ class ArraysTest extends TestCase
 			"value2" => 5,
 			"value3" => null
 		];
-		self::assertEquals($result, Arrays::mergeArrayConfig($defaultConfig, $config, true));
-		self::assertEquals(["value1" => ["value1_2"=> ["value1_2_2" => [8, 7]]], "value2" => 5, "value3" => null], Arrays::mergeArrayConfig($defaultConfig, $config, false));
-		self::assertException(function () use ($defaultConfig, $config) { Arrays::mergeArrayConfig($defaultConfig, $config, "blue"); }, InvalidArgumentException::class);
+		self::assertEquals($result, Arrays::mergeArrayConfig($config, $defaultConfig, true));
+		self::assertEquals(["value1" => ["value1_2"=> ["value1_2_2" => [8, 7]]], "value2" => 5, "value3" => null], Arrays::mergeArrayConfig($config, $defaultConfig, false));
+		self::assertException(function () use ($config, $defaultConfig) { Arrays::mergeArrayConfig($config, $defaultConfig, "blue"); }, InvalidArgumentException::class);
 	}
 
 }

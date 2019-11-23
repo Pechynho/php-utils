@@ -27,10 +27,7 @@ class Formatting
 	 */
 	public static function formatNumber($number, $decimals = 0, $decimalPoint = ",", $thousandsSeparator = " ", $removeTrailingZeroes = false)
 	{
-		if (!is_int($number) && !is_float($number))
-		{
-			throw new InvalidArgumentException('Parameter $number has to be type of int or float.');
-		}
+		ParamsChecker::isIntOrFloat('$number', $number, __METHOD__);
 		if (!is_int($decimals))
 		{
 			throw new InvalidArgumentException('Parameter $decimals has to be type of int.');
@@ -76,10 +73,7 @@ class Formatting
 	 */
 	public static function formatFileSize($bytes, $unit = null, $format = null, $useSI = true)
 	{
-		if (!is_int($bytes))
-		{
-			throw new InvalidArgumentException('Parameter $bytes has to be type of int.');
-		}
+		ParamsChecker::isInt('$bytes', $bytes, __METHOD__);
 		if (!is_string($unit) && $unit !== null)
 		{
 			throw new InvalidArgumentException('Parameter $unit has to be type of string or NULL.');

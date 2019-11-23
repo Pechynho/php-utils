@@ -19,6 +19,11 @@ class AnnotationsTest extends TestCase
 		self::assertEquals(null, Annotations::getMethodAnnotation(Worker::class, "getForename", MyAnnotation::class));
 	}
 
+	public function testGetMethodsWithAnnotation()
+	{
+		self::assertEquals(1, count(Annotations::getMethodsWithAnnotation(Worker::class, MyAnnotation::class)));
+	}
+
 	public function testCreateAnnotationReader()
 	{
 		self::assertInstanceOf(AnnotationReader::class, Annotations::createAnnotationReader());
@@ -28,6 +33,11 @@ class AnnotationsTest extends TestCase
 	{
 		self::assertInstanceOf(MyAnnotation::class, Annotations::getPropertyAnnotation(Worker::class, "job", MyAnnotation::class));
 		self::assertEquals(null, Annotations::getPropertyAnnotation(Worker::class, "forename", MyAnnotation::class));
+	}
+
+	public function testGetPropertiesWithAnnotation()
+	{
+		self::assertEquals(1, count(Annotations::getPropertiesWithAnnotation(Worker::class, MyAnnotation::class)));
 	}
 
 	public function testGetClassAnnotation()

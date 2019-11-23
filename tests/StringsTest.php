@@ -304,7 +304,11 @@ class StringsTest extends TestCase
 		self::assertEquals("Joe, Michelle and Johny", Strings::join($items, ", ", " and "));
 		self::assertEquals("Joe, Michelle, Johny", Strings::join($items, ", "));
 		self::assertEquals("Joe", Strings::join(["Joe"], ", "));
+		self::assertEquals("Joe", Strings::join(["Joe"], ", ", " and "));
+		self::assertEquals("Joe", Strings::join(["Joe"], ", ", ", "));
 		self::assertEquals("", Strings::join([], ", "));
+		self::assertEquals("", Strings::join([], ", ", " and "));
+		self::assertEquals("", Strings::join([], ", ", ", "));
 		self::assertEquals("Joe and John", Strings::join(["Joe", "John"], ", ", " and "));
 	}
 

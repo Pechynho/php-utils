@@ -7,6 +7,8 @@ namespace Pechynho\Utility;
 use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use ReflectionMethod;
+use ReflectionProperty;
 use RuntimeException;
 
 /**
@@ -32,6 +34,30 @@ class Annotations
 
 	/**
 	 * @param string $class
+	 * @param string $annotation
+	 * @return ReflectionProperty[]
+	 */
+	public static function getPropertiesWithAnnotation($class, $annotation)
+	{
+		ParamsChecker::notWhiteSpaceOrNullString('$class', $class, __METHOD__);
+		ParamsChecker::notWhiteSpaceOrNullString('$annotation', $annotation, __METHOD__);
+		$reflectionClass = Reflections::createReflectionClass($class);
+		$properties = $reflectionClass->getProperties();
+		$annotationReader = self::createAnnotationReader();
+		$output = [];
+		foreach ($properties as $property)
+		{
+			$annotation = $annotationReader->getPropertyAnnotation($property, $annotation);
+			if ($annotation != null)
+			{
+				$output[] = $property;
+			}
+		}
+		return $output;
+	}
+
+	/**
+	 * @param string $class
 	 * @param string $method
 	 * @param string $annotation
 	 * @return object|null
@@ -44,6 +70,31 @@ class Annotations
 		$method = Reflections::getMethod($class, $method);
 		$annotation = self::createAnnotationReader()->getMethodAnnotation($method, $annotation);
 		return $annotation;
+	}
+
+	/**
+	 * @param string $class
+	 * @param string $annotation
+	 * @return ReflectionMethod[]
+	 */
+	public static function getMethodsWithAnnotation($class, $annotation)
+	{
+		ParamsChecker::notWhiteSpaceOrNullString('$class', $class, __METHOD__);
+		ParamsChecker::notWhiteSpaceOrNullString('$annotation', $annotation, __METHOD__);
+		$reflectionClass = Reflections::createReflectionClass($class);
+		$methods = $reflectionClass->getMethods();
+		$annotationReader = self::createAnnotationReader();
+		$output = [];
+		foreach ($methods as $method)
+		{
+			echo $method->getName();
+			$annotationInstance = $annotationReader->getMethodAnnotation($method, $annotation);
+			if ($annotationInstance != null)
+			{
+				$output[] = $method;
+			}
+		}
+		return $output;
 	}
 
 	/**

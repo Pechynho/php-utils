@@ -2,12 +2,14 @@
 
 namespace Pechynho\Test;
 
+use InvalidArgumentException;
 use Pechynho\Test\Model\Worker;
 use Pechynho\Utility\Reflections;
 use PHPUnit\Framework\TestCase;
 use Reflection;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionObject;
 use ReflectionProperty;
 use RuntimeException;
 use VladaHejda\AssertException;
@@ -26,8 +28,19 @@ class ReflectionsTest extends TestCase
 
 	public function testCreateReflectionClass()
 	{
+		$worker = new Worker("Joe", "Doe", 30, 180, "Cook");
 		self::assertInstanceOf(ReflectionClass::class, Reflections::createReflectionClass(Worker::class));
+		self::assertInstanceOf(ReflectionClass::class, Reflections::createReflectionClass($worker));
 		self::assertException(function () { Reflections::createReflectionClass("string"); }, RuntimeException::class);
+		self::assertException(function () { Reflections::createReflectionClass(""); }, InvalidArgumentException::class);
+	}
+
+	public function testCreateReflectionObject()
+	{
+		$worker = new Worker("Joe", "Doe", 30, 180, "Cook");
+		self::assertInstanceOf(ReflectionObject::class, Reflections::createReflectionObject($worker));
+		self::assertException(function () { Reflections::createReflectionObject(Worker::class); }, InvalidArgumentException::class);
+		self::assertException(function () { Reflections::createReflectionObject(null); }, InvalidArgumentException::class);
 	}
 
 	public function testGetProperty()

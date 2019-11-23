@@ -14,6 +14,7 @@ class FormattingTest extends TestCase
 	public function testFormatFileSize()
 	{
 		self::assertEquals("10.21 MB", Formatting::formatFileSize(10207519));
+		self::assertEquals("10.21 MB", Formatting::formatFileSize("10207519"));
 		self::assertEquals("9.73 MiB", Formatting::formatFileSize(10207519, null, null, false));
 		self::assertEquals("10207.52 kB", Formatting::formatFileSize(10207519, "kB"));
 		self::assertEquals("9968.28 KiB", Formatting::formatFileSize(10207519, "KiB"));
@@ -24,6 +25,7 @@ class FormattingTest extends TestCase
 	public function testFormatNumber()
 	{
 		self::assertEquals("10 000.00", Formatting::formatNumber(10000, 2, ".", " ", false));
+		self::assertEquals("10 000.00", Formatting::formatNumber("10000", 2, ".", " ", false));
 		self::assertEquals("10 000", Formatting::formatNumber(10000, 2, ".", " ", true));
 		self::assertEquals("10,000.56", Formatting::formatNumber(10000.56, 2, ".", ",", true));
 		self::assertEquals("10,000.5", Formatting::formatNumber(10000.50, 2, ".", ",", true));

@@ -814,7 +814,7 @@ class Arrays
 		$count = count($keys);
 		foreach ($keys as $index => $key)
 		{
-			if (!isset($subject[$key]))
+			if (!is_array($subject) || !isset($subject[$key]))
 			{
 				break;
 			}
@@ -834,13 +834,9 @@ class Arrays
 	 * @param bool  $deep
 	 * @return array
 	 */
-	public static function mergeArrayConfig(array $defaultConfig, array $config = null, $deep = true)
+	public static function mergeArrayConfig(array $config, array $defaultConfig, $deep = true)
 	{
 		ParamsChecker::isBool('$deep', $deep, __METHOD__);
-		if (!is_array($config))
-		{
-			$config = [];
-		}
 		foreach ($defaultConfig as $option => $value)
 		{
 			if (!isset($config[$option]))
@@ -849,7 +845,7 @@ class Arrays
 			}
 			else if ($deep && isset($config[$option]) && is_array($config[$option]) && (empty($config[$option]) || is_string(Arrays::firstKey($config[$option]))))
 			{
-				$config[$option] = Arrays::mergeArrayConfig($defaultConfig[$option], $config[$option], $deep);
+				$config[$option] = Arrays::mergeArrayConfig($config[$option], $defaultConfig[$option], $deep);
 			}
 		}
 		return $config;

@@ -72,6 +72,10 @@ class ParamsChecker
 				$message = "Parameter {parameter} is expected to be one of these types: ";
 				foreach ($types as $item)
 				{
+					if (function_exists("is_" . Strings::toLower($item["type"])))
+					{
+						$item["type"] = Strings::toLower($item["type"]);
+					}
 					$message .= ($item["checkNotEmpty"] ? "non empty " : "") . $item["type"] . ", ";
 				}
 				$message = Strings::remove($message, Strings::length($message) - 2) . ". Value passed to {parameter}: " . print_r($arguments[1], true);

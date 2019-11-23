@@ -77,6 +77,10 @@ class PropertyAccess
 		}
 		try
 		{
+			if (is_array($objectOrArray) && is_string($propertyPath) && preg_match("/^\[[\S]+\]$/", $propertyPath) === 0)
+			{
+				$propertyPath = "[" . $propertyPath . "]";
+			}
 			return self::getPropertyAccessor()->getValue($objectOrArray, $propertyPath);
 		}
 		catch (Exception $exception)
@@ -121,7 +125,7 @@ class PropertyAccess
 	 * @param bool                                  $throwException
 	 * @param bool                                  $tryReflection
 	 */
-	public static function setValue($objectOrArray, $propertyPath, $value, $throwException = true, $tryReflection = false)
+	public static function setValue(&$objectOrArray, $propertyPath, $value, $throwException = true, $tryReflection = false)
 	{
 		if (!is_bool($throwException))
 		{
@@ -156,6 +160,10 @@ class PropertyAccess
 		}
 		try
 		{
+			if (is_array($objectOrArray) && is_string($propertyPath) && preg_match("/^\[[\S]+\]$/", $propertyPath) === 0)
+			{
+				$propertyPath = "[" . $propertyPath . "]";
+			}
 			self::getPropertyAccessor()->setValue($objectOrArray, $propertyPath, $value);
 			return;
 		}

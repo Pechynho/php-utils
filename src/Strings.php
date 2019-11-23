@@ -243,6 +243,24 @@ class Strings
 		}
 		$separator = Strings::parseToString($separator, '$separator');
 		$lastSeparator = Strings::parseToString($lastSeparator, '$lastSeparator', true);
+		if (is_array($subject))
+		{
+			if ($lastSeparator === null || $separator === $lastSeparator)
+			{
+				return implode($separator, $subject);
+			}
+			if (function_exists("array_key_first"))
+			{
+				$lastKey = array_key_last($subject);
+				$lastValue = $subject[$lastKey];
+				unset($subject[$lastKey]);
+				if (empty($subject))
+				{
+					return $lastValue;
+				}
+				return implode($separator, $subject) . $lastSeparator . $lastValue;
+			}
+		}
 		$parts = [];
 		$partsCount = 0;
 		foreach ($subject as $item)
