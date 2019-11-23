@@ -59,11 +59,12 @@ class Formatting
 			$length = Strings::length($formattedNumber);
 			if ($formattedNumber[$length - 1] === $decimalPoint)
 			{
-				$formattedNumber = Strings::substring($formattedNumber,0, Strings::length($formattedNumber) - 1);
+				$formattedNumber = Strings::substring($formattedNumber, 0, Strings::length($formattedNumber) - 1);
 			}
 		}
 		return $formattedNumber;
 	}
+
 	/**
 	 * @param int         $bytes
 	 * @param string|null $unit

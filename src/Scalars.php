@@ -32,13 +32,22 @@ class Scalars
 	const INT = "INT";
 
 	/**
+	 * @param mixed  $scalarValue
+	 * @param mixed  $result
 	 * @param string $scalarType
 	 * @return bool
 	 */
-	public static function isScalarTypeValid($scalarType)
+	public static function tryParse($scalarValue, &$result, $scalarType)
 	{
-		$scalarType = Strings::toUpper($scalarType);
-		return in_array($scalarType, [Scalars::BOOLEAN, Scalars::INTEGER, Scalars::FLOAT, Scalars::STRING, Scalars::BOOL, Scalars::INT]);
+		try
+		{
+			$result = Scalars::parse($scalarValue, $scalarType);
+			return true;
+		}
+		catch (Exception $exception)
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -93,21 +102,12 @@ class Scalars
 	}
 
 	/**
-	 * @param mixed  $scalarValue
-	 * @param mixed  $result
 	 * @param string $scalarType
 	 * @return bool
 	 */
-	public static function tryParse($scalarValue, &$result, $scalarType)
+	public static function isScalarTypeValid($scalarType)
 	{
-		try
-		{
-			$result = Scalars::parse($scalarValue, $scalarType);
-			return true;
-		}
-		catch (Exception $exception)
-		{
-			return false;
-		}
+		$scalarType = Strings::toUpper($scalarType);
+		return in_array($scalarType, [Scalars::BOOLEAN, Scalars::INTEGER, Scalars::FLOAT, Scalars::STRING, Scalars::BOOL, Scalars::INT]);
 	}
 }

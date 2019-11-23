@@ -231,7 +231,7 @@ class ArraysTest extends TestCase
 	{
 		self::assertEquals($this->surnames, Arrays::select($this->persons, "surname"));
 		self::assertEquals($this->surnames, Arrays::select($this->persons, "surname", true));
-		self::assertException(function () {  Arrays::select($this->persons, 5); }, InvalidArgumentException::class);
+		self::assertException(function () { Arrays::select($this->persons, 5); }, InvalidArgumentException::class);
 	}
 
 	public function testFlip()
@@ -251,6 +251,7 @@ class ArraysTest extends TestCase
 		self::assertException(function () { Arrays::mapToPairs($this->persons, null, "surname"); }, InvalidArgumentException::class);
 		self::assertException(function () { Arrays::mapToPairs($this->persons, "height", null); }, InvalidArgumentException::class);
 	}
+
 	public function testMapByProperty()
 	{
 		$testCase = [];
@@ -275,21 +276,21 @@ class ArraysTest extends TestCase
 	public function testMergeArrayConfig()
 	{
 		$defaultConfig = [
-			"value1" => ["value1_1" => 5, "value1_2"=> ["value1_2_1" => 5, "value1_2_2" => [5, 6, 7]]],
+			"value1" => ["value1_1" => 5, "value1_2" => ["value1_2_1" => 5, "value1_2_2" => [5, 6, 7]]],
 			"value2" => [4, 3, 5],
 			"value3" => null
 		];
 		$config = [
-			"value1" => ["value1_2"=> ["value1_2_2" => [8, 7]]],
+			"value1" => ["value1_2" => ["value1_2_2" => [8, 7]]],
 			"value2" => 5
 		];
 		$result = [
-			"value1" => ["value1_1" => 5, "value1_2"=> ["value1_2_1" => 5, "value1_2_2" => [8, 7]]],
+			"value1" => ["value1_1" => 5, "value1_2" => ["value1_2_1" => 5, "value1_2_2" => [8, 7]]],
 			"value2" => 5,
 			"value3" => null
 		];
 		self::assertEquals($result, Arrays::mergeArrayConfig($config, $defaultConfig, true));
-		self::assertEquals(["value1" => ["value1_2"=> ["value1_2_2" => [8, 7]]], "value2" => 5, "value3" => null], Arrays::mergeArrayConfig($config, $defaultConfig, false));
+		self::assertEquals(["value1" => ["value1_2" => ["value1_2_2" => [8, 7]]], "value2" => 5, "value3" => null], Arrays::mergeArrayConfig($config, $defaultConfig, false));
 		self::assertException(function () use ($config, $defaultConfig) { Arrays::mergeArrayConfig($config, $defaultConfig, "blue"); }, InvalidArgumentException::class);
 	}
 

@@ -23,12 +23,32 @@ class Arrays
 	const ORDER_DIRECTION_DESCENDING = "ORDER_DIRECTION_DESCENDING";
 
 	/**
-	 * @param mixed $subject
-	 * @return bool
+	 * @param array|Traversable $subject
+	 * @param callable          $predicate
+	 * @return mixed
 	 */
-	public static function isCountable($subject)
+	public static function first($subject, $predicate)
 	{
-		return is_array($subject) || $subject instanceof Countable;
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
+		if (!is_callable($predicate))
+		{
+			throw new InvalidArgumentException('Parameter $predicate has to be type of callable.');
+		}
+		if (Arrays::isEmpty($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject is empty.');
+		}
+		foreach ($subject as $item)
+		{
+			if ($predicate($item))
+			{
+				return $item;
+			}
+		}
+		throw new RuntimeException("No item was found by given predicate.");
 	}
 
 	/**
@@ -60,35 +80,6 @@ class Arrays
 	/**
 	 * @param array|Traversable $subject
 	 * @param callable          $predicate
-	 * @return mixed
-	 */
-	public static function first($subject, $predicate)
-	{
-		if (!Arrays::isIterable($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
-		}
-		if (!is_callable($predicate))
-		{
-			throw new InvalidArgumentException('Parameter $predicate has to be type of callable.');
-		}
-		if (Arrays::isEmpty($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject is empty.');
-		}
-		foreach ($subject as $item)
-		{
-			if ($predicate($item))
-			{
-				return $item;
-			}
-		}
-		throw new RuntimeException("No item was found by given predicate.");
-	}
-
-	/**
-	 * @param array|Traversable $subject
-	 * @param callable          $predicate
 	 * @param mixed             $defaultValue
 	 * @return mixed
 	 */
@@ -110,27 +101,6 @@ class Arrays
 			}
 		}
 		return $defaultValue;
-	}
-
-	/**
-	 * @param array $subject
-	 * @return int|string
-	 */
-	public static function firstKey($subject)
-	{
-		if (!is_array($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
-		}
-		if (empty($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject is empty.');
-		}
-		if (function_exists("array_key_first")) return array_key_first($subject);
-		foreach ($subject as $key => $item)
-		{
-			return $key;
-		}
 	}
 
 	/**
@@ -483,6 +453,15 @@ class Arrays
 	}
 
 	/**
+	 * @param mixed $subject
+	 * @return bool
+	 */
+	public static function isCountable($subject)
+	{
+		return is_array($subject) || $subject instanceof Countable;
+	}
+
+	/**
 	 * @param array|Traversable                     $subject
 	 * @param callable|string|PropertyPathInterface $propertyPath
 	 * @return array
@@ -707,28 +686,6 @@ class Arrays
 	 * @param array|Traversable $subject
 	 * @return array
 	 */
-	public static function reverse($subject)
-	{
-		if (!Arrays::isIterable($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
-		}
-		return array_reverse(is_array($subject) ? $subject : Arrays::toArray($subject));
-	}
-
-	/**
-	 * @param array $subject
-	 * @return array
-	 */
-	public static function flip(array $subject)
-	{
-		return array_flip($subject);
-	}
-
-	/**
-	 * @param array|Traversable $subject
-	 * @return array
-	 */
 	public static function toArray($subject)
 	{
 		if (!Arrays::isIterable($subject))
@@ -745,6 +702,28 @@ class Arrays
 			$output[] = $item;
 		}
 		return $output;
+	}
+
+	/**
+	 * @param array|Traversable $subject
+	 * @return array
+	 */
+	public static function reverse($subject)
+	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
+		return array_reverse(is_array($subject) ? $subject : Arrays::toArray($subject));
+	}
+
+	/**
+	 * @param array $subject
+	 * @return array
+	 */
+	public static function flip(array $subject)
+	{
+		return array_flip($subject);
 	}
 
 	/**
@@ -799,9 +778,9 @@ class Arrays
 	}
 
 	/**
-	 * @param array $subject
+	 * @param array  $subject
 	 * @param string $keyPath
-	 * @param mixed $value
+	 * @param mixed  $value
 	 * @return boolean
 	 */
 	public static function extract(array $subject, $keyPath, &$value = null)
@@ -849,5 +828,26 @@ class Arrays
 			}
 		}
 		return $config;
+	}
+
+	/**
+	 * @param array $subject
+	 * @return int|string
+	 */
+	public static function firstKey($subject)
+	{
+		if (!is_array($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
+		}
+		if (empty($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject is empty.');
+		}
+		if (function_exists("array_key_first")) return array_key_first($subject);
+		foreach ($subject as $key => $item)
+		{
+			return $key;
+		}
 	}
 }

@@ -29,12 +29,38 @@ class FileSystemTest extends TestCase
 		$this->prepareEnvironment();
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	protected function tearDown()
+	private function prepareEnvironment()
 	{
 		$this->destroyEnvironment();
+		$this->createStructure($this->baseDir . "/var", $this->structure["var"]);
+	}
+
+	private function destroyEnvironment()
+	{
+		$this->removeDirectory($this->baseDir . "/var");
+	}
+
+	/**
+	 * @param string $directory
+	 */
+	private function removeDirectory($directory)
+	{
+		if (!file_exists($directory))
+		{
+			return;
+		}
+		$items = array_diff(scandir($directory), [".", ".."]);
+		foreach ($items as $item)
+		{
+			$item = $directory . "/" . $item;
+			if (file_exists($item) and is_dir($item))
+			{
+				$this->removeDirectory($item);
+				continue;
+			}
+			unlink($item);
+		}
+		rmdir($directory);
 	}
 
 	/**
@@ -66,37 +92,11 @@ class FileSystemTest extends TestCase
 	}
 
 	/**
-	 * @param string $directory
+	 * @inheritDoc
 	 */
-	private function removeDirectory($directory)
-	{
-		if (!file_exists($directory))
-		{
-			return;
-		}
-		$items = array_diff(scandir($directory), [".", ".."]);
-		foreach ($items as $item)
-		{
-			$item = $directory . "/" . $item;
-			if (file_exists($item) and is_dir($item))
-			{
-				$this->removeDirectory($item);
-				continue;
-			}
-			unlink($item);
-		}
-		rmdir($directory);
-	}
-
-	private function prepareEnvironment()
+	protected function tearDown()
 	{
 		$this->destroyEnvironment();
-		$this->createStructure($this->baseDir . "/var", $this->structure["var"]);
-	}
-
-	private function destroyEnvironment()
-	{
-		$this->removeDirectory($this->baseDir . "/var");
 	}
 
 	public function testCombinePath()
@@ -236,9 +236,9 @@ class FileSystemTest extends TestCase
 		$source = $destination;
 		$destination = $this->baseDir . "/var/directory_1/file_2.txt";
 		FileSystem::copy($source, $destination);
-		self::assertException(function () use($source) { FileSystem::rename($source, ""); }, InvalidArgumentException::class);
-		self::assertException(function () use($destination) { FileSystem::rename("", $destination); }, InvalidArgumentException::class);
-		self::assertException(function () use($source, $destination) { FileSystem::rename($source, $destination); }, InvalidArgumentException::class);
+		self::assertException(function () use ($source) { FileSystem::rename($source, ""); }, InvalidArgumentException::class);
+		self::assertException(function () use ($destination) { FileSystem::rename("", $destination); }, InvalidArgumentException::class);
+		self::assertException(function () use ($source, $destination) { FileSystem::rename($source, $destination); }, InvalidArgumentException::class);
 		FileSystem::rename($source, $destination, true);
 		self::assertTrue(FileSystem::isFile($destination));
 	}

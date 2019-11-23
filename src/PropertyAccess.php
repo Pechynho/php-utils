@@ -6,10 +6,6 @@ namespace Pechynho\Utility;
 
 use Exception;
 use InvalidArgumentException;
-use ReflectionClass;
-use ReflectionException;
-use ReflectionObject;
-use ReflectionProperty;
 use RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -21,18 +17,6 @@ class PropertyAccess
 {
 	/** @var PropertyAccessorInterface */
 	private static $propertyAccessor = null;
-
-	/**
-	 * @return PropertyAccessorInterface
-	 */
-	private static function getPropertyAccessor()
-	{
-		if (self::$propertyAccessor === null)
-		{
-			self::$propertyAccessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
-		}
-		return self::$propertyAccessor;
-	}
 
 	/**
 	 * @param object|array                          $objectOrArray
@@ -116,6 +100,18 @@ class PropertyAccess
 			}
 			return $defaultValue;
 		}
+	}
+
+	/**
+	 * @return PropertyAccessorInterface
+	 */
+	private static function getPropertyAccessor()
+	{
+		if (self::$propertyAccessor === null)
+		{
+			self::$propertyAccessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
+		}
+		return self::$propertyAccessor;
 	}
 
 	/**

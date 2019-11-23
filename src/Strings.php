@@ -41,6 +41,17 @@ class Strings
 	const CASE_CAMEL = "CASE_CAMEL";
 
 	/**
+	 * Indicates whether the specified string is null or an empty string ("").
+	 * @param string|null $subject The string to test.
+	 * @return bool Returns true if the $subject parameter is null or an empty string (""); otherwise, false.
+	 */
+	public static function isNullOrEmpty($subject)
+	{
+		$subject = Strings::parseToString($subject, '$subject', true);
+		return $subject === null || $subject === Strings::EMPTY_STRING;
+	}
+
+	/**
 	 * @param mixed  $value
 	 * @param string $parameterName
 	 * @param bool   $canValueBeNull
@@ -60,17 +71,6 @@ class Strings
 	}
 
 	/**
-	 * Indicates whether the specified string is null or an empty string ("").
-	 * @param string|null $subject The string to test.
-	 * @return bool Returns true if the $subject parameter is null or an empty string (""); otherwise, false.
-	 */
-	public static function isNullOrEmpty($subject)
-	{
-		$subject = Strings::parseToString($subject, '$subject', true);
-		return $subject === null || $subject === Strings::EMPTY_STRING;
-	}
-
-	/**
 	 * Indicates whether a specified string is null, empty, or consists only of white-space characters.
 	 * @param string|null $subject The string to test.
 	 * @return bool Returns true if the $subject parameter is null, empty string ("") or consists exclusively of white-space characters.
@@ -79,6 +79,77 @@ class Strings
 	{
 		$subject = Strings::parseToString($subject, '$subject', true);
 		return $subject === null || Strings::trim($subject) === Strings::EMPTY_STRING;
+	}
+
+	/**
+	 * @param string   $subject
+	 * @param string[] $trimChars
+	 * @return string
+	 */
+	public static function trim($subject, array $trimChars = Strings::TRIM_WHITE_SPACE_CHARS)
+	{
+		$subject = Strings::parseToString($subject, '$subject');
+		if (!is_array($trimChars))
+		{
+			throw new InvalidArgumentException('Parameter $trimChars has to be type of array.');
+		}
+		if (empty($trimChars))
+		{
+			throw new InvalidArgumentException('Parameter $trimChars cannot be empty array.');
+		}
+		return trim($subject, Strings::join($trimChars, ""));
+	}
+
+	/**
+	 * @param array|Traversable $subject
+	 * @param string            $separator
+	 * @param string|null       $lastSeparator
+	 * @return string
+	 */
+	public static function join($subject, $separator, $lastSeparator = null)
+	{
+		if (!Arrays::isIterable($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
+		}
+		$separator = Strings::parseToString($separator, '$separator');
+		$lastSeparator = Strings::parseToString($lastSeparator, '$lastSeparator', true);
+		if (is_array($subject))
+		{
+			if ($lastSeparator === null || $separator === $lastSeparator)
+			{
+				return implode($separator, $subject);
+			}
+			if (function_exists("array_key_first"))
+			{
+				$lastKey = array_key_last($subject);
+				$lastValue = $subject[$lastKey];
+				unset($subject[$lastKey]);
+				if (empty($subject))
+				{
+					return $lastValue;
+				}
+				return implode($separator, $subject) . $lastSeparator . $lastValue;
+			}
+		}
+		$parts = [];
+		$partsCount = 0;
+		foreach ($subject as $item)
+		{
+			$parts[] = ["value" => $item, "separator" => $separator];
+			$partsCount++;
+		}
+		if ($partsCount != 0)
+		{
+			$parts[$partsCount - 1]["separator"] = $lastSeparator === null ? $separator : $lastSeparator;
+			$parts[0]["separator"] = Strings::EMPTY_STRING;
+		}
+		$output = Strings::EMPTY_STRING;
+		foreach ($parts as $part)
+		{
+			$output .= $part["separator"] . $part["value"];
+		}
+		return $output;
 	}
 
 	/**
@@ -117,19 +188,6 @@ class Strings
 	}
 
 	/**
-	 * Indicates if string ends with given value.
-	 * @param string $subject The string to seek in.
-	 * @param string $value   The substring to seek at end.
-	 * @return bool Returns true if the $subject parameter ends with $value parameter; otherwise false;
-	 */
-	public static function endsWith($subject, $value)
-	{
-		$subject = Strings::parseToString($subject, '$subject');
-		$value = Strings::parseToString($value, '$value');
-		return $value === "" || (($temp = mb_strlen($subject) - mb_strlen($value)) >= 0 && strpos($subject, $value, $temp) !== false);
-	}
-
-	/**
 	 * Returns integer representing index on which given value occurs in given string.
 	 * @param string $subject    The string to seek in.
 	 * @param string $value      The value to seek.
@@ -158,6 +216,29 @@ class Strings
 		}
 		$result = mb_strpos($subject, $value, $startIndex);
 		return $result === false ? -1 : $result;
+	}
+
+	/**
+	 * @param string $subject
+	 * @return int
+	 */
+	public static function length($subject)
+	{
+		$subject = Strings::parseToString($subject, '$subject');
+		return mb_strlen($subject);
+	}
+
+	/**
+	 * Indicates if string ends with given value.
+	 * @param string $subject The string to seek in.
+	 * @param string $value   The substring to seek at end.
+	 * @return bool Returns true if the $subject parameter ends with $value parameter; otherwise false;
+	 */
+	public static function endsWith($subject, $value)
+	{
+		$subject = Strings::parseToString($subject, '$subject');
+		$value = Strings::parseToString($value, '$value');
+		return $value === "" || (($temp = mb_strlen($subject) - mb_strlen($value)) >= 0 && strpos($subject, $value, $temp) !== false);
 	}
 
 	/**
@@ -230,88 +311,6 @@ class Strings
 	}
 
 	/**
-	 * @param array|Traversable $subject
-	 * @param string            $separator
-	 * @param string|null       $lastSeparator
-	 * @return string
-	 */
-	public static function join($subject, $separator, $lastSeparator = null)
-	{
-		if (!Arrays::isIterable($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
-		}
-		$separator = Strings::parseToString($separator, '$separator');
-		$lastSeparator = Strings::parseToString($lastSeparator, '$lastSeparator', true);
-		if (is_array($subject))
-		{
-			if ($lastSeparator === null || $separator === $lastSeparator)
-			{
-				return implode($separator, $subject);
-			}
-			if (function_exists("array_key_first"))
-			{
-				$lastKey = array_key_last($subject);
-				$lastValue = $subject[$lastKey];
-				unset($subject[$lastKey]);
-				if (empty($subject))
-				{
-					return $lastValue;
-				}
-				return implode($separator, $subject) . $lastSeparator . $lastValue;
-			}
-		}
-		$parts = [];
-		$partsCount = 0;
-		foreach ($subject as $item)
-		{
-			$parts[] = ["value" => $item, "separator" => $separator];
-			$partsCount++;
-		}
-		if ($partsCount != 0)
-		{
-			$parts[$partsCount - 1]["separator"] = $lastSeparator === null ? $separator : $lastSeparator;
-			$parts[0]["separator"] = Strings::EMPTY_STRING;
-		}
-		$output = Strings::EMPTY_STRING;
-		foreach ($parts as $part)
-		{
-			$output .= $part["separator"] . $part["value"];
-		}
-		return $output;
-	}
-
-	/**
-	 * @param string $subject
-	 * @param string $value
-	 * @param int    $startIndex
-	 * @return int
-	 */
-	public static function lastIndexOf($subject, $value, $startIndex = 0)
-	{
-		$subject = Strings::parseToString($subject, '$subject');
-		$value = Strings::parseToString($value, '$value');
-		if (!is_int($startIndex))
-		{
-			throw new InvalidArgumentException('Parameter $startIndex has to be type of int.');
-		}
-		if ($subject === Strings::EMPTY_STRING)
-		{
-			return -1;
-		}
-		if ($value === Strings::EMPTY_STRING)
-		{
-			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
-		}
-		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
-		{
-			throw new OutOfRangeException('Parameter $startIndex is out of range.');
-		}
-		$result = mb_strrpos($subject, $value, $startIndex);
-		return $result === false ? -1 : $result;
-	}
-
-	/**
 	 * @param string            $subject
 	 * @param array|Traversable $values
 	 * @param int               $startIndex
@@ -353,12 +352,32 @@ class Strings
 
 	/**
 	 * @param string $subject
+	 * @param string $value
+	 * @param int    $startIndex
 	 * @return int
 	 */
-	public static function length($subject)
+	public static function lastIndexOf($subject, $value, $startIndex = 0)
 	{
 		$subject = Strings::parseToString($subject, '$subject');
-		return mb_strlen($subject);
+		$value = Strings::parseToString($value, '$value');
+		if (!is_int($startIndex))
+		{
+			throw new InvalidArgumentException('Parameter $startIndex has to be type of int.');
+		}
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			return -1;
+		}
+		if ($value === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
+		}
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
+		{
+			throw new OutOfRangeException('Parameter $startIndex is out of range.');
+		}
+		$result = mb_strrpos($subject, $value, $startIndex);
+		return $result === false ? -1 : $result;
 	}
 
 	/**
@@ -449,6 +468,39 @@ class Strings
 	}
 
 	/**
+	 * @param string   $subject
+	 * @param int      $startIndex
+	 * @param int|null $length
+	 * @return string
+	 */
+	public static function substring($subject, $startIndex, $length = null)
+	{
+		$subject = Strings::parseToString($subject, '$subject');
+		if (!is_int($startIndex))
+		{
+			throw new InvalidArgumentException('Parameter $startIndex has to be type of int.');
+		}
+		if (!is_int($length) && $length != null)
+		{
+			throw new InvalidArgumentException('Parameter $length has to be type of int or NULL.');
+		}
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
+		}
+		$subjectLength = Strings::length($subject);
+		if ($startIndex < 0 || $startIndex >= $subjectLength)
+		{
+			throw new OutOfRangeException('Parameter $startIndex is out of range.');
+		}
+		if ($length !== null && $startIndex + $length > $subjectLength)
+		{
+			throw new OutOfRangeException('Parameter $length is out of range.');
+		}
+		return mb_substr($subject, $startIndex, $length);
+	}
+
+	/**
 	 * @param string $subject
 	 * @param string $oldValue
 	 * @param string $newValue
@@ -465,27 +517,6 @@ class Strings
 		}
 		return str_replace($oldValue, $newValue, $subject);
 
-	}
-
-	/**
-	 * @param string   $subject
-	 * @param string[] $replacements
-	 * @return string
-	 */
-	public static function replaceMultiple($subject, $replacements)
-	{
-		$subject = Strings::parseToString($subject, '$subject');
-		if (!is_array($replacements))
-		{
-			throw new InvalidArgumentException('Parameter $replacements has to be type of array.');
-		}
-		$oldValues = array_keys($replacements);
-		$newValues = array_values($replacements);
-		if (in_array("", $oldValues))
-		{
-			throw new InvalidArgumentException('Keys in parameter $replacements should be non-empty string values which should be replaced.');
-		}
-		return str_replace($oldValues, $newValues, $subject);
 	}
 
 	/**
@@ -521,8 +552,29 @@ class Strings
 			$replacements[$separators[$i]] = $separators[0];
 		}
 		if (!empty($replacements)) $subject = Strings::replaceMultiple($subject, $replacements);
-		$values =  $removeEmptyEntries ? array_diff(explode($separators[0], $subject), [Strings::EMPTY_STRING]) : explode($separators[0], $subject);
-		return  array_values($values);
+		$values = $removeEmptyEntries ? array_diff(explode($separators[0], $subject), [Strings::EMPTY_STRING]) : explode($separators[0], $subject);
+		return array_values($values);
+	}
+
+	/**
+	 * @param string   $subject
+	 * @param string[] $replacements
+	 * @return string
+	 */
+	public static function replaceMultiple($subject, $replacements)
+	{
+		$subject = Strings::parseToString($subject, '$subject');
+		if (!is_array($replacements))
+		{
+			throw new InvalidArgumentException('Parameter $replacements has to be type of array.');
+		}
+		$oldValues = array_keys($replacements);
+		$newValues = array_values($replacements);
+		if (in_array("", $oldValues))
+		{
+			throw new InvalidArgumentException('Keys in parameter $replacements should be non-empty string values which should be replaced.');
+		}
+		return str_replace($oldValues, $newValues, $subject);
 	}
 
 	/**
@@ -553,88 +605,6 @@ class Strings
 		$subject = Strings::parseToString($subject, '$subject');
 		$value = Strings::parseToString($value, '$value');
 		return $value === "" || strncmp($subject, $value, mb_strlen($value)) === 0;
-	}
-
-	/**
-	 * @param string   $subject
-	 * @param int      $startIndex
-	 * @param int|null $length
-	 * @return string
-	 */
-	public static function substring($subject, $startIndex, $length = null)
-	{
-		$subject = Strings::parseToString($subject, '$subject');
-		if (!is_int($startIndex))
-		{
-			throw new InvalidArgumentException('Parameter $startIndex has to be type of int.');
-		}
-		if (!is_int($length) && $length != null)
-		{
-			throw new InvalidArgumentException('Parameter $length has to be type of int or NULL.');
-		}
-		if ($subject === Strings::EMPTY_STRING)
-		{
-			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
-		}
-		$subjectLength = Strings::length($subject);
-		if ($startIndex < 0 || $startIndex >= $subjectLength)
-		{
-			throw new OutOfRangeException('Parameter $startIndex is out of range.');
-		}
-		if ($length !== null && $startIndex + $length > $subjectLength)
-		{
-			throw new OutOfRangeException('Parameter $length is out of range.');
-		}
-		return mb_substr($subject, $startIndex, $length);
-	}
-
-	/**
-	 * @param string $subject
-	 * @return array
-	 */
-	public static function toCharArray($subject)
-	{
-		$subject = Strings::parseToString($subject, '$subject');
-		return preg_split('//u', $subject, null, PREG_SPLIT_NO_EMPTY);
-	}
-
-	/**
-	 * @param string $subject
-	 * @return string
-	 */
-	public static function toLower($subject)
-	{
-		$subject = Strings::parseToString($subject, '$subject');
-		return mb_strtolower($subject);
-	}
-
-	/**
-	 * @param string $subject
-	 * @return string
-	 */
-	public static function toUpper($subject)
-	{
-		$subject = Strings::parseToString($subject, '$subject');
-		return mb_strtoupper($subject);
-	}
-
-	/**
-	 * @param string   $subject
-	 * @param string[] $trimChars
-	 * @return string
-	 */
-	public static function trim($subject, array $trimChars = Strings::TRIM_WHITE_SPACE_CHARS)
-	{
-		$subject = Strings::parseToString($subject, '$subject');
-		if (!is_array($trimChars))
-		{
-			throw new InvalidArgumentException('Parameter $trimChars has to be type of array.');
-		}
-		if (empty($trimChars))
-		{
-			throw new InvalidArgumentException('Parameter $trimChars cannot be empty array.');
-		}
-		return trim($subject, Strings::join($trimChars, ""));
 	}
 
 	/**
@@ -697,18 +667,10 @@ class Strings
 	 * @param string $subject
 	 * @return string
 	 */
-	public static function firstToLower($subject)
+	public static function toUpper($subject)
 	{
 		$subject = Strings::parseToString($subject, '$subject');
-		if ($subject === Strings::EMPTY_STRING)
-		{
-			return $subject;
-		}
-		if (Strings::length($subject) === 1)
-		{
-			return Strings::toLower($subject);
-		}
-		return Strings::toLower(Strings::substring($subject, 0, 1)) . Strings::substring($subject, 1);
+		return mb_strtoupper($subject);
 	}
 
 	/**
@@ -736,6 +698,21 @@ class Strings
 
 	/**
 	 * @param string $subject
+	 * @param string $caseType
+	 * @return string
+	 */
+	public static function dashesToCase($subject, $caseType = Strings::CASE_PASCAL)
+	{
+		$subject = Strings::parseToString($subject, '$subject');
+		if (!in_array($caseType, [Strings::CASE_CAMEL, Strings::CASE_PASCAL]))
+		{
+			throw new InvalidArgumentException('Invalid value passed to parameter $caseType.');
+		}
+		return self::convertToCase($subject, '-', $caseType);
+	}
+
+	/**
+	 * @param string $subject
 	 * @param string $separator
 	 * @param string $caseType
 	 * @return string
@@ -753,27 +730,30 @@ class Strings
 
 	/**
 	 * @param string $subject
-	 * @param string $separator
 	 * @return string
 	 */
-	private static function convertFromCase($subject, $separator)
+	public static function firstToLower($subject)
 	{
-		return ltrim(mb_strtolower(preg_replace('/[A-Z]/', $separator . '$0', $subject)), $separator);
+		$subject = Strings::parseToString($subject, '$subject');
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			return $subject;
+		}
+		if (Strings::length($subject) === 1)
+		{
+			return Strings::toLower($subject);
+		}
+		return Strings::toLower(Strings::substring($subject, 0, 1)) . Strings::substring($subject, 1);
 	}
 
 	/**
 	 * @param string $subject
-	 * @param string $caseType
 	 * @return string
 	 */
-	public static function dashesToCase($subject, $caseType = Strings::CASE_PASCAL)
+	public static function toLower($subject)
 	{
 		$subject = Strings::parseToString($subject, '$subject');
-		if (!in_array($caseType, [Strings::CASE_CAMEL, Strings::CASE_PASCAL]))
-		{
-			throw new InvalidArgumentException('Invalid value passed to parameter $caseType.');
-		}
-		return self::convertToCase($subject, '-', $caseType);
+		return mb_strtolower($subject);
 	}
 
 	/**
@@ -799,6 +779,16 @@ class Strings
 	{
 		$subject = Strings::parseToString($subject, '$subject');
 		return self::convertFromCase($subject, '-');
+	}
+
+	/**
+	 * @param string $subject
+	 * @param string $separator
+	 * @return string
+	 */
+	private static function convertFromCase($subject, $separator)
+	{
+		return ltrim(mb_strtolower(preg_replace('/[A-Z]/', $separator . '$0', $subject)), $separator);
 	}
 
 	/**
@@ -849,49 +839,6 @@ class Strings
 		$subject = preg_replace('/[\\' . $separator . ']+/', $separator, $subject);
 		$subject = Strings::trim($subject);
 		return $subject;
-	}
-
-	/**
-	 * @param string $subject
-	 * @return string
-	 */
-	public static function stripHtmlTags($subject)
-	{
-		$subject = Strings::parseToString($subject, '$subject');
-		$inside = false;
-		$output = Strings::EMPTY_STRING;
-		$characters = Strings::toCharArray($subject);
-		$length = count($characters);
-		for ($i = 0; $i < $length; $i++)
-		{
-			$char = $characters[$i];
-			if ($char == "<")
-			{
-				$inside = true;
-				continue;
-			}
-			else if ($char == ">")
-			{
-				$inside = false;
-				continue;
-			}
-			if ($inside)
-			{
-				continue;
-			}
-			$output .= $char;
-		}
-		return $output;
-	}
-
-	/**
-	 * @param string $subject
-	 * @return string
-	 */
-	public static function reverse($subject)
-	{
-		$subject = Strings::parseToString($subject, '$subject');
-		return strrev($subject);
 	}
 
 	/**
@@ -1003,5 +950,58 @@ class Strings
 		];
 
 		return strtr($subject, $chars);
+	}
+
+	/**
+	 * @param string $subject
+	 * @return string
+	 */
+	public static function stripHtmlTags($subject)
+	{
+		$subject = Strings::parseToString($subject, '$subject');
+		$inside = false;
+		$output = Strings::EMPTY_STRING;
+		$characters = Strings::toCharArray($subject);
+		$length = count($characters);
+		for ($i = 0; $i < $length; $i++)
+		{
+			$char = $characters[$i];
+			if ($char == "<")
+			{
+				$inside = true;
+				continue;
+			}
+			else if ($char == ">")
+			{
+				$inside = false;
+				continue;
+			}
+			if ($inside)
+			{
+				continue;
+			}
+			$output .= $char;
+		}
+		return $output;
+	}
+
+	/**
+	 * @param string $subject
+	 * @return array
+	 */
+	public static function toCharArray($subject)
+	{
+		$subject = Strings::parseToString($subject, '$subject');
+		return preg_split('//u', $subject, null, PREG_SPLIT_NO_EMPTY);
+	}
+
+	/**
+	 * @param string $subject
+	 * @return string
+	 */
+	public static function reverse($subject)
+	{
+		$subject = Strings::parseToString($subject, '$subject');
+		return strrev($subject);
 	}
 }

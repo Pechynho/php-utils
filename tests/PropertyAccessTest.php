@@ -39,7 +39,7 @@ class PropertyAccessTest extends TestCase
 	{
 		PropertyAccess::setValue($this->person, "forename", "Joshua");
 		self::assertEquals("Joshua", $this->person->getForename());
-		PropertyAccess::setValue($this->person, function (Person $person, $value) { $person->setSurname($value);}, "Green");
+		PropertyAccess::setValue($this->person, function (Person $person, $value) { $person->setSurname($value); }, "Green");
 		self::assertEquals("Green", $this->person->getSurname());
 		PropertyAccess::setValue($this->person, "age", 40, false, true);
 		self::assertEquals(40, PropertyAccess::getValue($this->person, "age", true, null, true));

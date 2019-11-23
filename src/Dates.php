@@ -81,24 +81,6 @@ class Dates
 	}
 
 	/**
-	 * @param int $timestamp
-	 * @return DateTime
-	 */
-	public static function fromTimestamp($timestamp)
-	{
-		ParamsChecker::range('$timestamp', $timestamp, 0, null, __METHOD__);
-		try
-		{
-			$dateTime = new DateTime("@" . $timestamp);
-		}
-		catch (Exception $exception)
-		{
-			throw new RuntimeException(sprintf("Creating new instance of DateTime from timestamp '%s' was not successful.", $timestamp));
-		}
-		return $dateTime;
-	}
-
-	/**
 	 * @author Modified algorithm from: https://www.itnetwork.cz/php/knihovny/php-tutorial-dokonceni-knihovny-dateutils-pro-cesky-datum-a-cas
 	 *
 	 * @param string|int $value
@@ -137,6 +119,24 @@ class Dates
 				throw $exception;
 			}
 			throw new RuntimeException(sprintf('Creating instance of %s from value %s failed.', DateTime::class, $value));
+		}
+		return $dateTime;
+	}
+
+	/**
+	 * @param int $timestamp
+	 * @return DateTime
+	 */
+	public static function fromTimestamp($timestamp)
+	{
+		ParamsChecker::range('$timestamp', $timestamp, 0, null, __METHOD__);
+		try
+		{
+			$dateTime = new DateTime("@" . $timestamp);
+		}
+		catch (Exception $exception)
+		{
+			throw new RuntimeException(sprintf("Creating new instance of DateTime from timestamp '%s' was not successful.", $timestamp));
 		}
 		return $dateTime;
 	}

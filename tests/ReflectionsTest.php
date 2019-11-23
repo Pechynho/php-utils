@@ -6,7 +6,6 @@ use InvalidArgumentException;
 use Pechynho\Test\Model\Worker;
 use Pechynho\Utility\Reflections;
 use PHPUnit\Framework\TestCase;
-use Reflection;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionObject;

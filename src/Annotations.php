@@ -33,6 +33,25 @@ class Annotations
 	}
 
 	/**
+	 * @return AnnotationReader
+	 */
+	public static function createAnnotationReader()
+	{
+		try
+		{
+			if (method_exists(AnnotationRegistry::class, "registerLoader"))
+			{
+				AnnotationRegistry::registerLoader("class_exists");
+			}
+			return new AnnotationReader();
+		}
+		catch (AnnotationException $exception)
+		{
+			throw new RuntimeException(sprintf("Creating new instance of '%s' class was not successful.", AnnotationReader::class));
+		}
+	}
+
+	/**
 	 * @param string $class
 	 * @param string $annotation
 	 * @return ReflectionProperty[]
@@ -118,24 +137,5 @@ class Annotations
 			$reflectionClass = $reflectionClass->getParentClass();
 		}
 		return null;
-	}
-
-	/**
-	 * @return AnnotationReader
-	 */
-	public static function createAnnotationReader()
-	{
-		try
-		{
-			if (method_exists(AnnotationRegistry::class, "registerLoader"))
-			{
-				AnnotationRegistry::registerLoader("class_exists");
-			}
-			return new AnnotationReader();
-		}
-		catch (AnnotationException $exception)
-		{
-			throw new RuntimeException(sprintf("Creating new instance of '%s' class was not successful.", AnnotationReader::class));
-		}
 	}
 }

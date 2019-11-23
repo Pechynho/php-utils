@@ -16,7 +16,7 @@ class DatesTest extends TestCase
 	public function testFromTimestamp()
 	{
 		self::assertEquals(new DateTime("@0"), Dates::fromTimestamp("0"));
-		self::assertException(function () {  Dates::fromTimestamp("-6"); }, InvalidArgumentException::class);
+		self::assertException(function () { Dates::fromTimestamp("-6"); }, InvalidArgumentException::class);
 	}
 
 	public function testNow()

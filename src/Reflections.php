@@ -4,8 +4,6 @@
 namespace Pechynho\Utility;
 
 
-use Exception;
-use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -18,27 +16,6 @@ use RuntimeException;
  */
 class Reflections
 {
-	/**
-	 * @param string|object $classOrObject
-	 * @return ReflectionClass
-	 */
-	public static function createReflectionClass($classOrObject)
-	{
-		ParamsChecker::isNotEmptyStringOrObject('$classOrObject', $classOrObject, __METHOD__);
-		try
-		{
-			if (is_string($classOrObject))
-			{
-				return new ReflectionClass($classOrObject);
-			}
-			return new ReflectionClass(get_class($classOrObject));
-		}
-		catch (ReflectionException $e)
-		{
-			throw new RuntimeException(sprintf('Creating reflection class for "%s" was not successful.', is_string($classOrObject) ? $classOrObject : get_class($classOrObject)));
-		}
-	}
-
 	/**
 	 * @param object $object
 	 * @return ReflectionObject
@@ -88,6 +65,27 @@ class Reflections
 			return null;
 		}
 		throw new RuntimeException(sprintf("Retrieving property '%s' of class '%s' was not successful.", $property, $class));
+	}
+
+	/**
+	 * @param string|object $classOrObject
+	 * @return ReflectionClass
+	 */
+	public static function createReflectionClass($classOrObject)
+	{
+		ParamsChecker::isNotEmptyStringOrObject('$classOrObject', $classOrObject, __METHOD__);
+		try
+		{
+			if (is_string($classOrObject))
+			{
+				return new ReflectionClass($classOrObject);
+			}
+			return new ReflectionClass(get_class($classOrObject));
+		}
+		catch (ReflectionException $e)
+		{
+			throw new RuntimeException(sprintf('Creating reflection class for "%s" was not successful.', is_string($classOrObject) ? $classOrObject : get_class($classOrObject)));
+		}
 	}
 
 	/**

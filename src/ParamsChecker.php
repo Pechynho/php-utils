@@ -92,36 +92,6 @@ class ParamsChecker
 	/**
 	 * @param string      $parameter
 	 * @param mixed       $value
-	 * @param array       $types
-	 * @param string|null $methodOrFunction
-	 */
-	public static function types($parameter, &$value, array $types, $methodOrFunction = null)
-	{
-		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
-		self::isNotEmptyArray('$types', $types, __METHOD__);
-		self::isStringOrNull('$methodOrFunction', $methodOrFunction, __METHOD__);
-		$success = false;
-		foreach ($types as $type)
-		{
-			try
-			{
-				self::type($parameter, $value, $type, $methodOrFunction);
-				$success = true;
-				break;
-			}
-			catch (InvalidArgumentException $exception)
-			{
-			}
-		}
-		if (!$success)
-		{
-			throw self::createException($parameter, sprintf("Parameter {parameter} is expected to be one of these types: %s. Value passed to {parameter}: %s", Strings::join($types, ",", "and"), print_r($value, true)), $methodOrFunction);
-		}
-	}
-
-	/**
-	 * @param string      $parameter
-	 * @param mixed       $value
 	 * @param string      $type
 	 * @param string|null $methodOrFunction
 	 */
@@ -154,6 +124,41 @@ class ParamsChecker
 			throw self::createException($parameter, sprintf("Parameter {parameter} is expected to be a(n) $type. Value passed to {parameter}: %s", print_r($value, true)), $methodOrFunction);
 		}
 		self::isInstanceOf($parameter, $value, $type, $methodOrFunction);
+	}
+
+	/**
+	 * @param string      $parameter
+	 * @param mixed       $value
+	 * @param string|null $methodOrFunction
+	 */
+	public static function notWhiteSpaceOrNullString($parameter, $value, $methodOrFunction = null)
+	{
+		if (Strings::isNullOrWhiteSpace($parameter))
+		{
+			throw self::createException('$parameter', sprintf('Parameter {parameter} cannot be NULL or an empty string ("") and cannot consists only from white-space characters. Value passed to {parameter}: %s', print_r($parameter, true)), __METHOD__);
+		}
+		if (!is_string($methodOrFunction) && $methodOrFunction != null)
+		{
+			throw self::createException('$methodOrFunction', sprintf("Parameter {parameter} is expected to be a string or a NULL. Value passed to {parameter}: %s", print_r($methodOrFunction, true)), __METHOD__);
+		}
+		if (Strings::isNullOrWhiteSpace($value))
+		{
+			throw self::createException($parameter, sprintf('Parameter {parameter} cannot be NULL or an empty string ("") and cannot consists only from white-space characters. Value passed to {parameter}: %s', print_r($value, true)), $methodOrFunction);
+		}
+	}
+
+	/**
+	 * @param string      $parameter
+	 * @param string      $message
+	 * @param string|null $methodOrFunction
+	 * @return InvalidArgumentException
+	 */
+	private static function createException($parameter, $message, $methodOrFunction = null)
+	{
+		$message = ($methodOrFunction !== null ? sprintf("Wrong parameter value was provided to '%s'. ", $methodOrFunction) : "") . $message;
+		$parameter = Strings::startsWith($parameter, "$") ? $parameter : "$" . $parameter;
+		$message = Strings::replace($message, "{parameter}", $parameter);
+		return new InvalidArgumentException($message);
 	}
 
 	/**
@@ -193,6 +198,51 @@ class ParamsChecker
 		if (!class_exists($value, true))
 		{
 			throw self::createException($parameter, sprintf("Passed value to {parameter} is not a valid class name. Value passed to {parameter}: %s", print_r($value, true)), $methodOrFunction);
+		}
+	}
+
+	/**
+	 * @param string      $parameter
+	 * @param mixed       $value
+	 * @param string|null $methodOrFunction
+	 */
+	public static function notEmpty($parameter, $value, $methodOrFunction = null)
+	{
+		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
+		self::isStringOrNull('$methodOrFunction', $methodOrFunction, __METHOD__);
+		if (empty($value))
+		{
+			throw self::createException($parameter, sprintf("Parameter {parameter} is empty. Method empty({parameter}) was called to determine this. Value passed to {parameter}: %s", print_r($value, true)), $methodOrFunction);
+		}
+	}
+
+	/**
+	 * @param string      $parameter
+	 * @param mixed       $value
+	 * @param array       $types
+	 * @param string|null $methodOrFunction
+	 */
+	public static function types($parameter, &$value, array $types, $methodOrFunction = null)
+	{
+		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
+		self::isNotEmptyArray('$types', $types, __METHOD__);
+		self::isStringOrNull('$methodOrFunction', $methodOrFunction, __METHOD__);
+		$success = false;
+		foreach ($types as $type)
+		{
+			try
+			{
+				self::type($parameter, $value, $type, $methodOrFunction);
+				$success = true;
+				break;
+			}
+			catch (InvalidArgumentException $exception)
+			{
+			}
+		}
+		if (!$success)
+		{
+			throw self::createException($parameter, sprintf("Parameter {parameter} is expected to be one of these types: %s. Value passed to {parameter}: %s", Strings::join($types, ",", "and"), print_r($value, true)), $methodOrFunction);
 		}
 	}
 
@@ -327,55 +377,5 @@ class ParamsChecker
 		{
 			throw self::createException($parameter, sprintf("Invalid value provided to a parameter {parameter}. Parameter {parameter} expects not to be one of these values: %s. Value passed to {parameter}: %s", Strings::join($values, ",", "and"), print_r($value, true)), $methodOrFunction);
 		}
-	}
-
-	/**
-	 * @param string      $parameter
-	 * @param mixed       $value
-	 * @param string|null $methodOrFunction
-	 */
-	public static function notEmpty($parameter, $value, $methodOrFunction = null)
-	{
-		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
-		self::isStringOrNull('$methodOrFunction', $methodOrFunction, __METHOD__);
-		if (empty($value))
-		{
-			throw self::createException($parameter, sprintf("Parameter {parameter} is empty. Method empty({parameter}) was called to determine this. Value passed to {parameter}: %s", print_r($value, true)), $methodOrFunction);
-		}
-	}
-
-	/**
-	 * @param string      $parameter
-	 * @param mixed       $value
-	 * @param string|null $methodOrFunction
-	 */
-	public static function notWhiteSpaceOrNullString($parameter, $value, $methodOrFunction = null)
-	{
-		if (Strings::isNullOrWhiteSpace($parameter))
-		{
-			throw self::createException('$parameter', sprintf('Parameter {parameter} cannot be NULL or an empty string ("") and cannot consists only from white-space characters. Value passed to {parameter}: %s', print_r($parameter, true)), __METHOD__);
-		}
-		if (!is_string($methodOrFunction) && $methodOrFunction != null)
-		{
-			throw self::createException('$methodOrFunction', sprintf("Parameter {parameter} is expected to be a string or a NULL. Value passed to {parameter}: %s", print_r($methodOrFunction, true)), __METHOD__);
-		}
-		if (Strings::isNullOrWhiteSpace($value))
-		{
-			throw self::createException($parameter, sprintf('Parameter {parameter} cannot be NULL or an empty string ("") and cannot consists only from white-space characters. Value passed to {parameter}: %s', print_r($value, true)), $methodOrFunction);
-		}
-	}
-
-	/**
-	 * @param string      $parameter
-	 * @param string      $message
-	 * @param string|null $methodOrFunction
-	 * @return InvalidArgumentException
-	 */
-	private static function createException($parameter, $message, $methodOrFunction = null)
-	{
-		$message = ($methodOrFunction !== null ? sprintf("Wrong parameter value was provided to '%s'. ", $methodOrFunction) : "") . $message;
-		$parameter = Strings::startsWith($parameter, "$") ? $parameter : "$" . $parameter;
-		$message = Strings::replace($message, "{parameter}", $parameter);
-		return new InvalidArgumentException($message);
 	}
 }
