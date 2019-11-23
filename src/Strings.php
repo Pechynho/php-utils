@@ -116,6 +116,10 @@ class Strings
 		$lastSeparator = Strings::parseToString($lastSeparator, '$lastSeparator', true);
 		if (is_array($subject))
 		{
+			if (Arrays::isEmpty($subject))
+			{
+				return "";
+			}
 			if ($lastSeparator === null || $separator === $lastSeparator)
 			{
 				return implode($separator, $subject);
