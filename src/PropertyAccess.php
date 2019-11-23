@@ -19,18 +19,6 @@ class PropertyAccess
 	private static $propertyAccessor = null;
 
 	/**
-	 * @return PropertyAccessorInterface
-	 */
-	private static function getPropertyAccessor(): PropertyAccessorInterface
-	{
-		if (self::$propertyAccessor === null)
-		{
-			self::$propertyAccessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
-		}
-		return self::$propertyAccessor;
-	}
-
-	/**
 	 * @param object|array                          $objectOrArray
 	 * @param callable|string|PropertyPathInterface $propertyPath
 	 * @param bool                                  $throwException
@@ -65,6 +53,10 @@ class PropertyAccess
 		}
 		try
 		{
+			if (is_array($objectOrArray) && is_string($propertyPath) && preg_match("/^\[[\S]+\]$/", $propertyPath) === 0)
+			{
+				$propertyPath = "[" . $propertyPath . "]";
+			}
 			return self::getPropertyAccessor()->getValue($objectOrArray, $propertyPath);
 		}
 		catch (Exception $exception)
@@ -103,13 +95,25 @@ class PropertyAccess
 	}
 
 	/**
+	 * @return PropertyAccessorInterface
+	 */
+	private static function getPropertyAccessor(): PropertyAccessorInterface
+	{
+		if (self::$propertyAccessor === null)
+		{
+			self::$propertyAccessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
+		}
+		return self::$propertyAccessor;
+	}
+
+	/**
 	 * @param object|array                          $objectOrArray
 	 * @param callable|string|PropertyPathInterface $propertyPath
 	 * @param mixed                                 $value
 	 * @param bool                                  $throwException
 	 * @param bool                                  $tryReflection
 	 */
-	public static function setValue($objectOrArray, $propertyPath, $value, bool $throwException = true, bool $tryReflection = false)
+	public static function setValue(&$objectOrArray, $propertyPath, $value, bool $throwException = true, bool $tryReflection = false)
 	{
 		if (!is_object($objectOrArray) && !is_array($objectOrArray))
 		{
@@ -136,6 +140,10 @@ class PropertyAccess
 		}
 		try
 		{
+			if (is_array($objectOrArray) && is_string($propertyPath) && preg_match("/^\[[\S]+\]$/", $propertyPath) === 0)
+			{
+				$propertyPath = "[" . $propertyPath . "]";
+			}
 			self::getPropertyAccessor()->setValue($objectOrArray, $propertyPath, $value);
 			return;
 		}

@@ -275,21 +275,20 @@ class ArraysTest extends TestCase
 	public function testMergeArrayConfig()
 	{
 		$defaultConfig = [
-			"value1" => ["value1_1" => 5, "value1_2"=> ["value1_2_1" => 5, "value1_2_2" => [5, 6, 7]]],
+			"value1" => ["value1_1" => 5, "value1_2" => ["value1_2_1" => 5, "value1_2_2" => [5, 6, 7]]],
 			"value2" => [4, 3, 5],
 			"value3" => null
 		];
 		$config = [
-			"value1" => ["value1_2"=> ["value1_2_2" => [8, 7]]],
+			"value1" => ["value1_2" => ["value1_2_2" => [8, 7]]],
 			"value2" => 5
 		];
 		$result = [
-			"value1" => ["value1_1" => 5, "value1_2"=> ["value1_2_1" => 5, "value1_2_2" => [8, 7]]],
+			"value1" => ["value1_1" => 5, "value1_2" => ["value1_2_1" => 5, "value1_2_2" => [8, 7]]],
 			"value2" => 5,
 			"value3" => null
 		];
-		self::assertEquals($result, Arrays::mergeArrayConfig($defaultConfig, $config, true));
-		self::assertEquals(["value1" => ["value1_2"=> ["value1_2_2" => [8, 7]]], "value2" => 5, "value3" => null], Arrays::mergeArrayConfig($defaultConfig, $config, false));
-		self::assertException(function () use ($defaultConfig, $config) { Arrays::mergeArrayConfig($defaultConfig, $config, "blue"); }, InvalidArgumentException::class);
+		self::assertEquals($result, Arrays::mergeArrayConfig($config, $defaultConfig, true));
+		self::assertEquals(["value1" => ["value1_2" => ["value1_2_2" => [8, 7]]], "value2" => 5, "value3" => null], Arrays::mergeArrayConfig($config, $defaultConfig, false));
 	}
 }

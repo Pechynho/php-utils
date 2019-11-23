@@ -23,34 +23,12 @@ class Arrays
 	public const ORDER_DIRECTION_DESCENDING = "ORDER_DIRECTION_DESCENDING";
 
 	/**
-	 * @param mixed $subject
-	 * @return bool
-	 */
-	public static function isCountable($subject): bool
-	{
-		return is_array($subject) || $subject instanceof Countable;
-	}
-
-	/**
 	 * @param mixed $value
 	 * @return bool
 	 */
 	public static function isIterable($value): bool
 	{
 		return is_array($value) || $value instanceof Traversable;
-	}
-
-	/**
-	 * @param iterable $subject
-	 * @return bool
-	 */
-	public static function isEmpty(iterable $subject): bool
-	{
-		foreach ($subject as $item)
-		{
-			return false;
-		}
-		return true;
 	}
 
 	/**
@@ -76,6 +54,19 @@ class Arrays
 
 	/**
 	 * @param iterable $subject
+	 * @return bool
+	 */
+	public static function isEmpty(iterable $subject): bool
+	{
+		foreach ($subject as $item)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * @param iterable $subject
 	 * @param callable $predicate
 	 * @param mixed    $defaultValue
 	 * @return mixed
@@ -90,23 +81,6 @@ class Arrays
 			}
 		}
 		return $defaultValue;
-	}
-
-	/**
-	 * @param $subject
-	 * @return int|string
-	 */
-	public static function firstKey(array $subject)
-	{
-		if (empty($subject))
-		{
-			throw new InvalidArgumentException('Parameter $subject is empty.');
-		}
-		if (function_exists("array_key_first")) return array_key_first($subject);
-		foreach ($subject as $key => $item)
-		{
-			return $key;
-		}
 	}
 
 	/**
@@ -403,6 +377,15 @@ class Arrays
 	}
 
 	/**
+	 * @param mixed $subject
+	 * @return bool
+	 */
+	public static function isCountable($subject): bool
+	{
+		return is_array($subject) || $subject instanceof Countable;
+	}
+
+	/**
 	 * @param iterable                              $subject
 	 * @param callable|string|PropertyPathInterface $propertyPath
 	 * @return array
@@ -599,24 +582,6 @@ class Arrays
 	 * @param iterable $subject
 	 * @return array
 	 */
-	public static function reverse(iterable $subject): array
-	{
-		return array_reverse(is_array($subject) ? $subject : Arrays::toArray($subject));
-	}
-
-	/**
-	 * @param array $subject
-	 * @return array
-	 */
-	public static function flip(array $subject): array
-	{
-		return array_flip($subject);
-	}
-
-	/**
-	 * @param iterable $subject
-	 * @return array
-	 */
 	public static function toArray(iterable $subject): array
 	{
 		if (is_array($subject))
@@ -629,6 +594,24 @@ class Arrays
 			$output[] = $item;
 		}
 		return $output;
+	}
+
+	/**
+	 * @param iterable $subject
+	 * @return array
+	 */
+	public static function reverse(iterable $subject): array
+	{
+		return array_reverse(is_array($subject) ? $subject : Arrays::toArray($subject));
+	}
+
+	/**
+	 * @param array $subject
+	 * @return array
+	 */
+	public static function flip(array $subject): array
+	{
+		return array_flip($subject);
 	}
 
 	/**
@@ -690,7 +673,7 @@ class Arrays
 		$count = count($keys);
 		foreach ($keys as $index => $key)
 		{
-			if (!isset($subject[$key]))
+			if (!is_array($subject) || !isset($subject[$key]))
 			{
 				break;
 			}
@@ -710,13 +693,8 @@ class Arrays
 	 * @param bool  $deep
 	 * @return array
 	 */
-	public static function mergeArrayConfig(array $defaultConfig, array $config = null, $deep = true)
+	public static function mergeArrayConfig(array $config, array $defaultConfig, bool $deep = true)
 	{
-		ParamsChecker::isBool('$deep', $deep, __METHOD__);
-		if (!is_array($config))
-		{
-			$config = [];
-		}
 		foreach ($defaultConfig as $option => $value)
 		{
 			if (!isset($config[$option]))
@@ -725,9 +703,26 @@ class Arrays
 			}
 			else if ($deep && isset($config[$option]) && is_array($config[$option]) && (empty($config[$option]) || is_string(Arrays::firstKey($config[$option]))))
 			{
-				$config[$option] = Arrays::mergeArrayConfig($defaultConfig[$option], $config[$option], $deep);
+				$config[$option] = Arrays::mergeArrayConfig($config[$option], $defaultConfig[$option], $deep);
 			}
 		}
 		return $config;
+	}
+
+	/**
+	 * @param $subject
+	 * @return int|string
+	 */
+	public static function firstKey(array $subject)
+	{
+		if (empty($subject))
+		{
+			throw new InvalidArgumentException('Parameter $subject is empty.');
+		}
+		if (function_exists("array_key_first")) return array_key_first($subject);
+		foreach ($subject as $key => $item)
+		{
+			return $key;
+		}
 	}
 }

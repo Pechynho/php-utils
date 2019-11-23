@@ -53,6 +53,59 @@ class FileSystem
 	}
 
 	/**
+	 * @param string $filename
+	 * @return bool
+	 */
+	public static function isFile(string $filename): bool
+	{
+		return file_exists($filename) && !is_dir($filename);
+	}
+
+	/**
+	 * @param string $directory
+	 * @return bool
+	 */
+	public static function isDirectory(string $directory): bool
+	{
+		return file_exists($directory) && is_dir($directory);
+	}
+
+	/**
+	 * @param string $directory
+	 * @param int    $mode
+	 */
+	public static function createDirectory(string $directory, int $mode = 0777)
+	{
+		if (Strings::isNullOrWhiteSpace($directory))
+		{
+			throw new InvalidArgumentException("Given value '$directory' is not valid directory.");
+		}
+		if (!FileSystem::isDirectory($directory))
+		{
+			mkdir($directory, $mode, true);
+		}
+	}
+
+	/**
+	 * @param string[] ...$paths
+	 * @return string
+	 */
+	public static function combinePath(...$paths): string
+	{
+		if (Arrays::isEmpty($paths))
+		{
+			throw new InvalidArgumentException("You have to provide at least one path.");
+		}
+		$finalPath = "";
+		foreach ($paths as $index => $path)
+		{
+			$finalPath = $finalPath . ($index == 0 ? "" : "/") . $path;
+		}
+		$finalPath = preg_replace('/[\/]{2,}/', '/', $finalPath);
+		return $finalPath;
+	}
+
+	/**
 	 * @param string $source
 	 * @param string $destination
 	 * @param bool   $overwrite
@@ -97,6 +150,29 @@ class FileSystem
 	}
 
 	/**
+	 * @param string $path
+	 */
+	public static function delete(string $path)
+	{
+		if (!file_exists($path))
+		{
+			throw new InvalidArgumentException("Path '$path' does not exist.");
+		}
+		if (FileSystem::isFile($path))
+		{
+			unlink($path);
+			return;
+		}
+		$items = array_diff(scandir($path), [".", ".."]);
+		foreach ($items as $item)
+		{
+			$item = FileSystem::combinePath($path, $item);
+			FileSystem::delete($item);
+		}
+		rmdir($path);
+	}
+
+	/**
 	 * @param string $filename
 	 * @param string $text
 	 * @param bool   $newLine
@@ -122,66 +198,6 @@ class FileSystem
 		}
 		fclose($file);
 		clearstatcache();
-	}
-
-	/**
-	 * @param string $filename
-	 * @param bool   $trimEndOfLine
-	 * @return array
-	 */
-	public static function readAllLines(string $filename, bool $trimEndOfLine = true): array
-	{
-		if (!FileSystem::isFile($filename))
-		{
-			throw new InvalidArgumentException("File '$filename' does not exist.");
-		}
-		$file = fopen($filename, "r");
-		$lines = [];
-		while (!feof($file))
-		{
-			$lines[] = $trimEndOfLine ? Strings::trimEnd(fgets($file), [PHP_EOL]) : fgets($file);
-		}
-		fclose($file);
-		clearstatcache();
-		return $lines;
-	}
-
-	/**
-	 * @param string $filename
-	 * @param bool   $trimEndOfLine
-	 * @return iterable
-	 */
-	public static function readLineByLine(string $filename, bool $trimEndOfLine = true): iterable
-	{
-		if (!FileSystem::isFile($filename))
-		{
-			throw new InvalidArgumentException("File '$filename' does not exist.");
-		}
-		$file = fopen($filename, "r");
-		while (!feof($file))
-		{
-			yield $trimEndOfLine ? Strings::trimEnd(fgets($file), [PHP_EOL]) : fgets($file);
-		}
-		fclose($file);
-		clearstatcache();
-	}
-
-	/**
-	 * @param string $filename
-	 * @return string
-	 */
-	public static function readAllText(string $filename): string
-	{
-		if (!FileSystem::isFile($filename))
-		{
-			throw new InvalidArgumentException("File '$filename' does not exist.");
-		}
-		$output = Strings::EMPTY_STRING;
-		foreach (FileSystem::readLineByLine($filename, false) as $line)
-		{
-			$output .= $line;
-		}
-		return $output;
 	}
 
 	/**
@@ -219,79 +235,63 @@ class FileSystem
 	}
 
 	/**
-	 * @param string[] ...$paths
-	 * @return string
+	 * @param string $filename
+	 * @param bool   $trimEndOfLine
+	 * @return array
 	 */
-	public static function combinePath(...$paths): string
+	public static function readAllLines(string $filename, bool $trimEndOfLine = true): array
 	{
-		if (Arrays::isEmpty($paths))
+		if (!FileSystem::isFile($filename))
 		{
-			throw new InvalidArgumentException("You have to provide at least one path.");
+			throw new InvalidArgumentException("File '$filename' does not exist.");
 		}
-		$finalPath = "";
-		foreach ($paths as $index => $path)
+		$file = fopen($filename, "r");
+		$lines = [];
+		while (!feof($file))
 		{
-			$finalPath = $finalPath . ($index == 0 ? "" : "/") . $path;
+			$lines[] = $trimEndOfLine ? Strings::trimEnd(fgets($file), [PHP_EOL]) : fgets($file);
 		}
-		$finalPath = preg_replace('/[\/]{2,}/', '/', $finalPath);
-		return $finalPath;
-	}
-
-	/**
-	 * @param string $path
-	 */
-	public static function delete(string $path)
-	{
-		if (!file_exists($path))
-		{
-			throw new InvalidArgumentException("Path '$path' does not exist.");
-		}
-		if (FileSystem::isFile($path))
-		{
-			unlink($path);
-			return;
-		}
-		$items = array_diff(scandir($path), [".", ".."]);
-		foreach ($items as $item)
-		{
-			$item = FileSystem::combinePath($path, $item);
-			FileSystem::delete($item);
-		}
-		rmdir($path);
-	}
-
-	/**
-	 * @param string $directory
-	 * @param int    $mode
-	 */
-	public static function createDirectory(string $directory, int $mode = 0777)
-	{
-		if (Strings::isNullOrWhiteSpace($directory))
-		{
-			throw new InvalidArgumentException("Given value '$directory' is not valid directory.");
-		}
-		if (!FileSystem::isDirectory($directory))
-		{
-			mkdir($directory, $mode, true);
-		}
-	}
-
-	/**
-	 * @param string $directory
-	 * @return bool
-	 */
-	public static function isDirectory(string $directory): bool
-	{
-		return file_exists($directory) && is_dir($directory);
+		fclose($file);
+		clearstatcache();
+		return $lines;
 	}
 
 	/**
 	 * @param string $filename
-	 * @return bool
+	 * @return string
 	 */
-	public static function isFile(string $filename): bool
+	public static function readAllText(string $filename): string
 	{
-		return file_exists($filename) && !is_dir($filename);
+		if (!FileSystem::isFile($filename))
+		{
+			throw new InvalidArgumentException("File '$filename' does not exist.");
+		}
+		$output = Strings::EMPTY_STRING;
+		foreach (FileSystem::readLineByLine($filename, false) as $line)
+		{
+			$output .= $line;
+		}
+		return $output;
+	}
+
+	/**
+	 * @param string $filename
+	 * @param bool   $trimEndOfLine
+	 * @return iterable
+	 */
+	public static function readLineByLine(string $filename, bool $trimEndOfLine = true): iterable
+	{
+		if (!FileSystem::isFile($filename))
+		{
+			throw new InvalidArgumentException("File '$filename' does not exist.");
+		}
+		$file = fopen($filename, "r");
+		while (!feof($file))
+		{
+			yield $trimEndOfLine ? Strings::trimEnd(fgets($file), [PHP_EOL]) : fgets($file);
+		}
+		fclose($file);
+		clearstatcache();
 	}
 
 	/**

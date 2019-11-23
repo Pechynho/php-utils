@@ -60,6 +60,70 @@ class Strings
 	}
 
 	/**
+	 * @param string   $subject
+	 * @param string[] $trimChars
+	 * @return string
+	 */
+	public static function trim(string $subject, array $trimChars = Strings::TRIM_WHITE_SPACE_CHARS): string
+	{
+		if (empty($trimChars))
+		{
+			throw new InvalidArgumentException('Parameter $trimChars cannot be empty array.');
+		}
+		return trim($subject, Strings::join($trimChars, ""));
+	}
+
+	/**
+	 * @param iterable    $subject
+	 * @param string      $separator
+	 * @param string|null $lastSeparator
+	 * @return string
+	 */
+	public static function join(iterable $subject, string $separator, ?string $lastSeparator = null): string
+	{
+		if (is_array($subject))
+		{
+			if (Arrays::isEmpty($subject))
+			{
+				return "";
+			}
+			if ($lastSeparator === null || $separator === $lastSeparator)
+			{
+				return implode($separator, $subject);
+			}
+			if (function_exists("array_key_first"))
+			{
+				$lastKey = array_key_last($subject);
+				$lastValue = $subject[$lastKey];
+				unset($subject[$lastKey]);
+				if (empty($subject))
+				{
+					return $lastValue;
+				}
+				return implode($separator, $subject) . $lastSeparator . $lastValue;
+			}
+		}
+		$parts = [];
+		$partsCount = 0;
+		foreach ($subject as $item)
+		{
+			$parts[] = ["value" => $item, "separator" => $separator];
+			$partsCount++;
+		}
+		if ($partsCount != 0)
+		{
+			$parts[$partsCount - 1]["separator"] = $lastSeparator === null ? $separator : $lastSeparator;
+			$parts[0]["separator"] = Strings::EMPTY_STRING;
+		}
+		$output = Strings::EMPTY_STRING;
+		foreach ($parts as $part)
+		{
+			$output .= $part["separator"] . $part["value"];
+		}
+		return $output;
+	}
+
+	/**
 	 * Compares two strings by their value.
 	 * @param string $strA First string to compare.
 	 * @param string $strB Second string to compare.
@@ -78,7 +142,7 @@ class Strings
 	/**
 	 * Returns a value indicating whether a specified substring occurs within passed string.
 	 * @param string $subject The string to seek in.
-	 * @param string $value The substring to seek.
+	 * @param string $value   The substring to seek.
 	 * @return bool Returns true if the $value parameter occurs within $subject parameter; otherwise false.
 	 */
 	public static function contains(string $subject, string $value): bool
@@ -91,20 +155,9 @@ class Strings
 	}
 
 	/**
-	 * Indicates if string ends with given value.
-	 * @param string $subject The string to seek in.
-	 * @param string $value The substring to seek at end.
-	 * @return bool Returns true if the $subject parameter ends with $value parameter; otherwise false;
-	 */
-	public static function endsWith(string $subject, string $value): bool
-	{
-		return $value === "" || (($temp = mb_strlen($subject) - mb_strlen($value)) >= 0 && strpos($subject, $value, $temp) !== false);
-	}
-
-	/**
 	 * Returns integer representing index on which given value occurs in given string.
-	 * @param string $subject The string to seek in.
-	 * @param string $value The value to seek.
+	 * @param string $subject    The string to seek in.
+	 * @param string $value      The value to seek.
 	 * @param int    $startIndex Offset value from start of the string.
 	 * @return int Returns value indicating on which index occurs $value in $subject; if $subject doesn't contain $value, then it returns -1.
 	 */
@@ -124,6 +177,26 @@ class Strings
 		}
 		$result = mb_strpos($subject, $value, $startIndex);
 		return $result === false ? -1 : $result;
+	}
+
+	/**
+	 * @param string $subject
+	 * @return int
+	 */
+	public static function length(string $subject): int
+	{
+		return mb_strlen($subject);
+	}
+
+	/**
+	 * Indicates if string ends with given value.
+	 * @param string $subject The string to seek in.
+	 * @param string $value   The substring to seek at end.
+	 * @return bool Returns true if the $subject parameter ends with $value parameter; otherwise false;
+	 */
+	public static function endsWith(string $subject, string $value): bool
+	{
+		return $value === "" || (($temp = mb_strlen($subject) - mb_strlen($value)) >= 0 && strpos($subject, $value, $temp) !== false);
 	}
 
 	/**
@@ -181,58 +254,6 @@ class Strings
 	}
 
 	/**
-	 * @param iterable    $subject
-	 * @param string      $separator
-	 * @param string|null $lastSeparator
-	 * @return string
-	 */
-	public static function join(iterable $subject, string $separator, ?string $lastSeparator = null): string
-	{
-		$parts = [];
-		$partsCount = 0;
-		foreach ($subject as $item)
-		{
-			$parts[] = ["value" => $item, "separator" => $separator];
-			$partsCount++;
-		}
-		if ($partsCount != 0)
-		{
-			$parts[$partsCount - 1]["separator"] = $lastSeparator === null ? $separator : $lastSeparator;
-			$parts[0]["separator"] = Strings::EMPTY_STRING;
-		}
-		$output = Strings::EMPTY_STRING;
-		foreach ($parts as $part)
-		{
-			$output .= $part["separator"] . $part["value"];
-		}
-		return $output;
-	}
-
-	/**
-	 * @param string $subject
-	 * @param string $value
-	 * @param int    $startIndex
-	 * @return int
-	 */
-	public static function lastIndexOf(string $subject, string $value, int $startIndex = 0): int
-	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
-			return -1;
-		}
-		if ($value === Strings::EMPTY_STRING)
-		{
-			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
-		}
-		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
-		{
-			throw new OutOfRangeException('Parameter $startIndex is out of range.');
-		}
-		$result = mb_strrpos($subject, $value, $startIndex);
-		return $result === false ? -1 : $result;
-	}
-
-	/**
 	 * @param string   $subject
 	 * @param iterable $values
 	 * @param int      $startIndex
@@ -265,11 +286,26 @@ class Strings
 
 	/**
 	 * @param string $subject
+	 * @param string $value
+	 * @param int    $startIndex
 	 * @return int
 	 */
-	public static function length(string $subject): int
+	public static function lastIndexOf(string $subject, string $value, int $startIndex = 0): int
 	{
-		return mb_strlen($subject);
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			return -1;
+		}
+		if ($value === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
+		}
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
+		{
+			throw new OutOfRangeException('Parameter $startIndex is out of range.');
+		}
+		$result = mb_strrpos($subject, $value, $startIndex);
+		return $result === false ? -1 : $result;
 	}
 
 	/**
@@ -339,6 +375,30 @@ class Strings
 	}
 
 	/**
+	 * @param string   $subject
+	 * @param int      $startIndex
+	 * @param int|null $length
+	 * @return string
+	 */
+	public static function substring(string $subject, int $startIndex, ?int $length = null): string
+	{
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
+		}
+		$subjectLength = Strings::length($subject);
+		if ($startIndex < 0 || $startIndex >= $subjectLength)
+		{
+			throw new OutOfRangeException('Parameter $startIndex is out of range.');
+		}
+		if ($length !== null && $startIndex + $length > $subjectLength)
+		{
+			throw new OutOfRangeException('Parameter $length is out of range.');
+		}
+		return mb_substr($subject, $startIndex, $length);
+	}
+
+	/**
 	 * @param string $subject
 	 * @param string $oldValue
 	 * @param string $newValue
@@ -351,26 +411,6 @@ class Strings
 			throw new InvalidArgumentException('Parameter $oldValue cannot be empty string.');
 		}
 		return str_replace($oldValue, $newValue, $subject);
-	}
-
-	/**
-	 * @param string   $subject
-	 * @param string[] $replacements
-	 * @return string
-	 */
-	public static function replaceMultiple(string $subject, array $replacements): string
-	{
-		$oldValues = array_keys($replacements);
-		$newValues = array_values($replacements);
-		if (empty($replacements))
-		{
-			return $subject;
-		}
-		if (in_array("", $oldValues))
-		{
-			throw new InvalidArgumentException('Keys in parameter $replacements should be non-empty string values which should be replaced.');
-		}
-		return str_replace($oldValues, $newValues, $subject);
 	}
 
 	/**
@@ -402,6 +442,26 @@ class Strings
 	}
 
 	/**
+	 * @param string   $subject
+	 * @param string[] $replacements
+	 * @return string
+	 */
+	public static function replaceMultiple(string $subject, array $replacements): string
+	{
+		$oldValues = array_keys($replacements);
+		$newValues = array_values($replacements);
+		if (empty($replacements))
+		{
+			return $subject;
+		}
+		if (in_array("", $oldValues))
+		{
+			throw new InvalidArgumentException('Keys in parameter $replacements should be non-empty string values which should be replaced.');
+		}
+		return str_replace($oldValues, $newValues, $subject);
+	}
+
+	/**
 	 * @param string $subject
 	 * @return string[]
 	 */
@@ -426,71 +486,6 @@ class Strings
 	public static function startsWith(string $subject, string $value): bool
 	{
 		return $value === "" || strncmp($subject, $value, mb_strlen($value)) === 0;
-	}
-
-	/**
-	 * @param string   $subject
-	 * @param int      $startIndex
-	 * @param int|null $length
-	 * @return string
-	 */
-	public static function substring(string $subject, int $startIndex, ?int $length = null): string
-	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
-			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
-		}
-		$subjectLength = Strings::length($subject);
-		if ($startIndex < 0 || $startIndex >= $subjectLength)
-		{
-			throw new OutOfRangeException('Parameter $startIndex is out of range.');
-		}
-		if ($length !== null && $startIndex + $length > $subjectLength)
-		{
-			throw new OutOfRangeException('Parameter $length is out of range.');
-		}
-		return mb_substr($subject, $startIndex, $length);
-	}
-
-	/**
-	 * @param string $subject
-	 * @return array
-	 */
-	public static function toCharArray(string $subject): array
-	{
-		return preg_split('//u', $subject, null, PREG_SPLIT_NO_EMPTY);
-	}
-
-	/**
-	 * @param string $subject
-	 * @return string
-	 */
-	public static function toLower(string $subject): string
-	{
-		return mb_strtolower($subject);
-	}
-
-	/**
-	 * @param string $subject
-	 * @return string
-	 */
-	public static function toUpper(string $subject): string
-	{
-		return mb_strtoupper($subject);
-	}
-
-	/**
-	 * @param string   $subject
-	 * @param string[] $trimChars
-	 * @return string
-	 */
-	public static function trim(string $subject, array $trimChars = Strings::TRIM_WHITE_SPACE_CHARS): string
-	{
-		if (empty($trimChars))
-		{
-			throw new InvalidArgumentException('Parameter $trimChars cannot be empty array.');
-		}
-		return trim($subject, Strings::join($trimChars, ""));
 	}
 
 	/**
@@ -542,17 +537,9 @@ class Strings
 	 * @param string $subject
 	 * @return string
 	 */
-	public static function firstToLower(string $subject): string
+	public static function toUpper(string $subject): string
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
-			return $subject;
-		}
-		if (Strings::length($subject) === 1)
-		{
-			return Strings::toLower($subject);
-		}
-		return Strings::toLower(Strings::substring($subject, 0, 1)) . Strings::substring($subject, 1);
+		return mb_strtoupper($subject);
 	}
 
 	/**
@@ -575,6 +562,16 @@ class Strings
 
 	/**
 	 * @param string $subject
+	 * @param string $caseType
+	 * @return string
+	 */
+	public static function dashesToCase(string $subject, string $caseType = Strings::CASE_PASCAL): string
+	{
+		return self::convertToCase($subject, '-', $caseType);
+	}
+
+	/**
+	 * @param string $subject
 	 * @param string $separator
 	 * @param string $caseType
 	 * @return string
@@ -592,22 +589,28 @@ class Strings
 
 	/**
 	 * @param string $subject
-	 * @param string $separator
 	 * @return string
 	 */
-	private static function convertFromCase(string $subject, string $separator): string
+	public static function firstToLower(string $subject): string
 	{
-		return ltrim(mb_strtolower(preg_replace('/[A-Z]/', $separator . '$0', $subject)), $separator);
+		if ($subject === Strings::EMPTY_STRING)
+		{
+			return $subject;
+		}
+		if (Strings::length($subject) === 1)
+		{
+			return Strings::toLower($subject);
+		}
+		return Strings::toLower(Strings::substring($subject, 0, 1)) . Strings::substring($subject, 1);
 	}
 
 	/**
 	 * @param string $subject
-	 * @param string $caseType
 	 * @return string
 	 */
-	public static function dashesToCase(string $subject, string $caseType = Strings::CASE_PASCAL): string
+	public static function toLower(string $subject): string
 	{
-		return self::convertToCase($subject, '-', $caseType);
+		return mb_strtolower($subject);
 	}
 
 	/**
@@ -627,6 +630,16 @@ class Strings
 	public static function caseToDashes(string $subject): string
 	{
 		return self::convertFromCase($subject, '-');
+	}
+
+	/**
+	 * @param string $subject
+	 * @param string $separator
+	 * @return string
+	 */
+	private static function convertFromCase(string $subject, string $separator): string
+	{
+		return ltrim(mb_strtolower(preg_replace('/[A-Z]/', $separator . '$0', $subject)), $separator);
 	}
 
 	/**
@@ -670,47 +683,6 @@ class Strings
 		$subject = preg_replace('/[\\' . $separator . ']+/', $separator, $subject);
 		$subject = Strings::trim($subject);
 		return $subject;
-	}
-
-	/**
-	 * @param string $subject
-	 * @return string
-	 */
-	public static function stripHtmlTags(string $subject): string
-	{
-		$inside = false;
-		$output = Strings::EMPTY_STRING;
-		$characters = Strings::toCharArray($subject);
-		$length = count($characters);
-		for ($i = 0; $i < $length; $i++)
-		{
-			$char = $characters[$i];
-			if ($char == "<")
-			{
-				$inside = true;
-				continue;
-			}
-			else if ($char == ">")
-			{
-				$inside = false;
-				continue;
-			}
-			if ($inside)
-			{
-				continue;
-			}
-			$output .= $char;
-		}
-		return $output;
-	}
-
-	/**
-	 * @param string $subject
-	 * @return string
-	 */
-	public static function reverse(string $subject): string
-	{
-		return strrev($subject);
 	}
 
 	/**
@@ -821,5 +793,55 @@ class Strings
 		];
 
 		return strtr($subject, $chars);
+	}
+
+	/**
+	 * @param string $subject
+	 * @return string
+	 */
+	public static function stripHtmlTags(string $subject): string
+	{
+		$inside = false;
+		$output = Strings::EMPTY_STRING;
+		$characters = Strings::toCharArray($subject);
+		$length = count($characters);
+		for ($i = 0; $i < $length; $i++)
+		{
+			$char = $characters[$i];
+			if ($char == "<")
+			{
+				$inside = true;
+				continue;
+			}
+			else if ($char == ">")
+			{
+				$inside = false;
+				continue;
+			}
+			if ($inside)
+			{
+				continue;
+			}
+			$output .= $char;
+		}
+		return $output;
+	}
+
+	/**
+	 * @param string $subject
+	 * @return array
+	 */
+	public static function toCharArray(string $subject): array
+	{
+		return preg_split('//u', $subject, null, PREG_SPLIT_NO_EMPTY);
+	}
+
+	/**
+	 * @param string $subject
+	 * @return string
+	 */
+	public static function reverse(string $subject): string
+	{
+		return strrev($subject);
 	}
 }

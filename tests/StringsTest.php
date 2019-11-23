@@ -39,10 +39,10 @@ class StringsTest extends TestCase
 
 	public function testInsert()
 	{
-		self::assertEquals("Hello World!", Strings::insert("Hello !", "World",6));
-		self::assertException(function () { Strings::insert("Hello !", "World",20); }, OutOfRangeException::class);
-		self::assertException(function () { Strings::insert("", "World",6); }, InvalidArgumentException::class);
-		self::assertException(function () { Strings::insert("Hello !", "",6); }, InvalidArgumentException::class);
+		self::assertEquals("Hello World!", Strings::insert("Hello !", "World", 6));
+		self::assertException(function () { Strings::insert("Hello !", "World", 20); }, OutOfRangeException::class);
+		self::assertException(function () { Strings::insert("", "World", 6); }, InvalidArgumentException::class);
+		self::assertException(function () { Strings::insert("Hello !", "", 6); }, InvalidArgumentException::class);
 	}
 
 	public function testStripHtmlTags()
@@ -151,7 +151,7 @@ class StringsTest extends TestCase
 		self::assertEquals(["a", "a", "", ""], Strings::split("a a ,", [" ", ","], false));
 		self::assertEquals(["a", "a"], Strings::split("a a ,", [" ", ","]));
 		self::assertEquals(["a", "a"], Strings::split("a a ,", [" ", ","]));
-		self::assertException(function () {  Strings::split("a a", ["b", ""]); }, InvalidArgumentException::class);
+		self::assertException(function () { Strings::split("a a", ["b", ""]); }, InvalidArgumentException::class);
 	}
 
 	public function testTrim()
@@ -261,9 +261,9 @@ class StringsTest extends TestCase
 		self::assertEquals("Hello", Strings::remove("Hello World!", 5));
 		self::assertEquals("Hello", Strings::remove("Hello World!", 5, 7));
 		self::assertEquals("Hello!", Strings::remove("Hello World!", 5, 6));
-		self::assertException(function () { Strings::remove("", 6);}, InvalidArgumentException::class);
-		self::assertException(function () { Strings::remove("Hello", 7);}, OutOfRangeException::class);
-		self::assertException(function () { Strings::remove("Hello", 0, 7);}, OutOfRangeException::class);
+		self::assertException(function () { Strings::remove("", 6); }, InvalidArgumentException::class);
+		self::assertException(function () { Strings::remove("Hello", 7); }, OutOfRangeException::class);
+		self::assertException(function () { Strings::remove("Hello", 0, 7); }, OutOfRangeException::class);
 	}
 
 	public function testDashesToCase()
@@ -304,7 +304,11 @@ class StringsTest extends TestCase
 		self::assertEquals("Joe, Michelle and Johny", Strings::join($items, ", ", " and "));
 		self::assertEquals("Joe, Michelle, Johny", Strings::join($items, ", "));
 		self::assertEquals("Joe", Strings::join(["Joe"], ", "));
+		self::assertEquals("Joe", Strings::join(["Joe"], ", ", " and "));
+		self::assertEquals("Joe", Strings::join(["Joe"], ", ", ", "));
 		self::assertEquals("", Strings::join([], ", "));
+		self::assertEquals("", Strings::join([], ", ", " and "));
+		self::assertEquals("", Strings::join([], ", ", ", "));
 		self::assertEquals("Joe and John", Strings::join(["Joe", "John"], ", ", " and "));
 	}
 

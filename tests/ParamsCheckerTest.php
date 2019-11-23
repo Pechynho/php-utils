@@ -62,7 +62,9 @@ class ParamsCheckerTest extends TestCase
 		ParamsChecker::type('value', $value, "DateTime");
 		$value = function () { };
 		ParamsChecker::type('value', $value, "callable");
-		self::assertException(function () { ParamsChecker::type('value', $value, "string");; }, InvalidArgumentException::class);
+		self::assertException(function () {
+			ParamsChecker::type('value', $value, "string");;
+		}, InvalidArgumentException::class);
 	}
 
 	public function testLength()
@@ -90,7 +92,9 @@ class ParamsCheckerTest extends TestCase
 		ParamsChecker::types('value', $value, ["int", "DateTime"]);
 		$value = function () { };
 		ParamsChecker::types('value', $value, ["int", "callable"]);
-		self::assertException(function () { ParamsChecker::types('value', $value, ["int", "string"]);; }, InvalidArgumentException::class);
+		self::assertException(function () {
+			ParamsChecker::types('value', $value, ["int", "string"]);;
+		}, InvalidArgumentException::class);
 	}
 
 	public function testClassExists()
