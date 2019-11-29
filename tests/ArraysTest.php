@@ -263,14 +263,22 @@ class ArraysTest extends TestCase
 		self::assertException(function () { Arrays::mapByProperty($this->persons, null); }, InvalidArgumentException::class);
 	}
 
-	public function testExtract()
+	public function testRecursiveGet()
 	{
 		$testCase = ["foo" => ["bar" => ["john" => ["doe" => [4 => 15]]]]];
-		self::assertTrue(Arrays::extract($testCase, "[foo][bar][john][doe][4]", $value));
+		self::assertTrue(Arrays::recursiveGet($testCase, "[foo][bar][john][doe][4]", $value));
 		self::assertEquals(15, $value);
-		self::assertFalse(Arrays::extract($testCase, "[foo][bar][lewis]"));
-		self::assertException(function () use ($testCase) { Arrays::extract($testCase, "   "); }, InvalidArgumentException::class);
-		self::assertFalse(Arrays::extract([], "[foo][bar]"));
+		self::assertFalse(Arrays::recursiveGet($testCase, "[foo][bar][lewis]"));
+		self::assertException(function () use ($testCase) { Arrays::recursiveGet($testCase, "   "); }, InvalidArgumentException::class);
+		self::assertFalse(Arrays::recursiveGet([], "[foo][bar]"));
+	}
+
+	public function testRecursiveSet()
+	{
+		self::assertEquals(["name" => ["forename" => "Joe"]], Arrays::recursiveSet([], "[name][forename]", "Joe"));
+		self::assertEquals(["name" => ["forename" => "Doe", "surname" => "Admin"]], Arrays::recursiveSet(["name" => ["forename" => "Joe", "surname" => "Admin"]], "[name][forename]", "Doe"));
+		self::assertEquals(["name" => ["forename" => "Joe", "surname" => "Admin", "job" => ["place" => "Prague"]]], Arrays::recursiveSet(["name" => ["forename" => "Joe", "surname" => "Admin"]], "[name][job][place]", "Prague"));
+		self::assertException(function () { Arrays::recursiveSet([], "   ", 5); }, InvalidArgumentException::class);
 	}
 
 	public function testMergeArrayConfig()

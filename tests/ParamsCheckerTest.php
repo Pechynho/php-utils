@@ -16,6 +16,9 @@ class ParamsCheckerTest extends TestCase
 
 	public function test__callStatic()
 	{
+		ParamsChecker::isStringOrNull('value', null);
+		ParamsChecker::isNullOrString('value', "");
+		ParamsChecker::isNullOrString('value', 5);
 		ParamsChecker::isNullOrIntOrBool('value', "true");
 		self::assertException(function () { ParamsChecker::isNullOrIntOrBool('value', "Hello"); }, InvalidArgumentException::class);
 		self::assertException(function () { ParamsChecker::isNotEmptyArray('value', []); }, InvalidArgumentException::class);

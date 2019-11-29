@@ -783,7 +783,7 @@ class Arrays
 	 * @param mixed  $value
 	 * @return boolean
 	 */
-	public static function extract(array $subject, $keyPath, &$value = null)
+	public static function recursiveGet(array $subject, $keyPath, &$value = null)
 	{
 		if (!is_string($keyPath) || Strings::isNullOrWhiteSpace($keyPath))
 		{
@@ -805,6 +805,31 @@ class Arrays
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @param array  $subject
+	 * @param string $keyPath
+	 * @param mixed  $value
+	 * @return array
+	 */
+	public static function recursiveSet(array $subject, $keyPath, $value)
+	{
+		if (!is_string($keyPath) || Strings::isNullOrWhiteSpace($keyPath))
+		{
+			throw new InvalidArgumentException('Parameter $keyPath has to be non empty ("") and non-whitespace string.');
+		}
+		$keys = Strings::split($keyPath, ["[", "]"], true);
+		if (count($keys) == 1)
+		{
+			$subject[$keys[0]] = $value;
+			return $subject;
+		}
+		$key = $keys[0];
+		unset($keys[0]);
+		$innerValue = isset($subject[$key]) ? $subject[$key] : [];
+		$subject[$key] = self::recursiveSet($innerValue, "[" . Strings::join($keys, "][") . "]", $value);
+		return $subject;
 	}
 
 	/**
