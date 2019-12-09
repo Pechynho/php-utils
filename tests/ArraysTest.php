@@ -302,4 +302,27 @@ class ArraysTest extends TestCase
 		self::assertException(function () use ($config, $defaultConfig) { Arrays::mergeArrayConfig($config, $defaultConfig, "blue"); }, InvalidArgumentException::class);
 	}
 
+	public static function testInsertAfter()
+	{
+		$target = ["one" => 1, "three" => 3];
+		self::assertEquals(["one" => 1, "two" => 2, "three" => 3], Arrays::insertAfter($target, "two", 2, "one"));
+		self::assertEquals(["one" => 1, "three" => 3, "key" => "key"], Arrays::insertAfter($target, "key", "key", "two"));
+		$target = [1 => 1, 3 => 3];
+		self::assertEquals([1 => 1, 2 => 2, 3 => 3], Arrays::insertAfter($target, 2, 2, 1));
+		self::assertEquals([1 => 1], Arrays::insertAfter([], 1, 1, "one"));
+		self::assertException(function () use ($target) { Arrays::insertAfter($target, null, 2, "one"); }, InvalidArgumentException::class);
+		self::assertException(function () use ($target) { Arrays::insertAfter($target, 2, 2, null); }, InvalidArgumentException::class);
+	}
+
+	public static function testInsertBefore()
+	{
+		$target = ["one" => 1, "three" => 3];
+		self::assertEquals(["one" => 1, "two" => 2, "three" => 3], Arrays::insertBefore($target, "two", 2, "three"));
+		self::assertEquals(["one" => 1, "three" => 3, "key" => "key"], Arrays::insertBefore($target, "key", "key", "two"));
+		$target = [1 => 1, 3 => 3];
+		self::assertEquals([1 => 1, 2 => 2, 3 => 3], Arrays::insertBefore($target, 2, 2, 3));
+		self::assertEquals([1 => 1], Arrays::insertBefore([], 1, 1, "one"));
+		self::assertException(function () use ($target) { Arrays::insertBefore($target, null, 2, "one"); }, InvalidArgumentException::class);
+		self::assertException(function () use ($target) { Arrays::insertBefore($target, 2, 2, null); }, InvalidArgumentException::class);
+	}
 }

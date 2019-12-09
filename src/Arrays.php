@@ -778,6 +778,64 @@ class Arrays
 	}
 
 	/**
+	 * @param array      $subject
+	 * @param string|int $key
+	 * @param mixed      $value
+	 * @param string|int $insertAfterKey
+	 * @return array
+	 */
+	public static function insertAfter(array $subject, $key, $value, $insertAfterKey)
+	{
+		ParamsChecker::isIntOrString('$key', $key, __METHOD__);
+		ParamsChecker::isIntOrString('$insertAfterKey', $insertAfterKey, __METHOD__);
+		$output = [];
+		$inserted = false;
+		foreach ($subject as $i => $item)
+		{
+			$output[$i] = $item;
+			if (!$inserted && $i == $insertAfterKey)
+			{
+				$output[$key] = $value;
+				$inserted = true;
+			}
+		}
+		if (!$inserted)
+		{
+			$output[$key] = $value;
+		}
+		return $output;
+	}
+
+	/**
+	 * @param array      $subject
+	 * @param string|int $key
+	 * @param mixed      $value
+	 * @param string|int $insertBeforeKey
+	 * @return array
+	 */
+	public static function insertBefore(array $subject, $key, $value, $insertBeforeKey)
+	{
+		ParamsChecker::isIntOrString('$key', $key, __METHOD__);
+		ParamsChecker::isIntOrString('$insertBeforeKey', $insertBeforeKey, __METHOD__);
+		$output = [];
+		$inserted = false;
+		foreach ($subject as $i => $item)
+		{
+			if (!$inserted && $i == $insertBeforeKey)
+			{
+				$output[$key] = $value;
+				$inserted = true;
+			}
+			$output[$i] = $item;
+		}
+		if (!$inserted)
+		{
+			$output[$key] = $value;
+		}
+		return $output;
+	}
+
+	/**
 	 * @param array  $subject
 	 * @param string $keyPath
 	 * @param mixed  $value
