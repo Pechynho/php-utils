@@ -6,6 +6,7 @@ namespace Pechynho\Utility;
 
 use DateTime;
 use Exception;
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -139,5 +140,49 @@ class Dates
 			throw new RuntimeException(sprintf("Creating new instance of DateTime from timestamp '%s' was not successful.", $timestamp));
 		}
 		return $dateTime;
+	}
+
+	/**
+	 * @param int|null $month
+	 * @param int|null $year
+	 * @return int
+	 */
+	public static function getLastDayOfMonth($month = null, $year = null)
+	{
+		return (int)self::getLastDateOfMonth($month, $year)->format("j");
+	}
+
+	/**
+	 * @param int|null $month
+	 * @param int|null $year
+	 * @return DateTime
+	 */
+	public static function getLastDateOfMonth($month = null, $year = null)
+	{
+		ParamsChecker::isIntOrNull('$month', $month, __METHOD__);
+		ParamsChecker::isIntOrNull('$year', $year, __METHOD__);
+		ParamsChecker::range('$month', $month, 1, 12, __METHOD__);
+		ParamsChecker::range('$year', $year, 1900, null, __METHOD__);
+		if ($month === null && $year !== null)
+		{
+			throw new InvalidArgumentException('Parameter $month cannot be NULL when $year has a value.');
+		}
+		$now = self::now();
+		if ($month === null)
+		{
+			$month = $now->format("n");
+		}
+		if ($year === null)
+		{
+			$year = $now->format("Y");
+		}
+		try
+		{
+			return new DateTime("last day of {$year}-{$month}");
+		}
+		catch (Exception $e)
+		{
+			throw new RuntimeException("Creating instance [e.g. new DateTime('last day of {$year}-{$month}')] of DateTime was not successful.");
+		}
 	}
 }
