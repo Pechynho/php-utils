@@ -71,4 +71,18 @@ class DatesTest extends TestCase
 		self::assertException(function () { Dates::parse("test"); }, RuntimeException::class);
 		self::assertException(function () { Dates::parse("      \t"); }, InvalidArgumentException::class);
 	}
+
+	public function testGetLastDayOfMonth()
+	{
+		self::assertEquals(31, Dates::getLastDayOfMonth(10, 2020));
+		self::assertException(function () { Dates::getLastDayOfMonth(null, 2020); }, InvalidArgumentException::class);
+		self::assertException(function () { Dates::getLastDayOfMonth(0, 2020); }, InvalidArgumentException::class);
+	}
+
+	public function testGetLastDateOfMonth()
+	{
+		self::assertSame("31.10.2020", Dates::getLastDateOfMonth(10, 2020)->format("d.m.Y"));
+		self::assertException(function () { Dates::getLastDateOfMonth(null, 2020); }, InvalidArgumentException::class);
+		self::assertException(function () { Dates::getLastDateOfMonth(0, 2020); }, InvalidArgumentException::class);
+	}
 }

@@ -6,6 +6,7 @@ namespace Pechynho\Utility;
 
 use DateTime;
 use Exception;
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -23,7 +24,7 @@ class Dates
 	 * @param boolean $maximumTime
 	 * @return DateTime
 	 */
-	public static function today(bool $maximumTime = false)
+	public static function today(bool $maximumTime = false): DateTime
 	{
 		$today = Dates::now();
 		if ($maximumTime)
@@ -40,7 +41,7 @@ class Dates
 	/**
 	 * @return DateTime
 	 */
-	public static function now()
+	public static function now(): DateTime
 	{
 		try
 		{
@@ -56,7 +57,7 @@ class Dates
 	/**
 	 * @return string
 	 */
-	public static function databaseNow()
+	public static function databaseNow(): string
 	{
 		return Dates::now()->format(Dates::DATABASE_DATETIME);
 	}
@@ -64,7 +65,7 @@ class Dates
 	/**
 	 * @return string
 	 */
-	public static function databaseToday()
+	public static function databaseToday(): string
 	{
 		return Dates::now()->format(Dates::DATABASE_DATE);
 	}
@@ -73,7 +74,7 @@ class Dates
 	 * @param int $year
 	 * @return bool
 	 */
-	public static function isYearLeap(int $year)
+	public static function isYearLeap(int $year): bool
 	{
 		return ((($year % 4) == 0) && ((($year % 100) != 0) || (($year % 400) == 0)));
 	}
@@ -84,7 +85,7 @@ class Dates
 	 * @param string|int $value
 	 * @return DateTime
 	 */
-	public static function parse($value)
+	public static function parse($value): DateTime
 	{
 		if (Scalars::tryParse($value, $value, Scalars::INT))
 		{
@@ -125,7 +126,7 @@ class Dates
 	 * @param int $timestamp
 	 * @return DateTime
 	 */
-	public static function fromTimestamp(int $timestamp)
+	public static function fromTimestamp(int $timestamp): DateTime
 	{
 		ParamsChecker::range('$timestamp', $timestamp, 0, null, __METHOD__);
 		try
@@ -137,5 +138,47 @@ class Dates
 			throw new RuntimeException(sprintf("Creating new instance of DateTime from timestamp '%s' was not successful.", $timestamp));
 		}
 		return $dateTime;
+	}
+
+	/**
+	 * @param int|null $month
+	 * @param int|null $year
+	 * @return int
+	 */
+	public static function getLastDayOfMonth(?int $month = null, ?int $year = null): int
+	{
+		return (int)self::getLastDateOfMonth($month, $year)->format("j");
+	}
+
+	/**
+	 * @param int|null $month
+	 * @param int|null $year
+	 * @return DateTime
+	 */
+	public static function getLastDateOfMonth(?int $month = null, ?int $year = null): DateTime
+	{
+		ParamsChecker::range('$month', $month, 1, 12, __METHOD__);
+		ParamsChecker::range('$year', $year, 1900, null, __METHOD__);
+		if ($month === null && $year !== null)
+		{
+			throw new InvalidArgumentException('Parameter $month cannot be NULL when $year has a value.');
+		}
+		$now = self::now();
+		if ($month === null)
+		{
+			$month = $now->format("n");
+		}
+		if ($year === null)
+		{
+			$year = $now->format("Y");
+		}
+		try
+		{
+			return new DateTime("last day of {$year}-{$month}");
+		}
+		catch (Exception $e)
+		{
+			throw new RuntimeException("Creating instance [e.g. new DateTime('last day of {$year}-{$month}')] of DateTime was not successful.");
+		}
 	}
 }
