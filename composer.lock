@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f5ce7da0b4c053d51215a21d11e9211d",
+    "content-hash": "acc228c6f0041af4a4220a6191ba2b4a",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -368,16 +368,16 @@
         },
         {
             "name": "symfony/property-access",
-            "version": "v3.4.35",
+            "version": "v3.4.45",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/property-access.git",
-                "reference": "5bd3b72aa0361a42c5d0316a6577892c6e04ca20"
+                "reference": "7af3179c29150f79368cff477c3f234c3b30e32a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/property-access/zipball/5bd3b72aa0361a42c5d0316a6577892c6e04ca20",
-                "reference": "5bd3b72aa0361a42c5d0316a6577892c6e04ca20",
+                "url": "https://api.github.com/repos/symfony/property-access/zipball/7af3179c29150f79368cff477c3f234c3b30e32a",
+                "reference": "7af3179c29150f79368cff477c3f234c3b30e32a",
                 "shasum": ""
             },
             "require": {
@@ -432,7 +432,7 @@
                 "property path",
                 "reflection"
             ],
-            "time": "2019-08-26T07:52:58+00:00"
+            "time": "2020-09-02T16:06:40+00:00"
         }
     ],
     "packages-dev": [
@@ -1807,8 +1807,5 @@
         "php": ">=5.6",
         "ext-mbstring": "*"
     },
-    "platform-dev": [],
-    "platform-overrides": {
-        "php": "5.6.40"
-    }
+    "platform-dev": []
 }
