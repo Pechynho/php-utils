@@ -20,7 +20,7 @@ class Reflections
 	 * @param object $object
 	 * @return ReflectionObject
 	 */
-	public static function createReflectionObject($object)
+	public static function createReflectionObject($object): ReflectionObject
 	{
 		ParamsChecker::isObject('$object', $object, __METHOD__);
 		try
@@ -39,7 +39,7 @@ class Reflections
 	 * @param bool   $returnNullIfNotFound
 	 * @return ReflectionProperty
 	 */
-	public static function getProperty(string $class, string $property, bool $returnNullIfNotFound = false)
+	public static function getProperty(string $class, string $property, bool $returnNullIfNotFound = false): ?ReflectionProperty
 	{
 		ParamsChecker::notWhiteSpaceOrNullString('$class', $class, __METHOD__);
 		ParamsChecker::notWhiteSpaceOrNullString('$property', $property, __METHOD__);
@@ -70,7 +70,7 @@ class Reflections
 	 * @param string|object $classOrObject
 	 * @return ReflectionClass
 	 */
-	public static function createReflectionClass($classOrObject)
+	public static function createReflectionClass($classOrObject): ReflectionClass
 	{
 		ParamsChecker::isNotEmptyStringOrObject('$classOrObject', $classOrObject, __METHOD__);
 		try
@@ -93,7 +93,7 @@ class Reflections
 	 * @param bool   $returnNullIfNotFound
 	 * @return ReflectionMethod
 	 */
-	public static function getMethod(string $class, string $method, bool $returnNullIfNotFound = false)
+	public static function getMethod(string $class, string $method, bool $returnNullIfNotFound = false): ?ReflectionMethod
 	{
 		ParamsChecker::notWhiteSpaceOrNullString('$class', $class, __METHOD__);
 		ParamsChecker::notWhiteSpaceOrNullString('$method', $method, __METHOD__);

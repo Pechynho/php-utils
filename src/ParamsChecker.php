@@ -16,7 +16,7 @@ class ParamsChecker
 	 * @param string $name
 	 * @param array  $arguments
 	 */
-	public static function __callStatic($name, $arguments)
+	public static function __callStatic(string $name, array $arguments): void
 	{
 		if (Strings::startsWith($name, "is") && $name != "is")
 		{
@@ -85,7 +85,6 @@ class ParamsChecker
 		{
 			throw new RuntimeException("Unknown method '$name' called.");
 		}
-
 	}
 
 	/**
@@ -94,7 +93,7 @@ class ParamsChecker
 	 * @param string      $type
 	 * @param string|null $methodOrFunction
 	 */
-	public static function type(string $parameter, &$value, string $type, ?string $methodOrFunction = null)
+	public static function type(string $parameter, &$value, string $type, ?string $methodOrFunction = null): void
 	{
 		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
 		$function = "is_" . Strings::toLower($type);
@@ -122,7 +121,7 @@ class ParamsChecker
 	 * @param mixed       $value
 	 * @param string|null $methodOrFunction
 	 */
-	public static function notWhiteSpaceOrNullString(string $parameter, $value, ?string $methodOrFunction = null)
+	public static function notWhiteSpaceOrNullString(string $parameter, $value, ?string $methodOrFunction = null): void
 	{
 		if (Strings::isNullOrWhiteSpace($parameter))
 		{
@@ -140,7 +139,7 @@ class ParamsChecker
 	 * @param string|null $methodOrFunction
 	 * @return InvalidArgumentException
 	 */
-	private static function createException(string $parameter, string $message, ?string $methodOrFunction = null)
+	private static function createException(string $parameter, string $message, ?string $methodOrFunction = null): InvalidArgumentException
 	{
 		$message = ($methodOrFunction !== null ? sprintf("Wrong parameter value was provided to '%s'. ", $methodOrFunction) : "") . $message;
 		$parameter = Strings::startsWith($parameter, "$") ? $parameter : "$" . $parameter;
@@ -154,7 +153,7 @@ class ParamsChecker
 	 * @param object      $value
 	 * @param string      $class
 	 */
-	public static function isInstanceOf(string $parameter, $value, string $class, ?string $methodOrFunction = null)
+	public static function isInstanceOf(string $parameter, $value, string $class, ?string $methodOrFunction = null): void
 	{
 		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
 		self::notWhiteSpaceOrNullString('$class', $class, __METHOD__);
@@ -170,7 +169,7 @@ class ParamsChecker
 	 * @param string      $value
 	 * @param string|null $methodOrFunction
 	 */
-	public static function classExists(string $parameter, string $value, ?string $methodOrFunction = null)
+	public static function classExists(string $parameter, string $value, ?string $methodOrFunction = null): void
 	{
 		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
 		if (!class_exists($value, true))
@@ -184,7 +183,7 @@ class ParamsChecker
 	 * @param mixed       $value
 	 * @param string|null $methodOrFunction
 	 */
-	public static function notEmpty(string $parameter, $value, ?string $methodOrFunction = null)
+	public static function notEmpty(string $parameter, $value, ?string $methodOrFunction = null): void
 	{
 		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
 		if (empty($value))
@@ -199,7 +198,7 @@ class ParamsChecker
 	 * @param array       $types
 	 * @param string|null $methodOrFunction
 	 */
-	public static function types(string $parameter, &$value, array $types, ?string $methodOrFunction = null)
+	public static function types(string $parameter, &$value, array $types, ?string $methodOrFunction = null): void
 	{
 		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
 		self::isNotEmptyArray('$types', $types, __METHOD__);
@@ -229,7 +228,7 @@ class ParamsChecker
 	 * @param int|null    $maxCount
 	 * @param string|null $methodOrFunction
 	 */
-	public static function count(string $parameter, iterable $value, ?int $minCount, ?int $maxCount, ?string $methodOrFunction = null)
+	public static function count(string $parameter, iterable $value, ?int $minCount, ?int $maxCount, ?string $methodOrFunction = null): void
 	{
 		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
 		$count = Arrays::count($value);
@@ -258,7 +257,7 @@ class ParamsChecker
 	 * @param int|null    $maxLength
 	 * @param string|null $methodOrFunction
 	 */
-	public static function length(string $parameter, string $value, ?int $minLength, ?int $maxLength, ?string $methodOrFunction = null)
+	public static function length(string $parameter, string $value, ?int $minLength, ?int $maxLength, ?string $methodOrFunction = null): void
 	{
 		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
 		$length = Strings::length($value);
@@ -287,7 +286,7 @@ class ParamsChecker
 	 * @param int|float|null $maxValue
 	 * @param string|null    $methodOrFunction
 	 */
-	public static function range(string $parameter, $value, $minValue, $maxValue, ?string $methodOrFunction = null)
+	public static function range(string $parameter, $value, $minValue, $maxValue, ?string $methodOrFunction = null): void
 	{
 		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
 		self::isIntOrFloat('$value', $value, __METHOD__);
@@ -317,7 +316,7 @@ class ParamsChecker
 	 * @param array       $values
 	 * @param string|null $methodOrFunction
 	 */
-	public static function inArray(string $parameter, $value, array $values, ?string $methodOrFunction = null)
+	public static function inArray(string $parameter, $value, array $values, ?string $methodOrFunction = null): void
 	{
 		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
 		if (!in_array($value, $values, true))
@@ -332,7 +331,7 @@ class ParamsChecker
 	 * @param array       $values
 	 * @param string|null $methodOrFunction
 	 */
-	public static function notInArray(string $parameter, $value, array $values, ?string $methodOrFunction = null)
+	public static function notInArray(string $parameter, $value, array $values, ?string $methodOrFunction = null): void
 	{
 		self::notWhiteSpaceOrNullString('$parameter', $parameter, __METHOD__);
 		if (in_array($value, $values, true))

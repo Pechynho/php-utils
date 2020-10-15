@@ -658,12 +658,70 @@ class Arrays
 	}
 
 	/**
+	 * @param array      $subject
+	 * @param string|int $key
+	 * @param mixed      $value
+	 * @param string|int $insertAfterKey
+	 * @return array
+	 */
+	public static function insertAfter(array $subject, $key, $value, $insertAfterKey): array
+	{
+		ParamsChecker::isIntOrString('$key', $key, __METHOD__);
+		ParamsChecker::isIntOrString('$insertAfterKey', $insertAfterKey, __METHOD__);
+		$output = [];
+		$inserted = false;
+		foreach ($subject as $i => $item)
+		{
+			$output[$i] = $item;
+			if (!$inserted && $i == $insertAfterKey)
+			{
+				$output[$key] = $value;
+				$inserted = true;
+			}
+		}
+		if (!$inserted)
+		{
+			$output[$key] = $value;
+		}
+		return $output;
+	}
+
+	/**
+	 * @param array      $subject
+	 * @param string|int $key
+	 * @param mixed      $value
+	 * @param string|int $insertBeforeKey
+	 * @return array
+	 */
+	public static function insertBefore(array $subject, $key, $value, $insertBeforeKey): array
+	{
+		ParamsChecker::isIntOrString('$key', $key, __METHOD__);
+		ParamsChecker::isIntOrString('$insertBeforeKey', $insertBeforeKey, __METHOD__);
+		$output = [];
+		$inserted = false;
+		foreach ($subject as $i => $item)
+		{
+			if (!$inserted && $i == $insertBeforeKey)
+			{
+				$output[$key] = $value;
+				$inserted = true;
+			}
+			$output[$i] = $item;
+		}
+		if (!$inserted)
+		{
+			$output[$key] = $value;
+		}
+		return $output;
+	}
+
+	/**
 	 * @param array  $subject
 	 * @param string $keyPath
 	 * @param mixed  $value
 	 * @return boolean
 	 */
-	public static function extract(array $subject, string $keyPath, &$value = null)
+	public static function recursiveGet(array $subject, string $keyPath, &$value = null): bool
 	{
 		if (Strings::isNullOrWhiteSpace($keyPath))
 		{
@@ -688,12 +746,37 @@ class Arrays
 	}
 
 	/**
+	 * @param array  $subject
+	 * @param string $keyPath
+	 * @param mixed  $value
+	 * @return array
+	 */
+	public static function recursiveSet(array $subject, string $keyPath, $value): array
+	{
+		if (Strings::isNullOrWhiteSpace($keyPath))
+		{
+			throw new InvalidArgumentException('Parameter $keyPath has to be non empty ("") and non-whitespace string.');
+		}
+		$keys = Strings::split($keyPath, ["[", "]"], true);
+		if (count($keys) == 1)
+		{
+			$subject[$keys[0]] = $value;
+			return $subject;
+		}
+		$key = $keys[0];
+		unset($keys[0]);
+		$innerValue = isset($subject[$key]) ? $subject[$key] : [];
+		$subject[$key] = self::recursiveSet($innerValue, "[" . Strings::join($keys, "][") . "]", $value);
+		return $subject;
+	}
+
+	/**
 	 * @param array $config
 	 * @param array $defaultConfig
 	 * @param bool  $deep
 	 * @return array
 	 */
-	public static function mergeArrayConfig(array $config, array $defaultConfig, bool $deep = true)
+	public static function mergeArrayConfig(array $config, array $defaultConfig, bool $deep = true): array
 	{
 		foreach ($defaultConfig as $option => $value)
 		{

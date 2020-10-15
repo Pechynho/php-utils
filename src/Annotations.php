@@ -35,7 +35,7 @@ class Annotations
 	/**
 	 * @return AnnotationReader
 	 */
-	public static function createAnnotationReader()
+	public static function createAnnotationReader(): AnnotationReader
 	{
 		try
 		{
@@ -56,7 +56,7 @@ class Annotations
 	 * @param string $annotation
 	 * @return ReflectionProperty[]
 	 */
-	public static function getPropertiesWithAnnotation(string $class, string $annotation)
+	public static function getPropertiesWithAnnotation(string $class, string $annotation): array
 	{
 		ParamsChecker::notWhiteSpaceOrNullString('$class', $class, __METHOD__);
 		ParamsChecker::notWhiteSpaceOrNullString('$annotation', $annotation, __METHOD__);
@@ -96,7 +96,7 @@ class Annotations
 	 * @param string $annotation
 	 * @return ReflectionMethod[]
 	 */
-	public static function getMethodsWithAnnotation(string $class, string $annotation)
+	public static function getMethodsWithAnnotation(string $class, string $annotation): array
 	{
 		ParamsChecker::notWhiteSpaceOrNullString('$class', $class, __METHOD__);
 		ParamsChecker::notWhiteSpaceOrNullString('$annotation', $annotation, __METHOD__);

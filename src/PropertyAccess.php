@@ -36,7 +36,7 @@ class PropertyAccess
 		{
 			throw new InvalidArgumentException('Parameter $propertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
-		if (is_callable($propertyPath))
+		if (is_callable($propertyPath) && !is_string($propertyPath))
 		{
 			try
 			{
@@ -113,7 +113,7 @@ class PropertyAccess
 	 * @param bool                                  $throwException
 	 * @param bool                                  $tryReflection
 	 */
-	public static function setValue(&$objectOrArray, $propertyPath, $value, bool $throwException = true, bool $tryReflection = false)
+	public static function setValue(&$objectOrArray, $propertyPath, $value, bool $throwException = true, bool $tryReflection = false): void
 	{
 		if (!is_object($objectOrArray) && !is_array($objectOrArray))
 		{
@@ -123,7 +123,7 @@ class PropertyAccess
 		{
 			throw new InvalidArgumentException('Parameter $propertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
-		if (is_callable($propertyPath))
+		if (is_callable($propertyPath) && !is_string($propertyPath))
 		{
 			try
 			{

@@ -105,7 +105,7 @@ class Scalars
 	 * @param string $scalarType
 	 * @return bool
 	 */
-	public static function isScalarTypeValid(string $scalarType)
+	public static function isScalarTypeValid(string $scalarType): bool
 	{
 		$scalarType = Strings::toUpper($scalarType);
 		return in_array($scalarType, [Scalars::BOOLEAN, Scalars::INTEGER, Scalars::FLOAT, Scalars::STRING, Scalars::BOOL, Scalars::INT]);

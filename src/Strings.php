@@ -465,7 +465,7 @@ class Strings
 	 * @param string $subject
 	 * @return string[]
 	 */
-	public static function splitByCase(string $subject)
+	public static function splitByCase(string $subject): array
 	{
 		$pattern = '/(?#! splitCamelCase Rev:20140412)
     			# Split camelCase "words". Two global alternatives. Either g1of2:
@@ -474,8 +474,7 @@ class Strings
     			| (?<=[A-Z])    # Or g2of2; Position is after uppercase,
       			(?=[A-Z][a-z])  # and before upper-then-lower case.
     			/x';
-		$values = preg_split($pattern, $subject);
-		return $values;
+		return preg_split($pattern, $subject);
 	}
 
 	/**
@@ -671,7 +670,7 @@ class Strings
 		$config = [
 			Strings::SLUGIFY_NORMAL   => "/\W+/",
 			Strings::SLUGIFY_FILENAME => '/[\/\\?%*:|"<>. ]+/',
-			Strings::SLUGIFY_URL      => '/[!*\'();:@&=+,?#\[\]\/]+/'
+			Strings::SLUGIFY_URL      => '/[!*\'%();:@&=+,?#\[\]\/]+/'
 		];
 		if ($toLower)
 		{

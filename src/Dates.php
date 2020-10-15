@@ -108,7 +108,7 @@ class Dates
 			$errors = DateTime::getLastErrors();
 			if ($errors["warning_count"] > 0)
 			{
-				throw new RuntimeException(sprintf("During creating instance of %s from value %s were raised these warnings: %s", DateTime::class, $value, Strings::join($errors["warning"], ", ", " and ")));
+				throw new RuntimeException(sprintf("During creating instance of %s from value %s were raised these warnings: %s", DateTime::class, $value, Strings::join($errors["warnings"], ", ", " and ")));
 			}
 		}
 		catch (Exception $exception)

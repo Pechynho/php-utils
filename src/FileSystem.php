@@ -4,7 +4,9 @@
 namespace Pechynho\Utility;
 
 
+use DirectoryIterator;
 use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * @author Jan Pech <pechynho@gmail.com>
@@ -25,7 +27,7 @@ class FileSystem
 	 * @param string $destination
 	 * @param bool   $overwrite
 	 */
-	public static function copy(string $source, string $destination, bool $overwrite = false)
+	public static function copy(string $source, string $destination, bool $overwrite = false): void
 	{
 		if (Strings::isNullOrWhiteSpace($destination))
 		{
@@ -38,16 +40,23 @@ class FileSystem
 		if (FileSystem::isFile($source))
 		{
 			if (FileSystem::isFile($destination) && !$overwrite) throw new InvalidArgumentException("File '$destination' already exists.");
-			copy($source, $destination);
+			if (copy($source, $destination) === false)
+			{
+				throw new RuntimeException(sprintf('Could not copy file from %s to %s.', $source, $destination));
+			}
 			return;
 		}
 		if (FileSystem::isDirectory($destination) && !$overwrite) throw new InvalidArgumentException("Directory '$destination' already exists.");
 		if (!FileSystem::isDirectory($destination)) FileSystem::createDirectory($destination);
-		$items = array_diff(scandir($source), [".", ".."]);
-		foreach ($items as $item)
+		$iterator = new DirectoryIterator($source);
+		foreach ($iterator as $item)
 		{
-			$sourceItem = FileSystem::combinePath($source, $item);
-			$destinationItem = FileSystem::combinePath($destination, $item);
+			if ($item->isDot())
+			{
+				continue;
+			}
+			$sourceItem = FileSystem::combinePath($source, $item->getFilename());
+			$destinationItem = FileSystem::combinePath($destination, $item->getFilename());
 			FileSystem::copy($sourceItem, $destinationItem, $overwrite);
 		}
 	}
@@ -74,7 +83,7 @@ class FileSystem
 	 * @param string $directory
 	 * @param int    $mode
 	 */
-	public static function createDirectory(string $directory, int $mode = 0777)
+	public static function createDirectory(string $directory, int $mode = 0777): void
 	{
 		if (Strings::isNullOrWhiteSpace($directory))
 		{
@@ -82,7 +91,10 @@ class FileSystem
 		}
 		if (!FileSystem::isDirectory($directory))
 		{
-			mkdir($directory, $mode, true);
+			if (mkdir($directory, $mode, true) === false)
+			{
+				throw new RuntimeException(sprintf("Could not create directory %s.", $directory));
+			}
 		}
 	}
 
@@ -102,6 +114,10 @@ class FileSystem
 			$finalPath = $finalPath . ($index == 0 ? "" : "/") . $path;
 		}
 		$finalPath = preg_replace('/[\/]{2,}/', '/', $finalPath);
+		if (false !== $realpath = realpath($finalPath))
+		{
+			$finalPath = $realpath;
+		}
 		return $finalPath;
 	}
 
@@ -110,7 +126,7 @@ class FileSystem
 	 * @param string $destination
 	 * @param bool   $overwrite
 	 */
-	public static function rename(string $source, string $destination, bool $overwrite = false)
+	public static function rename(string $source, string $destination, bool $overwrite = false): void
 	{
 		if (Strings::isNullOrWhiteSpace($destination))
 		{
@@ -124,15 +140,18 @@ class FileSystem
 		{
 			throw new InvalidArgumentException("File or directory '$destination' already exists.");
 		}
-		rename($source, $destination);
+		if (rename($source, $destination) === false)
+		{
+			throw new RuntimeException(sprintf("Could not rename %s to %s", $source, $destination));
+		}
 	}
 
 	/**
 	 * @param string $filename
-	 * @param string $text
+	 * @param string $content
 	 * @param bool   $overwrite
 	 */
-	public static function write(string $filename, string $text, bool $overwrite = false)
+	public static function write(string $filename, string $content, bool $overwrite = false): void
 	{
 		if (Strings::isNullOrWhiteSpace($filename))
 		{
@@ -143,16 +162,25 @@ class FileSystem
 			throw new InvalidArgumentException("File '$filename' already exists.");
 		}
 		if (FileSystem::isFile($filename)) FileSystem::delete($filename);
-		$file = fopen($filename, "w");
-		fwrite($file, $text);
-		fclose($file);
-		clearstatcache();
+		if (false === $file = fopen($filename, "w"))
+		{
+			throw new RuntimeException(sprintf("Function fopen('%s', 'w') failed.", $filename));
+		}
+		if (fwrite($file, $content) === false)
+		{
+			throw new RuntimeException(sprintf("Could not write (fwrite) content to %s.", $filename));
+		}
+		if (fclose($file) === false)
+		{
+			throw new RuntimeException(sprintf('Could not close (fclose) file %s.', $filename));
+		}
+		clearstatcache(true, $filename);
 	}
 
 	/**
 	 * @param string $path
 	 */
-	public static function delete(string $path)
+	public static function delete(string $path): void
 	{
 		if (!file_exists($path))
 		{
@@ -160,44 +188,69 @@ class FileSystem
 		}
 		if (FileSystem::isFile($path))
 		{
-			unlink($path);
+			if (unlink($path) === false)
+			{
+				throw new RuntimeException(sprintf("Could not delete file %s.", $path));
+			}
 			return;
 		}
-		$items = array_diff(scandir($path), [".", ".."]);
-		foreach ($items as $item)
+		$iterator = new DirectoryIterator($path);
+		foreach ($iterator as $item)
 		{
-			$item = FileSystem::combinePath($path, $item);
+			if ($item->isDot())
+			{
+				continue;
+			}
+			$item = FileSystem::combinePath($path, $item->getFilename());
 			FileSystem::delete($item);
 		}
-		rmdir($path);
+		if (rmdir($path) === false)
+		{
+			throw new RuntimeException(sprintf("Could not delete file %s.", $path));
+		}
 	}
 
 	/**
 	 * @param string $filename
-	 * @param string $text
+	 * @param string $content
 	 * @param bool   $newLine
 	 */
-	public static function append(string $filename, string $text, bool $newLine = true)
+	public static function append(string $filename, string $content, bool $newLine = true): void
 	{
 		if (Strings::isNullOrWhiteSpace($filename))
 		{
 			throw new InvalidArgumentException("Given value '$filename' is not valid filename.");
 		}
-		$file = fopen($filename, "a");
+		if (false === $file = fopen($filename, "a"))
+		{
+			throw new RuntimeException(sprintf("Could not open file fopen('%s', 'a').", $filename));
+		}
 		if (FileSystem::isEmpty($filename))
 		{
-			fwrite($file, $text);
+			if (fwrite($file, $content) === false)
+			{
+				throw new RuntimeException(sprintf("Could not write content to file %s.", $filename));
+			}
 		}
 		else if (!$newLine)
 		{
-			fwrite($file, $text);
+			if (fwrite($file, $content) === false)
+			{
+				throw new RuntimeException(sprintf("Could not write content to file %s.", $filename));
+			}
 		}
 		else
 		{
-			fwrite($file, PHP_EOL . $text);
+			if (fwrite($file, PHP_EOL . $content) === false)
+			{
+				throw new RuntimeException(sprintf("Could not write content to file %s.", $filename));
+			}
 		}
-		fclose($file);
-		clearstatcache();
+		if (fclose($file) === false)
+		{
+			throw new RuntimeException(sprintf('Could not close (fclose) file %s.', $filename));
+		}
+		clearstatcache(true, $filename);
 	}
 
 	/**
@@ -223,12 +276,23 @@ class FileSystem
 		{
 			throw new InvalidArgumentException("Path '$path' does not exist.");
 		}
-		if (FileSystem::isFile($path)) return filesize($path);
-		$items = array_diff(scandir($path), [".", ".."]);
-		$size = 0;
-		foreach ($items as $item)
+		if (FileSystem::isFile($path))
 		{
-			$item = FileSystem::combinePath($path, $item);
+			if (false === $size = filesize($path))
+			{
+				throw new RuntimeException(sprintf("Could not read file size of %s.", $path));
+			}
+			return $size;
+		}
+		$iterator = new DirectoryIterator($path);
+		$size = 0;
+		foreach ($iterator as $item)
+		{
+			if ($item->isDot())
+			{
+				continue;
+			}
+			$item = FileSystem::combinePath($path, $item->getFilename());
 			$size = $size + FileSystem::size($item);
 		}
 		return $size;
@@ -245,14 +309,24 @@ class FileSystem
 		{
 			throw new InvalidArgumentException("File '$filename' does not exist.");
 		}
-		$file = fopen($filename, "r");
+		if (false === $file = fopen($filename, "r"))
+		{
+			throw new RuntimeException(sprintf("Could not open file fopen('%s', 'r').", $filename));
+		}
 		$lines = [];
 		while (!feof($file))
 		{
-			$lines[] = $trimEndOfLine ? Strings::trimEnd(fgets($file), [PHP_EOL]) : fgets($file);
+			if (false === $line = fgets($file))
+			{
+				throw new RuntimeException(sprintf("Could not read line (fgets) of %s", $filename));
+			}
+			$lines[] = $trimEndOfLine ? Strings::trimEnd($line, [PHP_EOL]) : $line;
 		}
-		fclose($file);
-		clearstatcache();
+		if (fclose($file) === false)
+		{
+			throw new RuntimeException(sprintf('Could not close (fclose) file %s.', $filename));
+		}
+		clearstatcache(true, $filename);
 		return $lines;
 	}
 
@@ -285,13 +359,23 @@ class FileSystem
 		{
 			throw new InvalidArgumentException("File '$filename' does not exist.");
 		}
-		$file = fopen($filename, "r");
+		if (false === $file = fopen($filename, "r"))
+		{
+			throw new RuntimeException(sprintf("Could not open file fopen('%s', 'r').", $filename));
+		}
 		while (!feof($file))
 		{
-			yield $trimEndOfLine ? Strings::trimEnd(fgets($file), [PHP_EOL]) : fgets($file);
+			if (false === $line = fgets($file))
+			{
+				throw new RuntimeException(sprintf("Could not read line (fgets) of %s", $filename));
+			}
+			yield $trimEndOfLine ? Strings::trimEnd($line, [PHP_EOL]) : $line;
 		}
-		fclose($file);
-		clearstatcache();
+		if (fclose($file) === false)
+		{
+			throw new RuntimeException(sprintf('Could not close (fclose) file %s.', $filename));
+		}
+		clearstatcache(true, $filename);
 	}
 
 	/**
@@ -300,7 +384,7 @@ class FileSystem
 	 * @param bool   $recursively
 	 * @return string[]
 	 */
-	public static function scanDirectory(string $directory, string $mode = FileSystem::SCAN_ALL, bool $recursively = false)
+	public static function scanDirectory(string $directory, string $mode = FileSystem::SCAN_ALL, bool $recursively = false): array
 	{
 		if (!FileSystem::isDirectory($directory))
 		{
@@ -311,10 +395,14 @@ class FileSystem
 			throw new InvalidArgumentException('Invalid value passed to parameter $mode.');
 		}
 		$output = [];
-		$items = array_diff(scandir($directory), [".", ".."]);
-		foreach ($items as $item)
+		$iterator = new DirectoryIterator($directory);
+		foreach ($iterator as $item)
 		{
-			$item = FileSystem::combinePath($directory, $item);
+			if ($item->isDot())
+			{
+				continue;
+			}
+			$item = FileSystem::combinePath($directory, $item->getFilename());
 			if (FileSystem::isFile($item) && ($mode == FileSystem::SCAN_FILES || $mode == FileSystem::SCAN_ALL))
 			{
 				$output[] = $item;
