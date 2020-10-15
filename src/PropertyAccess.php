@@ -44,7 +44,7 @@ class PropertyAccess
 		{
 			throw new InvalidArgumentException('Parameter $propertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
-		if (is_callable($propertyPath))
+		if (is_callable($propertyPath) && !is_string($propertyPath))
 		{
 			try
 			{
@@ -139,7 +139,7 @@ class PropertyAccess
 		{
 			throw new InvalidArgumentException('Parameter $propertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
-		if (is_callable($propertyPath))
+		if (is_callable($propertyPath) && !is_string($propertyPath))
 		{
 			try
 			{
