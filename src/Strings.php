@@ -831,7 +831,7 @@ class Strings
 		$config = [
 			Strings::SLUGIFY_NORMAL   => "/\W+/",
 			Strings::SLUGIFY_FILENAME => '/[\/\\?%*:|"<>. ]+/',
-			Strings::SLUGIFY_URL      => '/[!*\'();:@&=+,?#\[\]\/]+/'
+			Strings::SLUGIFY_URL      => '/[!*\'%();:@&=+,?#\[\]\/]+/'
 		];
 		if ($toLower)
 		{
