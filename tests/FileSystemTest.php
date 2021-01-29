@@ -283,4 +283,9 @@ class FileSystemTest extends TestCase
 		self::assertException(function () use ($path) { FileSystem::scanDirectory(""); }, InvalidArgumentException::class);
 		self::assertException(function () use ($path) { FileSystem::scanDirectory($path, ""); }, InvalidArgumentException::class);
 	}
+
+	public function testNormalizePath()
+	{
+		self::assertEquals("C:/Test/Test/Test/Test/Test", FileSystem::normalizePath("C:\\Test\Test/Test\\\\Test////Test"));
+	}
 }

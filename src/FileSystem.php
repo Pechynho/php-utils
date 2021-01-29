@@ -122,6 +122,36 @@ class FileSystem
 	}
 
 	/**
+	 * @param string $path
+	 * @return string
+	 */
+	public static function normalizePath(string $path): string
+	{
+		$isStream = function ($path) {
+			$schemeSeparator = strpos($path, '://');
+			if (false === $schemeSeparator)
+			{
+				return false;
+			}
+			$stream = substr($path, 0, $schemeSeparator);
+			return in_array($stream, stream_get_wrappers(), true);
+		};
+		$wrapper = '';
+		if ($isStream($path))
+		{
+			list($wrapper, $path) = explode('://', $path, 2);
+			$wrapper .= '://';
+		}
+		$path = str_replace('\\', '/', $path); // Standardise all paths to use '/'.
+		$path = preg_replace('|(?<=.)/+|', '/', $path); // Replace multiple slashes down to a singular, allowing for network shares having two slashes.
+		if (':' === substr($path, 1, 1)) // Windows paths should uppercase the drive letter.
+		{
+			$path = ucfirst($path);
+		}
+		return $wrapper . $path;
+	}
+
+	/**
 	 * @param string $source
 	 * @param string $destination
 	 * @param bool   $overwrite
