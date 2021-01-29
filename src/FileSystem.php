@@ -137,12 +137,46 @@ class FileSystem
 		{
 			$finalPath = $finalPath . ($index == 0 ? "" : "/") . $path;
 		}
-		$finalPath = preg_replace('/[\/]{2,}/', '/', $finalPath);
+		$finalPath = self::normalizePath($finalPath);
 		if (false !== $realpath = realpath($finalPath))
 		{
 			$finalPath = $realpath;
 		}
 		return $finalPath;
+	}
+
+	/**
+	 * @param string $path
+	 * @return string
+	 */
+	public static function normalizePath($path)
+	{
+		if (!is_string($path))
+		{
+			throw new InvalidArgumentException('Parameter $path has to be type of string.');
+		}
+		$isStream = function ($path) {
+			$schemeSeparator = strpos($path, '://');
+			if (false === $schemeSeparator)
+			{
+				return false;
+			}
+			$stream = substr($path, 0, $schemeSeparator);
+			return in_array($stream, stream_get_wrappers(), true);
+		};
+		$wrapper = '';
+		if ($isStream($path))
+		{
+			list($wrapper, $path) = explode('://', $path, 2);
+			$wrapper .= '://';
+		}
+		$path = str_replace('\\', '/', $path); // Standardise all paths to use '/'.
+		$path = preg_replace('|(?<=.)/+|', '/', $path); // Replace multiple slashes down to a singular, allowing for network shares having two slashes.
+		if (':' === substr($path, 1, 1)) // Windows paths should uppercase the drive letter.
+		{
+			$path = ucfirst($path);
+		}
+		return $wrapper . $path;
 	}
 
 	/**
