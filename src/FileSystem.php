@@ -5,8 +5,13 @@ namespace Pechynho\Utility;
 
 
 use DirectoryIterator;
+use FilesystemIterator;
+use Generator;
 use InvalidArgumentException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use RuntimeException;
+use ZipArchive;
 
 /**
  * @author Jan Pech <pechynho@gmail.com>
@@ -541,5 +546,292 @@ class FileSystem
 			}
 		}
 		return $output;
+	}
+
+	/**
+	 * @param string $path
+	 * @return bool
+	 */
+	public static function exists($path)
+	{
+		if (!is_string($path))
+		{
+			throw new InvalidArgumentException('Parameter $path has to be type of string.');
+		}
+		return file_exists($path);
+	}
+
+	/**
+	 * @param string $directory
+	 * @param string $mode
+	 * @param bool $recursively
+	 * @return Generator
+	 */
+	public static function iterateDirectory($directory, $mode = FileSystem::SCAN_ALL, $recursively = false)
+	{
+		if (!FileSystem::isDirectory($directory))
+		{
+			throw new InvalidArgumentException("Given value '$directory' is not valid directory name.");
+		}
+		if (!in_array($mode, [FileSystem::SCAN_ALL, FileSystem::SCAN_DIRECTORIES, FileSystem::SCAN_FILES]))
+		{
+			throw new InvalidArgumentException('Invalid value passed to parameter $mode.');
+		}
+		if (!is_bool($recursively))
+		{
+			throw new InvalidArgumentException('Parameter $recursively has to be type of boolean.');
+		}
+		if (!$recursively)
+		{
+			$iterator = new DirectoryIterator($directory);
+			foreach ($iterator as $item)
+			{
+				if ($item->isDot())
+				{
+					continue;
+				}
+				if (($item->isDir() && ($mode == FileSystem::SCAN_DIRECTORIES || $mode == FileSystem::SCAN_ALL)) || ($item->isFile() && ($mode == FileSystem::SCAN_FILES || $mode == FileSystem::SCAN_ALL)))
+				{
+					yield $item->getRealPath();
+				}
+			}
+			return;
+		}
+		$iterator = new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS|FilesystemIterator::FOLLOW_SYMLINKS);
+		$iterator = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::SELF_FIRST);
+		foreach ($iterator as $item)
+		{
+			if (($item->isDir() && ($mode == FileSystem::SCAN_DIRECTORIES || $mode == FileSystem::SCAN_ALL)) || ($item->isFile() && ($mode == FileSystem::SCAN_FILES || $mode == FileSystem::SCAN_ALL)))
+			{
+				yield $item->getRealPath();
+			}
+		}
+	}
+
+	/**
+	 * @param string|null $directory
+	 * @param string|null $extension
+	 * @return string
+	 */
+	public static function generateFilename($directory = null, $extension = null)
+	{
+		if (!is_string($directory) && !is_null($directory))
+		{
+			throw new InvalidArgumentException('Parameter $directory has to be type of string or NULL.');
+		}
+		if (!is_string($extension) && !is_null($extension))
+		{
+			throw new InvalidArgumentException('Parameter $extension has to be type of string or NULL.');
+		}
+		if ($directory !== null && !FileSystem::isDirectory($directory))
+		{
+			throw new InvalidArgumentException("Given value '$directory' is not valid directory name.");
+		}
+		if ($directory === null)
+		{
+			$directory = sys_get_temp_dir();
+		}
+		$suffix = "";
+		if ($extension !== null && Strings::startsWith($extension,"."))
+		{
+			$suffix = $extension;
+		}
+		else if ($extension !== null && !Strings::startsWith($extension, "."))
+		{
+			$suffix = "." . $extension;
+		}
+		do
+		{
+			$filename = md5(uniqid()) . $suffix;
+		} while (self::exists(self::combinePath($directory, $filename)));
+		return self::combinePath($directory, $filename);
+	}
+
+	/**
+	 * @param string|null $directory
+	 * @param string|null $extension
+	 * @param string $mode
+	 * @return string
+	 */
+	public static function createTempFile($directory = null, $extension = null, $mode = "wb")
+	{
+		if (!is_string($directory) && !is_null($directory))
+		{
+			throw new InvalidArgumentException('Parameter $directory has to be type of string or NULL.');
+		}
+		if (!is_string($extension) && !is_null($extension))
+		{
+			throw new InvalidArgumentException('Parameter $extension has to be type of string or NULL.');
+		}
+		if (!is_string($mode))
+		{
+			throw new InvalidArgumentException('Parameter $mode has to be type of string.');
+		}
+		if ($directory !== null && !FileSystem::isDirectory($directory))
+		{
+			throw new InvalidArgumentException("Given value '$directory' is not valid directory name.");
+		}
+		if ($directory === null)
+		{
+			$directory = sys_get_temp_dir();
+		}
+		$filename = self::generateFilename($directory, $extension);
+		$resource = fopen($filename, $mode);
+		if ($resource === false)
+		{
+			throw new RuntimeException(sprintf("Function fopen('%s', '%s) has failed.", $filename, $mode));
+		}
+		if (fclose($resource) === false)
+		{
+			throw new RuntimeException(sprintf('Could not close (fclose) file %s.', $filename));
+		}
+		return $filename;
+	}
+
+	/**
+	 * @param string|null $directory
+	 * @param int $mode
+	 * @return string
+	 */
+	public static function createTempDirectory($directory = null, $mode = 0777)
+	{
+		if (!is_string($directory) && !is_null($directory))
+		{
+			throw new InvalidArgumentException('Parameter $directory has to be type of string or NULL.');
+		}
+		if (!is_int($mode))
+		{
+			throw new InvalidArgumentException('Parameter $mode has to be type of integer.');
+		}
+		if ($directory !== null && !FileSystem::isDirectory($directory))
+		{
+			throw new InvalidArgumentException("Given value '$directory' is not valid directory name.");
+		}
+		if ($directory === null)
+		{
+			$directory = sys_get_temp_dir();
+		}
+		$output = self::generateFilename($directory);
+		self::createDirectory($output, $mode);
+		return $output;
+	}
+
+	/**
+	 * @param string $source
+	 * @param string|null $destination
+	 * @param bool $overwrite
+	 * @param callable|null $filter
+	 * @return string
+	 */
+	public static function zip($source, $destination = null, $overwrite = false, $filter = null)
+	{
+		if (!is_string($source))
+		{
+			throw new InvalidArgumentException('Parameter $source has to be type of string.');
+		}
+		if (!is_string($destination) && !is_null($destination))
+		{
+			throw new InvalidArgumentException('Parameter $destination has to be type of string or NULL.');
+		}
+		if (!is_bool($overwrite))
+		{
+			throw new InvalidArgumentException('Parameter $overwrite has to be type of boolean.');
+		}
+		if (!is_string($filter) && !is_null($filter))
+		{
+			throw new InvalidArgumentException('Parameter $filter has to be type of callable or NULL.');
+		}
+		if (!$overwrite && $destination !== null && self::exists($destination))
+		{
+			throw new RuntimeException(sprintf("Filename %s already exists.", $destination));
+		}
+		if (!self::exists($source))
+		{
+			throw new InvalidArgumentException(sprintf("Source %s does not exist.", $source));
+		}
+		if ($destination === null)
+		{
+			$destination = self::createTempFile(null, ".zip");
+		}
+		$source = realpath($source);
+		$zip = new ZipArchive();
+		if ($zip->open($destination, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true)
+		{
+			throw new RuntimeException(sprintf("Could not create %s zip archive.", $destination));
+		}
+		$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::SELF_FIRST);
+		$sourceWithSeparator = $source . DIRECTORY_SEPARATOR;
+		foreach ($files as $file)
+		{
+			if (in_array(substr($file, strrpos($file, DIRECTORY_SEPARATOR) + 1), ['.', '..']))
+			{
+				continue;
+			}
+			if (is_callable($filter))
+			{
+				$skip = call_user_func($filter, (string)$file);
+				if (!is_bool($skip))
+				{
+					throw new RuntimeException(sprintf('Parameter $filter has to contain callback which returns boolean.'));
+				}
+				if ($skip)
+				{
+					continue;
+				}
+			}
+			if (is_dir($file) === true)
+			{
+				$zip->addEmptyDir(str_replace($sourceWithSeparator, '', $file . DIRECTORY_SEPARATOR));
+			}
+			else if (is_file($file) === true)
+			{
+				$zip->addFile($file, str_replace($sourceWithSeparator, '', $file));
+			}
+		}
+		if ($zip->close() !== true)
+		{
+			throw new RuntimeException(sprintf("Could not close %s zip archive.", $destination));
+		}
+		return $destination;
+	}
+
+	/**
+	 * @param string $source
+	 * @param string|null $destination
+	 * @return string
+	 */
+	public static function unzip($source, $destination = null)
+	{
+		if (!is_string($source))
+		{
+			throw new InvalidArgumentException('Parameter $source has to be type of string.');
+		}
+		if (!is_string($destination) && !is_null($destination))
+		{
+			throw new InvalidArgumentException('Parameter $destination has to be type of string or NULL.');
+		}
+		if ($destination !== null && self::exists($destination))
+		{
+			throw new RuntimeException(sprintf("Filename %s already exists.", $destination));
+		}
+		if (!self::exists($source))
+		{
+			throw new InvalidArgumentException(sprintf("Source %s does not exist.", $source));
+		}
+		if ($destination === null)
+		{
+			$destination = self::createTempDirectory();
+		}
+		$zip = new ZipArchive();
+		if ($zip->open($source) !== true)
+		{
+			throw new RuntimeException(sprintf("Could not open %s zip archive.", $source));
+		}
+		$zip->extractTo($destination);
+		if ($zip->close() !== true)
+		{
+			throw new RuntimeException(sprintf("Could not close %s zip archive.", $source));
+		}
+		return $destination;
 	}
 }
