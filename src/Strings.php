@@ -685,7 +685,7 @@ class Strings
 		{
 			$subject = Strings::toLower($subject);
 		}
-		$subject = Strings::replaceCzechSpecialCharsWithASCII($subject);
+		$subject = Strings::toAscii($subject);
 		$subject = preg_replace('!\s+!', $separator, $subject);
 		$subject = preg_replace($config[$slugifyType], $separator, $subject);
 		$subject = preg_replace('/[\\' . $separator . ']+/', $separator, $subject);
