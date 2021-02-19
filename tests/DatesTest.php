@@ -85,4 +85,10 @@ class DatesTest extends TestCase
 		self::assertException(function () { Dates::getLastDateOfMonth(null, 2020); }, InvalidArgumentException::class);
 		self::assertException(function () { Dates::getLastDateOfMonth(0, 2020); }, InvalidArgumentException::class);
 	}
+
+	public function testTryParse()
+	{
+		self::assertSame(false, Dates::tryParse("adfafdadf", $result));
+		self::assertSame(true, Dates::tryParse("2000-01-01", $result));
+	}
 }

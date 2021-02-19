@@ -288,4 +288,88 @@ class FileSystemTest extends TestCase
 	{
 		self::assertEquals("C:/Test/Test/Test/Test/Test", FileSystem::normalizePath("C:\\Test\Test/Test\\\\Test////Test"));
 	}
+
+	public function testExists()
+	{
+		$path = $this->baseDir . "/var";
+		self::assertSame(true, FileSystem::exists($path));
+		$path = $this->baseDir . "/var/directory_1/file_2.txt";
+		self::assertSame(true, FileSystem::exists($path));
+		self::assertSame(false, FileSystem::exists(""));
+	}
+
+	public function testIterateDirectory()
+	{
+		$files = [];
+		$directories = [];
+		$all = [];
+		$filesRecursively = [];
+		$directoriesRecursively = [];
+		$allRecursively = [];
+		foreach (FileSystem::iterateDirectory($this->baseDir . "/var", FileSystem::SCAN_FILES) as $path)
+		{
+			$files[] = $path;
+		}
+		foreach (FileSystem::iterateDirectory($this->baseDir. "/var", FileSystem::SCAN_DIRECTORIES) as $path)
+		{
+			$directories[] = $path;
+		}
+		foreach (FileSystem::iterateDirectory($this->baseDir. "/var", FileSystem::SCAN_ALL) as $path)
+		{
+			$all[] = $path;
+		}
+		foreach (FileSystem::iterateDirectory($this->baseDir. "/var", FileSystem::SCAN_FILES, true) as $path)
+		{
+			$filesRecursively[] = $path;
+		}
+		foreach (FileSystem::iterateDirectory($this->baseDir. "/var", FileSystem::SCAN_DIRECTORIES, true) as $path)
+		{
+			$directoriesRecursively[] = $path;
+		}
+		foreach (FileSystem::iterateDirectory($this->baseDir. "/var", FileSystem::SCAN_ALL, true) as $path)
+		{
+			$allRecursively[] = $path;
+		}
+		self::assertEquals(0, count($files));
+		self::assertEquals(2, count($directories));
+		self::assertEquals(2, count($all));
+		self::assertEquals(5, count($filesRecursively));
+		self::assertEquals(7, count($directoriesRecursively));
+		self::assertEquals(12, count($allRecursively));
+	}
+
+	public function testGenerateFilename()
+	{
+		self::assertEquals(true, !FileSystem::exists(FileSystem::generateFilename()));
+		self::assertEquals(true, !FileSystem::exists(FileSystem::generateFilename($this->baseDir . "/var")));
+	}
+
+	public function testCreateTempFile()
+	{
+		$temp = FileSystem::createTempFile();
+		self::assertEquals(true, FileSystem::isFile($temp));
+		$temp = FileSystem::createTempFile($this->baseDir . "/var");
+		self::assertEquals(true, FileSystem::isFile($temp));
+	}
+
+	public function testCreateTempDirectory()
+	{
+		$temp = FileSystem::createTempDirectory();
+		self::assertEquals(true, FileSystem::isDirectory($temp));
+		$temp = FileSystem::createTempDirectory($this->baseDir . "/var");
+		self::assertEquals(true, FileSystem::isDirectory($temp));
+	}
+
+	public function testZip()
+	{
+		$zip = FileSystem::zip($this->baseDir . "/var");
+		self::assertEquals(true, FileSystem::isFile($zip));
+	}
+
+	public function testUnzip()
+	{
+		$zip = FileSystem::zip($this->baseDir . "/var");
+		$unzip = FileSystem::unzip($zip);
+		self::assertEquals(true, FileSystem::isDirectory($unzip));
+	}
 }

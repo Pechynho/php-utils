@@ -322,4 +322,10 @@ class StringsTest extends TestCase
 	{
 		self::assertEquals(["find", "By", "ID"], Strings::splitByCase("findByID"));
 	}
+
+	public function testToAscii()
+	{
+		self::assertEquals("aAcCeEeEiInNoOrRsStTuUuUyYzZ", Strings::toAscii("áÁčČěĚéÉíÍňŇóÓřŘšŠťŤúÚůŮýÝžŽ"));
+		self::assertEquals("shi", Strings::toAscii("是"));
+	}
 }
