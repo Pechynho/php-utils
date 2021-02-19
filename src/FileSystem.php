@@ -507,7 +507,7 @@ class FileSystem
 	}
 
 	/**
-	 * @param string $directory
+	 * @param string|null $directory
 	 * @param string|null $extension
 	 * @return string
 	 */
