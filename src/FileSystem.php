@@ -5,8 +5,13 @@ namespace Pechynho\Utility;
 
 
 use DirectoryIterator;
+use FilesystemIterator;
+use Generator;
 use InvalidArgumentException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use RuntimeException;
+use ZipArchive;
 
 /**
  * @author Jan Pech <pechynho@gmail.com>
@@ -25,7 +30,7 @@ class FileSystem
 	/**
 	 * @param string $source
 	 * @param string $destination
-	 * @param bool   $overwrite
+	 * @param bool $overwrite
 	 */
 	public static function copy(string $source, string $destination, bool $overwrite = false): void
 	{
@@ -81,7 +86,7 @@ class FileSystem
 
 	/**
 	 * @param string $directory
-	 * @param int    $mode
+	 * @param int $mode
 	 */
 	public static function createDirectory(string $directory, int $mode = 0777): void
 	{
@@ -139,7 +144,7 @@ class FileSystem
 		$wrapper = '';
 		if ($isStream($path))
 		{
-			list($wrapper, $path) = explode('://', $path, 2);
+			[$wrapper, $path] = explode('://', $path, 2);
 			$wrapper .= '://';
 		}
 		$path = str_replace('\\', '/', $path); // Standardise all paths to use '/'.
@@ -154,7 +159,7 @@ class FileSystem
 	/**
 	 * @param string $source
 	 * @param string $destination
-	 * @param bool   $overwrite
+	 * @param bool $overwrite
 	 */
 	public static function rename(string $source, string $destination, bool $overwrite = false): void
 	{
@@ -179,7 +184,7 @@ class FileSystem
 	/**
 	 * @param string $filename
 	 * @param string $content
-	 * @param bool   $overwrite
+	 * @param bool $overwrite
 	 */
 	public static function write(string $filename, string $content, bool $overwrite = false): void
 	{
@@ -243,7 +248,7 @@ class FileSystem
 	/**
 	 * @param string $filename
 	 * @param string $content
-	 * @param bool   $newLine
+	 * @param bool $newLine
 	 */
 	public static function append(string $filename, string $content, bool $newLine = true): void
 	{
@@ -330,7 +335,7 @@ class FileSystem
 
 	/**
 	 * @param string $filename
-	 * @param bool   $trimEndOfLine
+	 * @param bool $trimEndOfLine
 	 * @return array
 	 */
 	public static function readAllLines(string $filename, bool $trimEndOfLine = true): array
@@ -380,7 +385,7 @@ class FileSystem
 
 	/**
 	 * @param string $filename
-	 * @param bool   $trimEndOfLine
+	 * @param bool $trimEndOfLine
 	 * @return iterable
 	 */
 	public static function readLineByLine(string $filename, bool $trimEndOfLine = true): iterable
@@ -411,7 +416,7 @@ class FileSystem
 	/**
 	 * @param string $directory
 	 * @param string $mode
-	 * @param bool   $recursively
+	 * @param bool $recursively
 	 * @return string[]
 	 */
 	public static function scanDirectory(string $directory, string $mode = FileSystem::SCAN_ALL, bool $recursively = false): array
@@ -447,5 +452,232 @@ class FileSystem
 			}
 		}
 		return $output;
+	}
+
+	/**
+	 * @param string $path
+	 * @return bool
+	 */
+	public static function exists(string $path): bool
+	{
+		return file_exists($path);
+	}
+
+	/**
+	 * @param string $directory
+	 * @param string $mode
+	 * @param bool $recursively
+	 * @return Generator
+	 */
+	public static function iterateDirectory(string $directory, string $mode = FileSystem::SCAN_ALL, bool $recursively = false): Generator
+	{
+		if (!FileSystem::isDirectory($directory))
+		{
+			throw new InvalidArgumentException("Given value '$directory' is not valid directory name.");
+		}
+		if (!in_array($mode, [FileSystem::SCAN_ALL, FileSystem::SCAN_DIRECTORIES, FileSystem::SCAN_FILES]))
+		{
+			throw new InvalidArgumentException('Invalid value passed to parameter $mode.');
+		}
+		if (!$recursively)
+		{
+			$iterator = new DirectoryIterator($directory);
+			foreach ($iterator as $item)
+			{
+				if ($item->isDot())
+				{
+					continue;
+				}
+				if (($item->isDir() && ($mode == FileSystem::SCAN_DIRECTORIES || $mode == FileSystem::SCAN_ALL)) || ($item->isFile() && ($mode == FileSystem::SCAN_FILES || $mode == FileSystem::SCAN_ALL)))
+				{
+					yield $item->getRealPath();
+				}
+			}
+			return;
+		}
+		$iterator = new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS|FilesystemIterator::FOLLOW_SYMLINKS);
+		$iterator = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::SELF_FIRST);
+		foreach ($iterator as $item)
+		{
+			if (($item->isDir() && ($mode == FileSystem::SCAN_DIRECTORIES || $mode == FileSystem::SCAN_ALL)) || ($item->isFile() && ($mode == FileSystem::SCAN_FILES || $mode == FileSystem::SCAN_ALL)))
+			{
+				yield $item->getRealPath();
+			}
+		}
+	}
+
+	/**
+	 * @param string $directory
+	 * @param string|null $extension
+	 * @return string
+	 */
+	public static function generateFilename(?string $directory = null, ?string $extension = null): string
+	{
+		if ($directory !== null && !FileSystem::isDirectory($directory))
+		{
+			throw new InvalidArgumentException("Given value '$directory' is not valid directory name.");
+		}
+		if ($directory === null)
+		{
+			$directory = sys_get_temp_dir();
+		}
+		$suffix = "";
+		if ($extension !== null && Strings::startsWith($extension,"."))
+		{
+			$suffix = $extension;
+		}
+		else if ($extension !== null && !Strings::startsWith($extension, "."))
+		{
+			$suffix = "." . $extension;
+		}
+		do
+		{
+			$filename = md5(uniqid()) . $suffix;
+		} while (self::exists(self::combinePath($directory, $filename)));
+		return self::combinePath($directory, $filename);
+	}
+
+	/**
+	 * @param string|null $directory
+	 * @param string|null $extension
+	 * @param string $mode
+	 * @return string
+	 */
+	public static function createTempFile(?string $directory = null, ?string $extension = null, string $mode = "wb"): string
+	{
+		if ($directory !== null && !FileSystem::isDirectory($directory))
+		{
+			throw new InvalidArgumentException("Given value '$directory' is not valid directory name.");
+		}
+		if ($directory === null)
+		{
+			$directory = sys_get_temp_dir();
+		}
+		$filename = self::generateFilename($directory, $extension);
+		$resource = fopen($filename, $mode);
+		if ($resource === false)
+		{
+			throw new RuntimeException(sprintf("Function fopen('%s', '%s) has failed.", $filename, $mode));
+		}
+		if (fclose($resource) === false)
+		{
+			throw new RuntimeException(sprintf('Could not close (fclose) file %s.', $filename));
+		}
+		return $filename;
+	}
+
+	/**
+	 * @param string|null $directory
+	 * @param int $mode
+	 * @return string
+	 */
+	public static function createTempDirectory(?string $directory = null, int $mode = 0777): string
+	{
+		if ($directory !== null && !FileSystem::isDirectory($directory))
+		{
+			throw new InvalidArgumentException("Given value '$directory' is not valid directory name.");
+		}
+		if ($directory === null)
+		{
+			$directory = sys_get_temp_dir();
+		}
+		$output = self::generateFilename($directory);
+		self::createDirectory($output, $mode);
+		return $output;
+	}
+
+	/**
+	 * @param string $source
+	 * @param string|null $destination
+	 * @param bool $overwrite
+	 * @param callable|null $filter
+	 * @return string
+	 */
+	public static function zip(string $source, ?string $destination = null, bool $overwrite = false, ?callable $filter = null): string
+	{
+		if (!$overwrite && $destination !== null && self::exists($destination))
+		{
+			throw new RuntimeException(sprintf("Filename %s already exists.", $destination));
+		}
+		if (!self::exists($source))
+		{
+			throw new InvalidArgumentException(sprintf("Source %s does not exist.", $source));
+		}
+		if ($destination === null)
+		{
+			$destination = self::createTempFile(null, ".zip");
+		}
+		$source = realpath($source);
+		$zip = new ZipArchive();
+		if ($zip->open($destination, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true)
+		{
+			throw new RuntimeException(sprintf("Could not create %s zip archive.", $destination));
+		}
+		$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::SELF_FIRST);
+		$sourceWithSeparator = $source . DIRECTORY_SEPARATOR;
+		foreach ($files as $file)
+		{
+			if (in_array(substr($file, strrpos($file, DIRECTORY_SEPARATOR) + 1), ['.', '..']))
+			{
+				continue;
+			}
+			if (is_callable($filter))
+			{
+				$skip = call_user_func($filter, (string)$file);
+				if (!is_bool($skip))
+				{
+					throw new RuntimeException(sprintf('Parameter $filter has to contain callback which returns boolean.'));
+				}
+				if ($skip)
+				{
+					continue;
+				}
+			}
+			if (is_dir($file) === true)
+			{
+				$zip->addEmptyDir(str_replace($sourceWithSeparator, '', $file . DIRECTORY_SEPARATOR));
+			}
+			else if (is_file($file) === true)
+			{
+				$zip->addFile($file, str_replace($sourceWithSeparator, '', $file));
+			}
+		}
+		if ($zip->close() !== true)
+		{
+			throw new RuntimeException(sprintf("Could not close %s zip archive.", $destination));
+		}
+		return $destination;
+	}
+
+	/**
+	 * @param string $source
+	 * @param string|null $destination
+	 * @return string
+	 */
+	public static function unzip(string $source, ?string $destination = null): string
+	{
+		if ($destination !== null && self::exists($destination))
+		{
+			throw new RuntimeException(sprintf("Filename %s already exists.", $destination));
+		}
+		if (!self::exists($source))
+		{
+			throw new InvalidArgumentException(sprintf("Source %s does not exist.", $source));
+		}
+		if ($destination === null)
+		{
+			$destination = self::createTempDirectory();
+		}
+		$zip = new ZipArchive();
+		if ($zip->open($source) !== true)
+		{
+			throw new RuntimeException(sprintf("Could not open %s zip archive.", $source));
+		}
+		$zip->extractTo($destination);
+		if ($zip->close() !== true)
+		{
+			throw new RuntimeException(sprintf("Could not close %s zip archive.", $source));
+		}
+		return $destination;
 	}
 }

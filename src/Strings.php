@@ -6,6 +6,8 @@ namespace Pechynho\Utility;
 
 use InvalidArgumentException;
 use OutOfRangeException;
+use RuntimeException;
+use Transliterator;
 
 /**
  * @author Jan Pech <pechynho@gmail.com>
@@ -60,7 +62,7 @@ class Strings
 	}
 
 	/**
-	 * @param string   $subject
+	 * @param string $subject
 	 * @param string[] $trimChars
 	 * @return string
 	 */
@@ -74,8 +76,8 @@ class Strings
 	}
 
 	/**
-	 * @param iterable    $subject
-	 * @param string      $separator
+	 * @param iterable $subject
+	 * @param string $separator
 	 * @param string|null $lastSeparator
 	 * @return string
 	 */
@@ -142,7 +144,7 @@ class Strings
 	/**
 	 * Returns a value indicating whether a specified substring occurs within passed string.
 	 * @param string $subject The string to seek in.
-	 * @param string $value   The substring to seek.
+	 * @param string $value The substring to seek.
 	 * @return bool Returns true if the $value parameter occurs within $subject parameter; otherwise false.
 	 */
 	public static function contains(string $subject, string $value): bool
@@ -156,9 +158,9 @@ class Strings
 
 	/**
 	 * Returns integer representing index on which given value occurs in given string.
-	 * @param string $subject    The string to seek in.
-	 * @param string $value      The value to seek.
-	 * @param int    $startIndex Offset value from start of the string.
+	 * @param string $subject The string to seek in.
+	 * @param string $value The value to seek.
+	 * @param int $startIndex Offset value from start of the string.
 	 * @return int Returns value indicating on which index occurs $value in $subject; if $subject doesn't contain $value, then it returns -1.
 	 */
 	public static function indexOf(string $subject, string $value, int $startIndex = 0): int
@@ -191,18 +193,22 @@ class Strings
 	/**
 	 * Indicates if string ends with given value.
 	 * @param string $subject The string to seek in.
-	 * @param string $value   The substring to seek at end.
+	 * @param string $value The substring to seek at end.
 	 * @return bool Returns true if the $subject parameter ends with $value parameter; otherwise false;
 	 */
 	public static function endsWith(string $subject, string $value): bool
 	{
+		if (function_exists("str_ends_with"))
+		{
+			return str_ends_with($subject, $value);
+		}
 		return $value === "" || (($temp = mb_strlen($subject) - mb_strlen($value)) >= 0 && strpos($subject, $value, $temp) !== false);
 	}
 
 	/**
-	 * @param string   $subject
+	 * @param string $subject
 	 * @param iterable $values
-	 * @param int      $startIndex
+	 * @param int $startIndex
 	 * @return int
 	 */
 	public static function indexOfAny(string $subject, iterable $values, int $startIndex = 0): int
@@ -233,7 +239,7 @@ class Strings
 	/**
 	 * @param string $subject
 	 * @param string $value
-	 * @param int    $startIndex
+	 * @param int $startIndex
 	 * @return string
 	 */
 	public static function insert(string $subject, string $value, int $startIndex): string
@@ -254,9 +260,9 @@ class Strings
 	}
 
 	/**
-	 * @param string   $subject
+	 * @param string $subject
 	 * @param iterable $values
-	 * @param int      $startIndex
+	 * @param int $startIndex
 	 * @return int
 	 */
 	public static function lastIndexOfAny(string $subject, iterable $values, int $startIndex = 0): int
@@ -287,7 +293,7 @@ class Strings
 	/**
 	 * @param string $subject
 	 * @param string $value
-	 * @param int    $startIndex
+	 * @param int $startIndex
 	 * @return int
 	 */
 	public static function lastIndexOf(string $subject, string $value, int $startIndex = 0): int
@@ -310,7 +316,7 @@ class Strings
 
 	/**
 	 * @param string $subject
-	 * @param int    $totalWidth
+	 * @param int $totalWidth
 	 * @param string $paddingChar
 	 * @return string
 	 */
@@ -330,7 +336,7 @@ class Strings
 
 	/**
 	 * @param string $subject
-	 * @param int    $totalWidth
+	 * @param int $totalWidth
 	 * @param string $paddingChar
 	 * @return string
 	 */
@@ -349,8 +355,8 @@ class Strings
 	}
 
 	/**
-	 * @param string   $subject
-	 * @param int      $startIndex
+	 * @param string $subject
+	 * @param int $startIndex
 	 * @param int|null $length
 	 * @return string
 	 */
@@ -375,8 +381,8 @@ class Strings
 	}
 
 	/**
-	 * @param string   $subject
-	 * @param int      $startIndex
+	 * @param string $subject
+	 * @param int $startIndex
 	 * @param int|null $length
 	 * @return string
 	 */
@@ -414,9 +420,9 @@ class Strings
 	}
 
 	/**
-	 * @param string   $subject
+	 * @param string $subject
 	 * @param string[] $separators
-	 * @param bool     $removeEmptyEntries
+	 * @param bool $removeEmptyEntries
 	 * @return array
 	 */
 	public static function split(string $subject, array $separators, bool $removeEmptyEntries = true): array
@@ -442,7 +448,7 @@ class Strings
 	}
 
 	/**
-	 * @param string   $subject
+	 * @param string $subject
 	 * @param string[] $replacements
 	 * @return string
 	 */
@@ -484,11 +490,15 @@ class Strings
 	 */
 	public static function startsWith(string $subject, string $value): bool
 	{
+		if (function_exists("str_starts_with "))
+		{
+			return str_starts_with($subject, $value);
+		}
 		return $value === "" || strncmp($subject, $value, mb_strlen($value)) === 0;
 	}
 
 	/**
-	 * @param string   $subject
+	 * @param string $subject
 	 * @param string[] $trimChars
 	 * @return string
 	 */
@@ -502,7 +512,7 @@ class Strings
 	}
 
 	/**
-	 * @param string   $subject
+	 * @param string $subject
 	 * @param string[] $trimChars
 	 * @return string
 	 */
@@ -543,7 +553,7 @@ class Strings
 
 	/**
 	 * @param string $subject
-	 * @param int    $maximumLength
+	 * @param int $maximumLength
 	 * @return string
 	 */
 	public static function truncate(string $subject, int $maximumLength): string
@@ -654,7 +664,7 @@ class Strings
 	 * @param string $subject
 	 * @param string $separator
 	 * @param string $slugifyType
-	 * @param bool   $toLower
+	 * @param bool $toLower
 	 * @return  string
 	 */
 	public static function slugify(string $subject, string $separator = "-", string $slugifyType = Strings::SLUGIFY_NORMAL, bool $toLower = true): string
@@ -668,15 +678,15 @@ class Strings
 			throw new InvalidArgumentException('Parameter $separator has to be single character.');
 		}
 		$config = [
-			Strings::SLUGIFY_NORMAL   => "/\W+/",
+			Strings::SLUGIFY_NORMAL => "/\W+/",
 			Strings::SLUGIFY_FILENAME => '/[\/\\?%*:|"<>. ]+/',
-			Strings::SLUGIFY_URL      => '/[!*\'%();:@&=+,?#\[\]\/]+/'
+			Strings::SLUGIFY_URL => '/[!*\'%();:@&=+,?#\[\]\/]+/'
 		];
 		if ($toLower)
 		{
 			$subject = Strings::toLower($subject);
 		}
-		$subject = Strings::replaceCzechSpecialCharsWithASCII($subject);
+		$subject = Strings::toAscii($subject);
 		$subject = preg_replace('!\s+!', $separator, $subject);
 		$subject = preg_replace($config[$slugifyType], $separator, $subject);
 		$subject = preg_replace('/[\\' . $separator . ']+/', $separator, $subject);
@@ -692,103 +702,103 @@ class Strings
 	{
 		$chars = [
 			// Decompositions for Latin-1 Supplement
-			chr(195) . chr(128)            => 'A', chr(195) . chr(129) => 'A',
-			chr(195) . chr(130)            => 'A', chr(195) . chr(131) => 'A',
-			chr(195) . chr(132)            => 'A', chr(195) . chr(133) => 'A',
-			chr(195) . chr(135)            => 'C', chr(195) . chr(136) => 'E',
-			chr(195) . chr(137)            => 'E', chr(195) . chr(138) => 'E',
-			chr(195) . chr(139)            => 'E', chr(195) . chr(140) => 'I',
-			chr(195) . chr(141)            => 'I', chr(195) . chr(142) => 'I',
-			chr(195) . chr(143)            => 'I', chr(195) . chr(145) => 'N',
-			chr(195) . chr(146)            => 'O', chr(195) . chr(147) => 'O',
-			chr(195) . chr(148)            => 'O', chr(195) . chr(149) => 'O',
-			chr(195) . chr(150)            => 'O', chr(195) . chr(153) => 'U',
-			chr(195) . chr(154)            => 'U', chr(195) . chr(155) => 'U',
-			chr(195) . chr(156)            => 'U', chr(195) . chr(157) => 'Y',
-			chr(195) . chr(159)            => 's', chr(195) . chr(160) => 'a',
-			chr(195) . chr(161)            => 'a', chr(195) . chr(162) => 'a',
-			chr(195) . chr(163)            => 'a', chr(195) . chr(164) => 'a',
-			chr(195) . chr(165)            => 'a', chr(195) . chr(167) => 'c',
-			chr(195) . chr(168)            => 'e', chr(195) . chr(169) => 'e',
-			chr(195) . chr(170)            => 'e', chr(195) . chr(171) => 'e',
-			chr(195) . chr(172)            => 'i', chr(195) . chr(173) => 'i',
-			chr(195) . chr(174)            => 'i', chr(195) . chr(175) => 'i',
-			chr(195) . chr(177)            => 'n', chr(195) . chr(178) => 'o',
-			chr(195) . chr(179)            => 'o', chr(195) . chr(180) => 'o',
-			chr(195) . chr(181)            => 'o', chr(195) . chr(182) => 'o',
-			chr(195) . chr(182)            => 'o', chr(195) . chr(185) => 'u',
-			chr(195) . chr(186)            => 'u', chr(195) . chr(187) => 'u',
-			chr(195) . chr(188)            => 'u', chr(195) . chr(189) => 'y',
-			chr(195) . chr(191)            => 'y',
+			chr(195) . chr(128) => 'A', chr(195) . chr(129) => 'A',
+			chr(195) . chr(130) => 'A', chr(195) . chr(131) => 'A',
+			chr(195) . chr(132) => 'A', chr(195) . chr(133) => 'A',
+			chr(195) . chr(135) => 'C', chr(195) . chr(136) => 'E',
+			chr(195) . chr(137) => 'E', chr(195) . chr(138) => 'E',
+			chr(195) . chr(139) => 'E', chr(195) . chr(140) => 'I',
+			chr(195) . chr(141) => 'I', chr(195) . chr(142) => 'I',
+			chr(195) . chr(143) => 'I', chr(195) . chr(145) => 'N',
+			chr(195) . chr(146) => 'O', chr(195) . chr(147) => 'O',
+			chr(195) . chr(148) => 'O', chr(195) . chr(149) => 'O',
+			chr(195) . chr(150) => 'O', chr(195) . chr(153) => 'U',
+			chr(195) . chr(154) => 'U', chr(195) . chr(155) => 'U',
+			chr(195) . chr(156) => 'U', chr(195) . chr(157) => 'Y',
+			chr(195) . chr(159) => 's', chr(195) . chr(160) => 'a',
+			chr(195) . chr(161) => 'a', chr(195) . chr(162) => 'a',
+			chr(195) . chr(163) => 'a', chr(195) . chr(164) => 'a',
+			chr(195) . chr(165) => 'a', chr(195) . chr(167) => 'c',
+			chr(195) . chr(168) => 'e', chr(195) . chr(169) => 'e',
+			chr(195) . chr(170) => 'e', chr(195) . chr(171) => 'e',
+			chr(195) . chr(172) => 'i', chr(195) . chr(173) => 'i',
+			chr(195) . chr(174) => 'i', chr(195) . chr(175) => 'i',
+			chr(195) . chr(177) => 'n', chr(195) . chr(178) => 'o',
+			chr(195) . chr(179) => 'o', chr(195) . chr(180) => 'o',
+			chr(195) . chr(181) => 'o', chr(195) . chr(182) => 'o',
+			chr(195) . chr(182) => 'o', chr(195) . chr(185) => 'u',
+			chr(195) . chr(186) => 'u', chr(195) . chr(187) => 'u',
+			chr(195) . chr(188) => 'u', chr(195) . chr(189) => 'y',
+			chr(195) . chr(191) => 'y',
 			// Decompositions for Latin Extended-A
-			chr(196) . chr(128)            => 'A', chr(196) . chr(129) => 'a',
-			chr(196) . chr(130)            => 'A', chr(196) . chr(131) => 'a',
-			chr(196) . chr(132)            => 'A', chr(196) . chr(133) => 'a',
-			chr(196) . chr(134)            => 'C', chr(196) . chr(135) => 'c',
-			chr(196) . chr(136)            => 'C', chr(196) . chr(137) => 'c',
-			chr(196) . chr(138)            => 'C', chr(196) . chr(139) => 'c',
-			chr(196) . chr(140)            => 'C', chr(196) . chr(141) => 'c',
-			chr(196) . chr(142)            => 'D', chr(196) . chr(143) => 'd',
-			chr(196) . chr(144)            => 'D', chr(196) . chr(145) => 'd',
-			chr(196) . chr(146)            => 'E', chr(196) . chr(147) => 'e',
-			chr(196) . chr(148)            => 'E', chr(196) . chr(149) => 'e',
-			chr(196) . chr(150)            => 'E', chr(196) . chr(151) => 'e',
-			chr(196) . chr(152)            => 'E', chr(196) . chr(153) => 'e',
-			chr(196) . chr(154)            => 'E', chr(196) . chr(155) => 'e',
-			chr(196) . chr(156)            => 'G', chr(196) . chr(157) => 'g',
-			chr(196) . chr(158)            => 'G', chr(196) . chr(159) => 'g',
-			chr(196) . chr(160)            => 'G', chr(196) . chr(161) => 'g',
-			chr(196) . chr(162)            => 'G', chr(196) . chr(163) => 'g',
-			chr(196) . chr(164)            => 'H', chr(196) . chr(165) => 'h',
-			chr(196) . chr(166)            => 'H', chr(196) . chr(167) => 'h',
-			chr(196) . chr(168)            => 'I', chr(196) . chr(169) => 'i',
-			chr(196) . chr(170)            => 'I', chr(196) . chr(171) => 'i',
-			chr(196) . chr(172)            => 'I', chr(196) . chr(173) => 'i',
-			chr(196) . chr(174)            => 'I', chr(196) . chr(175) => 'i',
-			chr(196) . chr(176)            => 'I', chr(196) . chr(177) => 'i',
-			chr(196) . chr(178)            => 'IJ', chr(196) . chr(179) => 'ij',
-			chr(196) . chr(180)            => 'J', chr(196) . chr(181) => 'j',
-			chr(196) . chr(182)            => 'K', chr(196) . chr(183) => 'k',
-			chr(196) . chr(184)            => 'k', chr(196) . chr(185) => 'L',
-			chr(196) . chr(186)            => 'l', chr(196) . chr(187) => 'L',
-			chr(196) . chr(188)            => 'l', chr(196) . chr(189) => 'L',
-			chr(196) . chr(190)            => 'l', chr(196) . chr(191) => 'L',
-			chr(197) . chr(128)            => 'l', chr(197) . chr(129) => 'L',
-			chr(197) . chr(130)            => 'l', chr(197) . chr(131) => 'N',
-			chr(197) . chr(132)            => 'n', chr(197) . chr(133) => 'N',
-			chr(197) . chr(134)            => 'n', chr(197) . chr(135) => 'N',
-			chr(197) . chr(136)            => 'n', chr(197) . chr(137) => 'N',
-			chr(197) . chr(138)            => 'n', chr(197) . chr(139) => 'N',
-			chr(197) . chr(140)            => 'O', chr(197) . chr(141) => 'o',
-			chr(197) . chr(142)            => 'O', chr(197) . chr(143) => 'o',
-			chr(197) . chr(144)            => 'O', chr(197) . chr(145) => 'o',
-			chr(197) . chr(146)            => 'OE', chr(197) . chr(147) => 'oe',
-			chr(197) . chr(148)            => 'R', chr(197) . chr(149) => 'r',
-			chr(197) . chr(150)            => 'R', chr(197) . chr(151) => 'r',
-			chr(197) . chr(152)            => 'R', chr(197) . chr(153) => 'r',
-			chr(197) . chr(154)            => 'S', chr(197) . chr(155) => 's',
-			chr(197) . chr(156)            => 'S', chr(197) . chr(157) => 's',
-			chr(197) . chr(158)            => 'S', chr(197) . chr(159) => 's',
-			chr(197) . chr(160)            => 'S', chr(197) . chr(161) => 's',
-			chr(197) . chr(162)            => 'T', chr(197) . chr(163) => 't',
-			chr(197) . chr(164)            => 'T', chr(197) . chr(165) => 't',
-			chr(197) . chr(166)            => 'T', chr(197) . chr(167) => 't',
-			chr(197) . chr(168)            => 'U', chr(197) . chr(169) => 'u',
-			chr(197) . chr(170)            => 'U', chr(197) . chr(171) => 'u',
-			chr(197) . chr(172)            => 'U', chr(197) . chr(173) => 'u',
-			chr(197) . chr(174)            => 'U', chr(197) . chr(175) => 'u',
-			chr(197) . chr(176)            => 'U', chr(197) . chr(177) => 'u',
-			chr(197) . chr(178)            => 'U', chr(197) . chr(179) => 'u',
-			chr(197) . chr(180)            => 'W', chr(197) . chr(181) => 'w',
-			chr(197) . chr(182)            => 'Y', chr(197) . chr(183) => 'y',
-			chr(197) . chr(184)            => 'Y', chr(197) . chr(185) => 'Z',
-			chr(197) . chr(186)            => 'z', chr(197) . chr(187) => 'Z',
-			chr(197) . chr(188)            => 'z', chr(197) . chr(189) => 'Z',
-			chr(197) . chr(190)            => 'z', chr(197) . chr(191) => 's',
+			chr(196) . chr(128) => 'A', chr(196) . chr(129) => 'a',
+			chr(196) . chr(130) => 'A', chr(196) . chr(131) => 'a',
+			chr(196) . chr(132) => 'A', chr(196) . chr(133) => 'a',
+			chr(196) . chr(134) => 'C', chr(196) . chr(135) => 'c',
+			chr(196) . chr(136) => 'C', chr(196) . chr(137) => 'c',
+			chr(196) . chr(138) => 'C', chr(196) . chr(139) => 'c',
+			chr(196) . chr(140) => 'C', chr(196) . chr(141) => 'c',
+			chr(196) . chr(142) => 'D', chr(196) . chr(143) => 'd',
+			chr(196) . chr(144) => 'D', chr(196) . chr(145) => 'd',
+			chr(196) . chr(146) => 'E', chr(196) . chr(147) => 'e',
+			chr(196) . chr(148) => 'E', chr(196) . chr(149) => 'e',
+			chr(196) . chr(150) => 'E', chr(196) . chr(151) => 'e',
+			chr(196) . chr(152) => 'E', chr(196) . chr(153) => 'e',
+			chr(196) . chr(154) => 'E', chr(196) . chr(155) => 'e',
+			chr(196) . chr(156) => 'G', chr(196) . chr(157) => 'g',
+			chr(196) . chr(158) => 'G', chr(196) . chr(159) => 'g',
+			chr(196) . chr(160) => 'G', chr(196) . chr(161) => 'g',
+			chr(196) . chr(162) => 'G', chr(196) . chr(163) => 'g',
+			chr(196) . chr(164) => 'H', chr(196) . chr(165) => 'h',
+			chr(196) . chr(166) => 'H', chr(196) . chr(167) => 'h',
+			chr(196) . chr(168) => 'I', chr(196) . chr(169) => 'i',
+			chr(196) . chr(170) => 'I', chr(196) . chr(171) => 'i',
+			chr(196) . chr(172) => 'I', chr(196) . chr(173) => 'i',
+			chr(196) . chr(174) => 'I', chr(196) . chr(175) => 'i',
+			chr(196) . chr(176) => 'I', chr(196) . chr(177) => 'i',
+			chr(196) . chr(178) => 'IJ', chr(196) . chr(179) => 'ij',
+			chr(196) . chr(180) => 'J', chr(196) . chr(181) => 'j',
+			chr(196) . chr(182) => 'K', chr(196) . chr(183) => 'k',
+			chr(196) . chr(184) => 'k', chr(196) . chr(185) => 'L',
+			chr(196) . chr(186) => 'l', chr(196) . chr(187) => 'L',
+			chr(196) . chr(188) => 'l', chr(196) . chr(189) => 'L',
+			chr(196) . chr(190) => 'l', chr(196) . chr(191) => 'L',
+			chr(197) . chr(128) => 'l', chr(197) . chr(129) => 'L',
+			chr(197) . chr(130) => 'l', chr(197) . chr(131) => 'N',
+			chr(197) . chr(132) => 'n', chr(197) . chr(133) => 'N',
+			chr(197) . chr(134) => 'n', chr(197) . chr(135) => 'N',
+			chr(197) . chr(136) => 'n', chr(197) . chr(137) => 'N',
+			chr(197) . chr(138) => 'n', chr(197) . chr(139) => 'N',
+			chr(197) . chr(140) => 'O', chr(197) . chr(141) => 'o',
+			chr(197) . chr(142) => 'O', chr(197) . chr(143) => 'o',
+			chr(197) . chr(144) => 'O', chr(197) . chr(145) => 'o',
+			chr(197) . chr(146) => 'OE', chr(197) . chr(147) => 'oe',
+			chr(197) . chr(148) => 'R', chr(197) . chr(149) => 'r',
+			chr(197) . chr(150) => 'R', chr(197) . chr(151) => 'r',
+			chr(197) . chr(152) => 'R', chr(197) . chr(153) => 'r',
+			chr(197) . chr(154) => 'S', chr(197) . chr(155) => 's',
+			chr(197) . chr(156) => 'S', chr(197) . chr(157) => 's',
+			chr(197) . chr(158) => 'S', chr(197) . chr(159) => 's',
+			chr(197) . chr(160) => 'S', chr(197) . chr(161) => 's',
+			chr(197) . chr(162) => 'T', chr(197) . chr(163) => 't',
+			chr(197) . chr(164) => 'T', chr(197) . chr(165) => 't',
+			chr(197) . chr(166) => 'T', chr(197) . chr(167) => 't',
+			chr(197) . chr(168) => 'U', chr(197) . chr(169) => 'u',
+			chr(197) . chr(170) => 'U', chr(197) . chr(171) => 'u',
+			chr(197) . chr(172) => 'U', chr(197) . chr(173) => 'u',
+			chr(197) . chr(174) => 'U', chr(197) . chr(175) => 'u',
+			chr(197) . chr(176) => 'U', chr(197) . chr(177) => 'u',
+			chr(197) . chr(178) => 'U', chr(197) . chr(179) => 'u',
+			chr(197) . chr(180) => 'W', chr(197) . chr(181) => 'w',
+			chr(197) . chr(182) => 'Y', chr(197) . chr(183) => 'y',
+			chr(197) . chr(184) => 'Y', chr(197) . chr(185) => 'Z',
+			chr(197) . chr(186) => 'z', chr(197) . chr(187) => 'Z',
+			chr(197) . chr(188) => 'z', chr(197) . chr(189) => 'Z',
+			chr(197) . chr(190) => 'z', chr(197) . chr(191) => 's',
 			// Euro Sign
 			chr(226) . chr(130) . chr(172) => 'E',
 			// GBP (Pound) Sign
-			chr(194) . chr(163)            => ''
+			chr(194) . chr(163) => ''
 		];
 
 		return strtr($subject, $chars);
@@ -842,5 +852,84 @@ class Strings
 	public static function reverse(string $subject): string
 	{
 		return strrev($subject);
+	}
+
+	/**
+	 * @param string $subject
+	 * @return string
+	 */
+	public static function toAscii(string $subject): string
+	{
+		$iconv = defined('ICONV_IMPL') ? trim(ICONV_IMPL, '"\'') : null;
+		$transliterator = null;
+		if ($transliterator === null)
+		{
+			if (class_exists('Transliterator', false))
+			{
+				$transliterator = Transliterator::create('Any-Latin; Latin-ASCII');
+			}
+			else
+			{
+				trigger_error(__METHOD__ . "(): it is recommended to enable PHP extensions 'intl'.", E_USER_NOTICE);
+				$transliterator = false;
+			}
+		}
+		// remove control characters and check UTF-8 validity
+		$subject = preg_replace('#[^\x09\x0A\x0D\x20-\x7E\xA0-\x{2FF}\x{370}-\x{10FFFF}]#u', '', $subject);
+		// transliteration (by Transliterator and iconv) is not optimal, replace some characters directly
+		$subject = strtr($subject, ["\u{201E}" => '"', "\u{201C}" => '"', "\u{201D}" => '"', "\u{201A}" => "'", "\u{2018}" => "'", "\u{2019}" => "'", "\u{B0}" => '^', "\u{42F}" => 'Ya', "\u{44F}" => 'ya', "\u{42E}" => 'Yu', "\u{44E}" => 'yu', "\u{c4}" => 'Ae', "\u{d6}" => 'Oe', "\u{dc}" => 'Ue', "\u{1e9e}" => 'Ss', "\u{e4}" => 'ae', "\u{f6}" => 'oe', "\u{fc}" => 'ue', "\u{df}" => 'ss']); // „ “ ” ‚ ‘ ’ ° Я я Ю ю Ä Ö Ü ẞ ä ö ü ß
+		if ($iconv !== 'libiconv')
+		{
+			$subject = strtr($subject, ["\u{AE}" => '(R)', "\u{A9}" => '(c)', "\u{2026}" => '...', "\u{AB}" => '<<', "\u{BB}" => '>>', "\u{A3}" => 'lb', "\u{A5}" => 'yen', "\u{B2}" => '^2', "\u{B3}" => '^3', "\u{B5}" => 'u', "\u{B9}" => '^1', "\u{BA}" => 'o', "\u{BF}" => '?', "\u{2CA}" => "'", "\u{2CD}" => '_', "\u{2DD}" => '"', "\u{1FEF}" => '', "\u{20AC}" => 'EUR', "\u{2122}" => 'TM', "\u{212E}" => 'e', "\u{2190}" => '<-', "\u{2191}" => '^', "\u{2192}" => '->', "\u{2193}" => 'V', "\u{2194}" => '<->']); // ® © … « » £ ¥ ² ³ µ ¹ º ¿ ˊ ˍ ˝ ` € ™ ℮ ← ↑ → ↓ ↔
+		}
+		if ($transliterator)
+		{
+			$subject = $transliterator->transliterate($subject);
+			// use iconv because The transliterator leaves some characters out of ASCII, eg → ʾ
+			if ($iconv === 'glibc')
+			{
+				$subject = strtr($subject, '?', "\x01"); // temporarily hide ? to distinguish them from the garbage that iconv creates
+				$subject = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $subject);
+				$subject = str_replace(['?', "\x01"], ['', '?'], $subject); // remove garbage and restore ? characters
+			}
+			else if ($iconv === 'libiconv')
+			{
+				$subject = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $subject);
+			}
+			else
+			{
+				// null or 'unknown' (#216)
+				$subject = preg_replace('#[^\x00-\x7F]++#', '', $subject); // remove non-ascii chars
+			}
+		}
+		else if ($iconv === 'glibc' || $iconv === 'libiconv')
+		{
+			// temporarily hide these characters to distinguish them from the garbage that iconv creates
+			$subject = strtr($subject, '`\'"^~?', "\x01\x02\x03\x04\x05\x06");
+			if ($iconv === 'glibc')
+			{
+				// glibc implementation is very limited. transliterate into Windows-1250 and then into ASCII, so most Eastern European characters are preserved
+				$subject = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT//IGNORE', $subject);
+				$subject = strtr(
+					$subject,
+					"\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf8\xf9\xfa\xfb\xfc\xfd\xfe\x96\xa0\x8b\x97\x9b\xa6\xad\xb7",
+					'ALLSSSSTZZZallssstzzzRAAAALCCCEEEEIIDDNNOOOOxRUUUUYTsraaaalccceeeeiiddnnooooruuuuyt- <->|-.'
+				);
+				$subject = preg_replace('#[^\x00-\x7F]++#', '', $subject);
+			}
+			else
+			{
+				$subject = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $subject);
+			}
+			// remove garbage that iconv creates during transliteration (eg Ý -> Y')
+			$subject = str_replace(['`', "'", '"', '^', '~', '?'], '', $subject);
+			// restore temporarily hidden characters
+			$subject = strtr($subject, "\x01\x02\x03\x04\x05\x06", '`\'"^~?');
+		}
+		else
+		{
+			$subject = preg_replace('#[^\x00-\x7F]++#', '', $subject);
+		}
+		return $subject;
 	}
 }

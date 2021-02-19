@@ -123,6 +123,24 @@ class Dates
 	}
 
 	/**
+	 * @param mixed $value
+	 * @param bool $result
+	 * @return bool
+	 */
+	public static function tryParse($value, &$result): bool
+	{
+		try
+		{
+			$result = Dates::parse($value);
+			return true;
+		}
+		catch (Exception $exception)
+		{
+			return false;
+		}
+	}
+
+	/**
 	 * @param int $timestamp
 	 * @return DateTime
 	 */
