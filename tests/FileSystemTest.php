@@ -45,16 +45,13 @@ class FileSystemTest extends TestCase
 	 */
 	private function removeDirectory(string $directory)
 	{
-		if (!file_exists($directory))
-		{
+		if (!file_exists($directory)) {
 			return;
 		}
 		$items = array_diff(scandir($directory), [".", ".."]);
-		foreach ($items as $item)
-		{
+		foreach ($items as $item) {
 			$item = $directory . "/" . $item;
-			if (file_exists($item) and is_dir($item))
-			{
+			if (file_exists($item) and is_dir($item)) {
 				$this->removeDirectory($item);
 				continue;
 			}
@@ -65,29 +62,27 @@ class FileSystemTest extends TestCase
 
 	/**
 	 * @param string $name
-	 * @param array  $items
+	 * @param array $items
 	 */
 	private function createStructure($name, $items)
 	{
-		if (!file_exists($name))
-		{
+		if (!file_exists($name)) {
 			mkdir($name);
 		}
-		foreach ($items as $key => $item)
-		{
-			if (is_array($item))
-			{
+		foreach ($items as $key => $item) {
+			if (is_array($item)) {
 				$this->createStructure($name . "/" . $key, $item);
 				continue;
 			}
-			if (Strings::endsWith($item, ".txt") && !file_exists($name . "/" . $item))
-			{
+			if (Strings::endsWith($item, ".txt") && !file_exists($name . "/" . $item)) {
 				$file = fopen($name . "/" . $item, "w");
 				fwrite($file, $item);
 				fclose($file);
 				continue;
 			}
-			if (!file_exists($name . "/" . $item)) mkdir($name . "/" . $item);
+			if (!file_exists($name . "/" . $item)) {
+				mkdir($name . "/" . $item);
+			}
 		}
 	}
 
@@ -210,14 +205,12 @@ class FileSystemTest extends TestCase
 		$filename = $this->baseDir . "/var/directory_1/file_2.txt";
 		FileSystem::append($filename, "Appended line!");
 		$count = 0;
-		foreach (FileSystem::readLineByLine($filename) as $line)
-		{
+		foreach (FileSystem::readLineByLine($filename) as $line) {
 			$count++;
 		}
 		self::assertEquals(2, $count);
 		self::assertException(function () {
-			foreach (FileSystem::readLineByLine("") as $line)
-			{
+			foreach (FileSystem::readLineByLine("") as $line) {
 			}
 		}, InvalidArgumentException::class);
 	}
@@ -306,28 +299,22 @@ class FileSystemTest extends TestCase
 		$filesRecursively = [];
 		$directoriesRecursively = [];
 		$allRecursively = [];
-		foreach (FileSystem::iterateDirectory($this->baseDir . "/var", FileSystem::SCAN_FILES) as $path)
-		{
+		foreach (FileSystem::iterateDirectory($this->baseDir . "/var", FileSystem::SCAN_FILES) as $path) {
 			$files[] = $path;
 		}
-		foreach (FileSystem::iterateDirectory($this->baseDir. "/var", FileSystem::SCAN_DIRECTORIES) as $path)
-		{
+		foreach (FileSystem::iterateDirectory($this->baseDir . "/var", FileSystem::SCAN_DIRECTORIES) as $path) {
 			$directories[] = $path;
 		}
-		foreach (FileSystem::iterateDirectory($this->baseDir. "/var", FileSystem::SCAN_ALL) as $path)
-		{
+		foreach (FileSystem::iterateDirectory($this->baseDir . "/var", FileSystem::SCAN_ALL) as $path) {
 			$all[] = $path;
 		}
-		foreach (FileSystem::iterateDirectory($this->baseDir. "/var", FileSystem::SCAN_FILES, true) as $path)
-		{
+		foreach (FileSystem::iterateDirectory($this->baseDir . "/var", FileSystem::SCAN_FILES, true) as $path) {
 			$filesRecursively[] = $path;
 		}
-		foreach (FileSystem::iterateDirectory($this->baseDir. "/var", FileSystem::SCAN_DIRECTORIES, true) as $path)
-		{
+		foreach (FileSystem::iterateDirectory($this->baseDir . "/var", FileSystem::SCAN_DIRECTORIES, true) as $path) {
 			$directoriesRecursively[] = $path;
 		}
-		foreach (FileSystem::iterateDirectory($this->baseDir. "/var", FileSystem::SCAN_ALL, true) as $path)
-		{
+		foreach (FileSystem::iterateDirectory($this->baseDir . "/var", FileSystem::SCAN_ALL, true) as $path) {
 			$allRecursively[] = $path;
 		}
 		self::assertEquals(0, count($files));
