@@ -28,12 +28,9 @@ class Dates
 	{
 		ParamsChecker::isBool('$maximumTime', $maximumTime, __METHOD__);
 		$today = Dates::now();
-		if ($maximumTime)
-		{
+		if ($maximumTime) {
 			$today->setTime(23, 59, 59);
-		}
-		else
-		{
+		} else {
 			$today->setTime(0, 0);
 		}
 		return $today;
@@ -44,12 +41,10 @@ class Dates
 	 */
 	public static function now()
 	{
-		try
-		{
+		try {
 			$today = new DateTime();
 		}
-		catch (Exception $exception)
-		{
+		catch (Exception $exception) {
 			throw new RuntimeException("Creating new blank instance [e.g. new DateTime()] of DateTime was not successful.");
 		}
 		return $today;
@@ -90,12 +85,10 @@ class Dates
 	public static function parse($value)
 	{
 		ParamsChecker::notWhiteSpaceOrNullString('$value', $value, __METHOD__);
-		if (Scalars::tryParse($value, $value, Scalars::INT))
-		{
+		if (Scalars::tryParse($value, $value, Scalars::INT)) {
 			return Dates::fromTimestamp($value);
 		}
-		if (mb_substr_count($value, ':') == 1)
-		{
+		if (mb_substr_count($value, ':') == 1) {
 			$value .= ':00';
 		}
 		$patterns = ['/([\.\:\/])\s+/', '/\s+([\.\:\/])/', '/\s{2,}/'];
@@ -104,19 +97,15 @@ class Dates
 		$patterns = ['/^0(\d+)/', '/([\.\/])0(\d+)/'];
 		$replacements = ['\1', '\1\2'];
 		$value = preg_replace($patterns, $replacements, $value);
-		try
-		{
+		try {
 			$dateTime = new DateTime($value);
 			$errors = DateTime::getLastErrors();
-			if ($errors["warning_count"] > 0)
-			{
+			if ($errors["warning_count"] > 0) {
 				throw new RuntimeException(sprintf("During creating instance of %s from value %s were raised these warnings: %s", DateTime::class, $value, Strings::join($errors["warnings"], ", ", " and ")));
 			}
 		}
-		catch (Exception $exception)
-		{
-			if ($exception instanceof RuntimeException)
-			{
+		catch (Exception $exception) {
+			if ($exception instanceof RuntimeException) {
 				throw $exception;
 			}
 			throw new RuntimeException(sprintf('Creating instance of %s from value %s failed.', DateTime::class, $value));
@@ -131,13 +120,11 @@ class Dates
 	 */
 	public static function tryParse($value, &$result)
 	{
-		try
-		{
+		try {
 			$result = Dates::parse($value);
 			return true;
 		}
-		catch (Exception $exception)
-		{
+		catch (Exception $exception) {
 			return false;
 		}
 	}
@@ -149,12 +136,10 @@ class Dates
 	public static function fromTimestamp($timestamp)
 	{
 		ParamsChecker::range('$timestamp', $timestamp, 0, null, __METHOD__);
-		try
-		{
+		try {
 			$dateTime = new DateTime("@" . $timestamp);
 		}
-		catch (Exception $exception)
-		{
+		catch (Exception $exception) {
 			throw new RuntimeException(sprintf("Creating new instance of DateTime from timestamp '%s' was not successful.", $timestamp));
 		}
 		return $dateTime;
@@ -181,25 +166,20 @@ class Dates
 		ParamsChecker::isIntOrNull('$year', $year, __METHOD__);
 		ParamsChecker::range('$month', $month, 1, 12, __METHOD__);
 		ParamsChecker::range('$year', $year, 1900, null, __METHOD__);
-		if ($month === null && $year !== null)
-		{
+		if ($month === null && $year !== null) {
 			throw new InvalidArgumentException('Parameter $month cannot be NULL when $year has a value.');
 		}
 		$now = self::now();
-		if ($month === null)
-		{
+		if ($month === null) {
 			$month = $now->format("n");
 		}
-		if ($year === null)
-		{
+		if ($year === null) {
 			$year = $now->format("Y");
 		}
-		try
-		{
+		try {
 			return new DateTime("last day of {$year}-{$month}");
 		}
-		catch (Exception $e)
-		{
+		catch (Exception $e) {
 			throw new RuntimeException("Creating instance [e.g. new DateTime('last day of {$year}-{$month}')] of DateTime was not successful.");
 		}
 	}

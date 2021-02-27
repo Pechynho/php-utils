@@ -12,7 +12,6 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
 use SplFileObject;
-use ZipArchive;
 
 /**
  * @author Jan Pech <pechynho@gmail.com>
@@ -602,6 +601,9 @@ class FileSystem
 	 */
 	public static function zip($source, $destination = null, $overwrite = false, $filter = null)
 	{
+		if (!extension_loaded("zip")) {
+			throw new RuntimeException("You have to enable zip extension to use this function.");
+		}
 		if (!is_string($source)) {
 			throw new InvalidArgumentException('Parameter $source has to be type of string.');
 		}
@@ -615,41 +617,45 @@ class FileSystem
 			throw new InvalidArgumentException('Parameter $filter has to be type of callable or NULL.');
 		}
 		if (!$overwrite && $destination !== null && self::exists($destination)) {
-			throw new RuntimeException(sprintf("Filename %s already exists.", $destination));
+			throw new RuntimeException(sprintf("Destination %s already exists.", $destination));
 		}
 		if (!self::exists($source)) {
 			throw new InvalidArgumentException(sprintf("Source %s does not exist.", $source));
 		}
 		if ($destination === null) {
-			$destination = self::createTempFile(null, ".zip");
+			$destination = self::generateFilename(null, ".zip");
 		}
 		$source = realpath($source);
-		$zip = new ZipArchive();
-		if ($zip->open($destination, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+		$archive = new \ZipArchive();
+		if ($archive->open($destination, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
 			throw new RuntimeException(sprintf("Could not create %s zip archive.", $destination));
 		}
-		$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::SELF_FIRST);
 		$sourceWithSeparator = $source . DIRECTORY_SEPARATOR;
-		foreach ($files as $file) {
-			if (in_array(substr($file, strrpos($file, DIRECTORY_SEPARATOR) + 1), ['.', '..'])) {
-				continue;
-			}
-			if (is_callable($filter)) {
-				$skip = call_user_func($filter, (string)$file);
-				if (!is_bool($skip)) {
-					throw new RuntimeException(sprintf('Parameter $filter has to contain callback which returns boolean.'));
-				}
-				if ($skip) {
+		if (self::isDirectory($source)) {
+			$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::SELF_FIRST);
+			foreach ($files as $file) {
+				if (in_array(substr($file, strrpos($file, DIRECTORY_SEPARATOR) + 1), ['.', '..'])) {
 					continue;
 				}
+				if (is_callable($filter)) {
+					$skip = call_user_func($filter, (string)$file);
+					if (!is_bool($skip)) {
+						throw new RuntimeException(sprintf('Parameter $filter has to contain callback which returns boolean.'));
+					}
+					if ($skip) {
+						continue;
+					}
+				}
+				if (is_dir($file) === true) {
+					$archive->addEmptyDir(str_replace($sourceWithSeparator, '', $file . DIRECTORY_SEPARATOR));
+				} else if (is_file($file) === true) {
+					$archive->addFile($file, str_replace($sourceWithSeparator, '', $file));
+				}
 			}
-			if (is_dir($file) === true) {
-				$zip->addEmptyDir(str_replace($sourceWithSeparator, '', $file . DIRECTORY_SEPARATOR));
-			} else if (is_file($file) === true) {
-				$zip->addFile($file, str_replace($sourceWithSeparator, '', $file));
-			}
+		} else {
+			$archive->addFile($source, str_replace($sourceWithSeparator, '', $source));
 		}
-		if ($zip->close() !== true) {
+		if ($archive->close() !== true) {
 			throw new RuntimeException(sprintf("Could not close %s zip archive.", $destination));
 		}
 		return $destination;
@@ -658,32 +664,153 @@ class FileSystem
 	/**
 	 * @param string $source
 	 * @param string|null $destination
+	 * @param bool $overwrite
 	 * @return string
 	 */
-	public static function unzip($source, $destination = null)
+	public static function unzip($source, $destination = null, $overwrite = false)
 	{
+		if (!extension_loaded("zip")) {
+			throw new RuntimeException("You have to enable zip extension to use this function.");
+		}
 		if (!is_string($source)) {
 			throw new InvalidArgumentException('Parameter $source has to be type of string.');
 		}
 		if (!is_string($destination) && !is_null($destination)) {
 			throw new InvalidArgumentException('Parameter $destination has to be type of string or NULL.');
 		}
-		if ($destination !== null && self::exists($destination)) {
-			throw new RuntimeException(sprintf("Filename %s already exists.", $destination));
+		if (!is_bool($overwrite)) {
+			throw new InvalidArgumentException('Parameter $overwrite has to be type of boolean.');
+		}
+		if (!$overwrite && $destination !== null && self::exists($destination)) {
+			throw new RuntimeException(sprintf("Destination %s already exists.", $destination));
 		}
 		if (!self::exists($source)) {
 			throw new InvalidArgumentException(sprintf("Source %s does not exist.", $source));
 		}
-		if ($destination === null) {
+		if ($overwrite && $destination !== null && self::exists($destination)) {
+			self::delete($destination);
+			self::createDirectory($destination);
+		} else if ($destination !== null && !self::exists($destination)) {
+			self::createDirectory($destination);
+		} else if ($destination === null) {
 			$destination = self::createTempDirectory();
 		}
-		$zip = new ZipArchive();
+		$zip = new \ZipArchive();
 		if ($zip->open($source) !== true) {
 			throw new RuntimeException(sprintf("Could not open %s zip archive.", $source));
 		}
 		$zip->extractTo($destination);
 		if ($zip->close() !== true) {
 			throw new RuntimeException(sprintf("Could not close %s zip archive.", $source));
+		}
+		return $destination;
+	}
+
+	public static function compressFile($source, $destination = null, $overwrite = false, $compressionLevel = 9, $bufferSize = 512)
+	{
+		if (!extension_loaded("zlib")) {
+			throw new RuntimeException("You have to enable zlib extension to use this function.");
+		}
+		if (!is_string($source)) {
+			throw new InvalidArgumentException('Parameter $source has to be type of string.');
+		}
+		if (!is_string($destination) && !is_null($destination)) {
+			throw new InvalidArgumentException('Parameter $destination has to be type of string or NULL.');
+		}
+		if (!is_bool($overwrite)) {
+			throw new InvalidArgumentException('Parameter $overwrite has to be type of boolean.');
+		}
+		if (!is_int($compressionLevel)) {
+			throw new InvalidArgumentException('Parameter $compressionLevel has to be type of integer.');
+		}
+		if (!is_int($bufferSize)) {
+			throw new InvalidArgumentException('Parameter $bufferSize has to be type of integer.');
+		}
+		if (!$overwrite && $destination !== null && self::exists($destination)) {
+			throw new RuntimeException(sprintf("Destination %s already exists.", $destination));
+		}
+		if (!self::isFile($source)) {
+			throw new InvalidArgumentException(sprintf("Source %s does not exits.", $source));
+		}
+		if ($compressionLevel < 1 || $compressionLevel > 9) {
+			throw new InvalidArgumentException(sprintf('Parameter $compressionLevel has to be between 1 and 9.'));
+		}
+		if ($bufferSize < 1) {
+			throw new RuntimeException(sprintf('Parameter $bufferSize has to be greater than 1.'));
+		}
+		if ($destination !== null && self::exists($destination)) {
+			self::delete($destination);
+		} else if ($destination === null) {
+			$destination = self::generateFilename(null, ".gz");
+		}
+		if (false === $destinationResource = gzopen($destination, "wb{$compressionLevel}")) {
+			throw new RuntimeException(sprintf("Function gzopen('%s', 'wb%s') has failed.", $destination, $compressionLevel));
+		}
+		if (false === $sourceResource = fopen($source, "rb")) {
+			throw new RuntimeException(sprintf("Function fopen('%s', '%s') has failed.", $source, "rb"));
+		}
+		while (!feof($sourceResource)) {
+			$chunk = fread($sourceResource, 1024 * $bufferSize);
+			if ($chunk === false) {
+				throw new RuntimeException("Could not read chunk from file {$source}.");
+			}
+			gzwrite($destinationResource, $chunk);
+		}
+		if (gzclose($destinationResource) === false) {
+			throw new RuntimeException("Could not close file {$destination}.");
+		}
+		if (fclose($sourceResource) === false) {
+			throw new RuntimeException("Could not close file {$source}.");
+		}
+		return $destination;
+	}
+
+	public static function decompressFile($source, $destination = null, $overwrite = false, $bufferSize = 512)
+	{
+		if (!extension_loaded("zlib")) {
+			throw new RuntimeException("You have to enable zlib extension to use this function.");
+		}
+		if (!is_string($source)) {
+			throw new InvalidArgumentException('Parameter $source has to be type of string.');
+		}
+		if (!is_string($destination) && !is_null($destination)) {
+			throw new InvalidArgumentException('Parameter $destination has to be type of string or NULL.');
+		}
+		if (!is_bool($overwrite)) {
+			throw new InvalidArgumentException('Parameter $overwrite has to be type of boolean.');
+		}
+		if (!is_int($bufferSize)) {
+			throw new InvalidArgumentException('Parameter $bufferSize has to be type of integer.');
+		}
+		if (!$overwrite && $destination !== null && self::exists($destination)) {
+			throw new RuntimeException(sprintf("Destination %s already exists.", $destination));
+		}
+		if (!self::isFile($source)) {
+			throw new InvalidArgumentException(sprintf("Source %s does not exits.", $source));
+		}
+		if ($bufferSize < 1) {
+			throw new RuntimeException(sprintf('Parameter $bufferSize has to be greater than 1.'));
+		}
+		if ($overwrite && $destination !== null && self::exists($destination)) {
+			self::delete($destination);
+		}
+		if ($destination === null) {
+			$destination = self::generateFilename();
+		}
+		if (false === $sourceResource = gzopen($source, "rb")) {
+			throw new RuntimeException(sprintf("Function gzopen('%s', 'rb') has failed.", $source));
+		}
+		if (false === $destinationResource = fopen($destination, "wb")) {
+			throw new RuntimeException(sprintf("Function fopen('%s', 'wb') has failed.", $destination));
+		}
+		while (!gzeof($sourceResource)) {
+			fwrite($destinationResource, gzread($sourceResource, 1024 * $bufferSize));
+		}
+		if (gzclose($sourceResource) === false) {
+			throw new RuntimeException("Could not close file {$source}.");
+		}
+		if (fclose($destinationResource) === false) {
+			throw new RuntimeException("Could not close file {$destination}.");
 		}
 		return $destination;
 	}

@@ -37,16 +37,13 @@ class Annotations
 	 */
 	public static function createAnnotationReader()
 	{
-		try
-		{
-			if (method_exists(AnnotationRegistry::class, "registerLoader"))
-			{
+		try {
+			if (method_exists(AnnotationRegistry::class, "registerLoader")) {
 				AnnotationRegistry::registerLoader("class_exists");
 			}
 			return new AnnotationReader();
 		}
-		catch (AnnotationException $exception)
-		{
+		catch (AnnotationException $exception) {
 			throw new RuntimeException(sprintf("Creating new instance of '%s' class was not successful.", AnnotationReader::class));
 		}
 	}
@@ -64,11 +61,9 @@ class Annotations
 		$properties = $reflectionClass->getProperties();
 		$annotationReader = self::createAnnotationReader();
 		$output = [];
-		foreach ($properties as $property)
-		{
+		foreach ($properties as $property) {
 			$annotation = $annotationReader->getPropertyAnnotation($property, $annotation);
-			if ($annotation != null)
-			{
+			if ($annotation != null) {
 				$output[] = $property;
 			}
 		}
@@ -104,12 +99,10 @@ class Annotations
 		$methods = $reflectionClass->getMethods();
 		$annotationReader = self::createAnnotationReader();
 		$output = [];
-		foreach ($methods as $method)
-		{
+		foreach ($methods as $method) {
 			echo $method->getName();
 			$annotationInstance = $annotationReader->getMethodAnnotation($method, $annotation);
-			if ($annotationInstance != null)
-			{
+			if ($annotationInstance != null) {
 				$output[] = $method;
 			}
 		}
@@ -127,11 +120,9 @@ class Annotations
 		ParamsChecker::notWhiteSpaceOrNullString('$annotation', $annotation, __METHOD__);
 		$reflectionClass = Reflections::createReflectionClass($class);
 		$annotationReader = self::createAnnotationReader();
-		while ($reflectionClass !== false)
-		{
+		while ($reflectionClass !== false) {
 			$annotationInstance = $annotationReader->getClassAnnotation($reflectionClass, $annotation);
-			if ($annotationInstance !== null)
-			{
+			if ($annotationInstance !== null) {
 				return $annotationInstance;
 			}
 			$reflectionClass = $reflectionClass->getParentClass();

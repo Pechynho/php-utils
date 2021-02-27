@@ -32,70 +32,59 @@ class Scalars
 	const INT = "INT";
 
 	/**
-	 * @param mixed  $scalarValue
-	 * @param mixed  $result
+	 * @param mixed $scalarValue
+	 * @param mixed $result
 	 * @param string $scalarType
 	 * @return bool
 	 */
 	public static function tryParse($scalarValue, &$result, $scalarType)
 	{
-		try
-		{
+		try {
 			$result = Scalars::parse($scalarValue, $scalarType);
 			return true;
 		}
-		catch (Exception $exception)
-		{
+		catch (Exception $exception) {
 			return false;
 		}
 	}
 
 	/**
 	 * @param string|int|float|boolean $scalarValue
-	 * @param string                   $scalarType
+	 * @param string $scalarType
 	 * @return string|int|float|boolean
 	 */
 	public static function parse($scalarValue, $scalarType)
 	{
-		if (!is_scalar($scalarValue))
-		{
+		if (!is_scalar($scalarValue)) {
 			throw new InvalidArgumentException('Parameter $scalarType is not scalar type.');
 		}
-		if (!Scalars::isScalarTypeValid($scalarType))
-		{
+		if (!Scalars::isScalarTypeValid($scalarType)) {
 			throw new InvalidArgumentException('Unknown value given to parameter $scalarType.');
 		}
 		$scalarType = Strings::toUpper($scalarType);
 		$config = [
 			Scalars::INTEGER => FILTER_VALIDATE_INT,
-			Scalars::FLOAT   => FILTER_VALIDATE_FLOAT,
+			Scalars::FLOAT => FILTER_VALIDATE_FLOAT,
 			Scalars::BOOLEAN => FILTER_VALIDATE_BOOLEAN,
-			Scalars::BOOL    => FILTER_VALIDATE_BOOLEAN,
-			Scalars::INT     => FILTER_VALIDATE_INT
+			Scalars::BOOL => FILTER_VALIDATE_BOOLEAN,
+			Scalars::INT => FILTER_VALIDATE_INT
 		];
-		if ($scalarType == Scalars::STRING)
-		{
-			if (is_string($scalarValue))
-			{
+		if ($scalarType == Scalars::STRING) {
+			if (is_string($scalarValue)) {
 				return $scalarValue;
-			}
-			else if (is_bool($scalarValue))
-			{
+			} else if (is_bool($scalarValue)) {
 				return $scalarValue === true ? "true" : "false";
 			}
 			return (string)$scalarValue;
 		}
-		if (is_string($scalarValue))
-		{
+		if (is_string($scalarValue)) {
 			$scalarValue = Strings::trim($scalarValue);
 		}
-		if (($scalarType == Scalars::BOOLEAN || $scalarType == Scalars::BOOL) && ($scalarValue === "0" || Strings::toLower($scalarValue) === "false" || $scalarValue === 0 || $scalarValue === 0.0 || $scalarValue === false))
-		{
+		if (($scalarType == Scalars::BOOLEAN || $scalarType == Scalars::BOOL) && ($scalarValue === "0" || Strings::toLower($scalarValue) === "false" || $scalarValue === 0 || $scalarValue === 0.0 || $scalarValue === false)) {
 			return false;
 		}
 		$parsedValue = filter_var($scalarValue, $config[$scalarType]);
-		if ($parsedValue === false)
-		{
+		if ($parsedValue === false) {
 			throw new RuntimeException(sprintf("Parameter %s containing value '%s' couldn't be parsed to given scalar type '%s'.", '$scalarTypeValue', $scalarValue, $scalarType));
 		}
 		return $parsedValue;

@@ -24,27 +24,22 @@ class Arrays
 
 	/**
 	 * @param array|Traversable $subject
-	 * @param callable          $predicate
+	 * @param callable $predicate
 	 * @return mixed
 	 */
 	public static function first($subject, $predicate)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (!is_callable($predicate))
-		{
+		if (!is_callable($predicate)) {
 			throw new InvalidArgumentException('Parameter $predicate has to be type of callable.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
+		if (Arrays::isEmpty($subject)) {
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		foreach ($subject as $item)
-		{
-			if ($predicate($item))
-			{
+		foreach ($subject as $item) {
+			if ($predicate($item)) {
 				return $item;
 			}
 		}
@@ -66,12 +61,10 @@ class Arrays
 	 */
 	public static function isEmpty($subject)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			return false;
 		}
 		return true;
@@ -79,24 +72,20 @@ class Arrays
 
 	/**
 	 * @param array|Traversable $subject
-	 * @param callable          $predicate
-	 * @param mixed             $defaultValue
+	 * @param callable $predicate
+	 * @param mixed $defaultValue
 	 * @return mixed
 	 */
 	public static function firstOrDefault($subject, $predicate, $defaultValue = null)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (!is_callable($predicate))
-		{
+		if (!is_callable($predicate)) {
 			throw new InvalidArgumentException('Parameter $predicate has to be type of callable.');
 		}
-		foreach ($subject as $item)
-		{
-			if ($predicate($item))
-			{
+		foreach ($subject as $item) {
+			if ($predicate($item)) {
 				return $item;
 			}
 		}
@@ -109,16 +98,13 @@ class Arrays
 	 */
 	public static function firstValue($subject)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
+		if (Arrays::isEmpty($subject)) {
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			return $item;
 		}
 	}
@@ -129,18 +115,17 @@ class Arrays
 	 */
 	public static function lastKey($subject)
 	{
-		if (!is_array($subject))
-		{
+		if (!is_array($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
 		}
-		if (empty($subject))
-		{
+		if (empty($subject)) {
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		if (function_exists("array_key_last")) return array_key_last($subject);
+		if (function_exists("array_key_last")) {
+			return array_key_last($subject);
+		}
 		$lastKey = null;
-		foreach ($subject as $key => $item)
-		{
+		foreach ($subject as $key => $item) {
 			$lastKey = $key;
 		}
 		return $lastKey;
@@ -152,17 +137,14 @@ class Arrays
 	 */
 	public static function lastValue($subject)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
+		if (Arrays::isEmpty($subject)) {
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
 		$lastValue = null;
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$lastValue = $item;
 		}
 		return $lastValue;
@@ -170,24 +152,20 @@ class Arrays
 
 	/**
 	 * @param array|Traversable $subject
-	 * @param callable          $predicate
+	 * @param callable $predicate
 	 * @return array
 	 */
 	public static function where($subject, $predicate)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (!is_callable($predicate))
-		{
+		if (!is_callable($predicate)) {
 			throw new InvalidArgumentException('Parameter $predicate has to be type of callable.');
 		}
 		$output = [];
-		foreach ($subject as $item)
-		{
-			if ($predicate($item))
-			{
+		foreach ($subject as $item) {
+			if ($predicate($item)) {
 				$output[] = $item;
 			}
 		}
@@ -195,41 +173,32 @@ class Arrays
 	}
 
 	/**
-	 * @param array|Traversable                     $subject
+	 * @param array|Traversable $subject
 	 * @param callable|string|PropertyPathInterface $propertyPath
-	 * @param bool                                  $preserveKeys
+	 * @param bool $preserveKeys
 	 * @return array
 	 */
 	public static function select($subject, $propertyPath, $preserveKeys = false)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (!is_bool($preserveKeys))
-		{
+		if (!is_bool($preserveKeys)) {
 			throw new InvalidArgumentException('Parameter $preserveKeys has to be type of boolean.');
 		}
-		if (!is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
-		{
+		if (!is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $propertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
-		if ($preserveKeys && !is_array($subject))
-		{
+		if ($preserveKeys && !is_array($subject)) {
 			throw new InvalidArgumentException('Cannot preserve keys if parameter $subject is not array.');
 		}
 		$output = [];
-		if ($preserveKeys)
-		{
-			foreach ($subject as $key => $item)
-			{
+		if ($preserveKeys) {
+			foreach ($subject as $key => $item) {
 				$output[$key] = PropertyAccess::getValue($item, $propertyPath);
 			}
-		}
-		else
-		{
-			foreach ($subject as $item)
-			{
+		} else {
+			foreach ($subject as $item) {
 				$output[] = PropertyAccess::getValue($item, $propertyPath);
 			}
 		}
@@ -237,30 +206,25 @@ class Arrays
 	}
 
 	/**
-	 * @param array|iterable                             $subject
+	 * @param array|iterable $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return mixed
 	 */
 	public static function min($subject, $propertyPath = null)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
+		if (Arrays::isEmpty($subject)) {
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
-		{
+		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
 		$minValue = null;
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$value = $propertyPath === null ? $item : PropertyAccess::getValue($item, $propertyPath);
-			if ($minValue == null || $value < $minValue)
-			{
+			if ($minValue == null || $value < $minValue) {
 				$minValue = $value;
 			}
 		}
@@ -268,35 +232,29 @@ class Arrays
 	}
 
 	/**
-	 * @param array|Traversable                          $subject
+	 * @param array|Traversable $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return array
 	 */
 	public static function itemsWithMin($subject, $propertyPath = null)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
-		{
+		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
+		if (Arrays::isEmpty($subject)) {
 			return [];
 		}
 		$minValue = null;
 		$items = [];
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$value = $propertyPath === null ? $item : PropertyAccess::getValue($item, $propertyPath);
-			if ($value == $minValue)
-			{
+			if ($value == $minValue) {
 				$items[] = $item;
 			}
-			if ($minValue == null || $value < $minValue)
-			{
+			if ($minValue == null || $value < $minValue) {
 				$minValue = $value;
 				$items = [$item];
 			}
@@ -305,30 +263,25 @@ class Arrays
 	}
 
 	/**
-	 * @param array|Traversable                          $subject
+	 * @param array|Traversable $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return mixed
 	 */
 	public static function max($subject, $propertyPath = null)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
+		if (Arrays::isEmpty($subject)) {
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
-		{
+		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
 		$maxValue = null;
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$value = $propertyPath === null ? $item : PropertyAccess::getValue($item, $propertyPath);
-			if ($maxValue == null || $value > $maxValue)
-			{
+			if ($maxValue == null || $value > $maxValue) {
 				$maxValue = $value;
 			}
 		}
@@ -336,35 +289,29 @@ class Arrays
 	}
 
 	/**
-	 * @param array|Traversable                          $subject
+	 * @param array|Traversable $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return array
 	 */
 	public static function itemsWithMax($subject, $propertyPath = null)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
-		{
+		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
+		if (Arrays::isEmpty($subject)) {
 			return [];
 		}
 		$maxValue = null;
 		$items = [];
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$value = $propertyPath === null ? $item : PropertyAccess::getValue($item, $propertyPath);
-			if ($value == $maxValue)
-			{
+			if ($value == $maxValue) {
 				$items[] = $item;
 			}
-			if ($maxValue == null || $value > $maxValue)
-			{
+			if ($maxValue == null || $value > $maxValue) {
 				$maxValue = $value;
 				$items = [$item];
 			}
@@ -373,28 +320,24 @@ class Arrays
 	}
 
 	/**
-	 * @param array|Traversable                          $subject
+	 * @param array|Traversable $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return float
 	 */
 	public static function average($subject, $propertyPath = null)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
+		if (Arrays::isEmpty($subject)) {
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
-		{
+		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
 		$sum = 0;
 		$count = 0;
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$value = $propertyPath === null ? $item : PropertyAccess::getValue($item, $propertyPath);
 			$sum = $sum + $value;
 			$count++;
@@ -403,27 +346,23 @@ class Arrays
 	}
 
 	/**
-	 * @param array|Traversable                          $subject
+	 * @param array|Traversable $subject
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
 	 * @return int|float
 	 */
 	public static function sum($subject, $propertyPath = null)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
+		if (Arrays::isEmpty($subject)) {
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
-		{
+		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
 		$sum = 0;
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$value = $propertyPath === null ? $item : PropertyAccess::getValue($item, $propertyPath);
 			$sum = $sum + $value;
 		}
@@ -436,17 +375,14 @@ class Arrays
 	 */
 	public static function count($subject)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (Arrays::isCountable($subject))
-		{
+		if (Arrays::isCountable($subject)) {
 			return count($subject);
 		}
 		$count = 0;
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$count++;
 		}
 		return $count;
@@ -462,30 +398,25 @@ class Arrays
 	}
 
 	/**
-	 * @param array|Traversable                     $subject
+	 * @param array|Traversable $subject
 	 * @param callable|string|PropertyPathInterface $propertyPath
 	 * @return array
 	 */
 	public static function groupBy($subject, $propertyPath)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (!is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
-		{
+		if (!is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $propertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
 		$output = [];
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$key = PropertyAccess::getValue($item, $propertyPath);
-			if (!is_string($key) && !is_int($key))
-			{
+			if (!is_string($key) && !is_int($key)) {
 				throw new InvalidArgumentException('Items cannot be grouped by given property path, because its value is not int or string.');
 			}
-			if (!isset($output[$key]))
-			{
+			if (!isset($output[$key])) {
 				$output[$key] = [];
 			}
 			$output[$key][] = $item;
@@ -502,19 +433,13 @@ class Arrays
 	{
 		$left = 0;
 		$right = count($subject) - 1;
-		while ($left <= $right)
-		{
+		while ($left <= $right) {
 			$mid = (int)floor(($left + $right) / 2);
-			if ($subject[$mid] < $value)
-			{
+			if ($subject[$mid] < $value) {
 				$left = $mid + 1;
-			}
-			else if ($subject[$mid] > $value)
-			{
+			} else if ($subject[$mid] > $value) {
 				$right = $mid - 1;
-			}
-			else
-			{
+			} else {
 				return $mid;
 			}
 		}
@@ -523,35 +448,29 @@ class Arrays
 
 	/**
 	 * @param array|Traversable $subject
-	 * @param callable          $predicate
+	 * @param callable $predicate
 	 * @return mixed
 	 */
 	public static function last($subject, $predicate)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (!is_callable($predicate))
-		{
+		if (!is_callable($predicate)) {
 			throw new InvalidArgumentException('Parameter $predicate has ty pe type of callable.');
 		}
-		if (Arrays::isEmpty($subject))
-		{
+		if (Arrays::isEmpty($subject)) {
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
 		$lastItem = null;
 		$found = false;
-		foreach ($subject as $item)
-		{
-			if ($predicate($item))
-			{
+		foreach ($subject as $item) {
+			if ($predicate($item)) {
 				$lastItem = $item;
 				$found = true;
 			}
 		}
-		if ($found)
-		{
+		if ($found) {
 			return $lastItem;
 		}
 		throw new RuntimeException("No item was found by given predicate.");
@@ -559,26 +478,22 @@ class Arrays
 
 	/**
 	 * @param array|Traversable $subject
-	 * @param callable          $predicate
-	 * @param mixed             $defaultValue
+	 * @param callable $predicate
+	 * @param mixed $defaultValue
 	 * @return mixed
 	 */
 	public static function lastOrDefault($subject, $predicate, $defaultValue = null)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (!is_callable($predicate))
-		{
+		if (!is_callable($predicate)) {
 			throw new InvalidArgumentException('Parameter $predicate has ty pe type of callable.');
 		}
 		$lastItem = null;
 		$found = false;
-		foreach ($subject as $item)
-		{
-			if ($predicate($item))
-			{
+		foreach ($subject as $item) {
+			if ($predicate($item)) {
 				$lastItem = $item;
 				$found = true;
 			}
@@ -588,23 +503,19 @@ class Arrays
 
 	/**
 	 * @param array|Traversable $subject
-	 * @param mixed             $value
+	 * @param mixed $value
 	 * @return bool
 	 */
 	public static function contains($subject, $value)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (is_array($subject))
-		{
+		if (is_array($subject)) {
 			return in_array($value, $subject, true);
 		}
-		foreach ($subject as $item)
-		{
-			if ($item === $value)
-			{
+		foreach ($subject as $item) {
+			if ($item === $value) {
 				return true;
 			}
 		}
@@ -623,33 +534,28 @@ class Arrays
 	}
 
 	/**
-	 * @param array|Traversable                          $subject
-	 * @param string                                     $direction
+	 * @param array|Traversable $subject
+	 * @param string $direction
 	 * @param callable|string|PropertyPathInterface|null $propertyPath
-	 * @param callable|null                              $comparisonFunction
+	 * @param callable|null $comparisonFunction
 	 * @return array
 	 */
 	public static function orderBy($subject, $direction = Arrays::ORDER_DIRECTION_ASCENDING, $propertyPath = null, $comparisonFunction = null)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (!in_array($direction, [Arrays::ORDER_DIRECTION_ASCENDING, Arrays::ORDER_DIRECTION_DESCENDING]))
-		{
+		if (!in_array($direction, [Arrays::ORDER_DIRECTION_ASCENDING, Arrays::ORDER_DIRECTION_DESCENDING])) {
 			throw new InvalidArgumentException('Invalid value for argument $direction.');
 		}
-		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface)
-		{
+		if ($propertyPath !== null && !is_callable($propertyPath) && !is_string($propertyPath) && !$propertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $propertyPath has to be NULL, callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
-		if ($comparisonFunction !== null && !is_callable($comparisonFunction))
-		{
+		if ($comparisonFunction !== null && !is_callable($comparisonFunction)) {
 			throw new InvalidArgumentException('Parameter $comparisonFunction has to be NULL or callable.');
 		}
 		$subject = Arrays::toArray($subject);
-		if ($comparisonFunction !== null)
-		{
+		if ($comparisonFunction !== null) {
 			usort($subject, function ($itemA, $itemB) use (&$propertyPath, &$comparisonFunction) {
 				$valueA = $propertyPath === null ? $itemA : PropertyAccess::getValue($itemA, $propertyPath);
 				$valueB = $propertyPath === null ? $itemB : PropertyAccess::getValue($itemB, $propertyPath);
@@ -660,22 +566,21 @@ class Arrays
 		usort($subject, function ($itemA, $itemB) use (&$propertyPath, $direction) {
 			$valueA = $propertyPath === null ? $itemA : PropertyAccess::getValue($itemA, $propertyPath);
 			$valueB = $propertyPath === null ? $itemB : PropertyAccess::getValue($itemB, $propertyPath);
-			try
-			{
-				if (is_string($valueA) || is_string($valueB))
-				{
+			try {
+				if (is_string($valueA) || is_string($valueB)) {
 					$comparisonResult = Strings::compare($valueA, $valueB, Strings::COMPARE_CASE_INSENSITIVE);
-				}
-				else
-				{
+				} else {
 					$comparisonResult = 0;
-					if ($valueA < $valueB) $comparisonResult = -1;
-					if ($valueA > $valueB) $comparisonResult = 1;
+					if ($valueA < $valueB) {
+						$comparisonResult = -1;
+					}
+					if ($valueA > $valueB) {
+						$comparisonResult = 1;
+					}
 				}
 				return $direction === Arrays::ORDER_DIRECTION_ASCENDING ? $comparisonResult : -1 * $comparisonResult;
 			}
-			catch (Exception $exception)
-			{
+			catch (Exception $exception) {
 				throw new RuntimeException("Exception occurred during default comparison. Please, provide your own one.");
 			}
 		});
@@ -688,17 +593,14 @@ class Arrays
 	 */
 	public static function toArray($subject)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
-		if (is_array($subject))
-		{
+		if (is_array($subject)) {
 			return $subject;
 		}
 		$output = [];
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$output[] = $item;
 		}
 		return $output;
@@ -710,8 +612,7 @@ class Arrays
 	 */
 	public static function reverse($subject)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array or Traversable.');
 		}
 		return array_reverse(is_array($subject) ? $subject : Arrays::toArray($subject));
@@ -727,60 +628,53 @@ class Arrays
 	}
 
 	/**
-	 * @param array|Traversable                     $subject
+	 * @param array|Traversable $subject
 	 * @param string|callable|PropertyPathInterface $keyPropertyPath
 	 * @param string|callable|PropertyPathInterface $valuePropertyPath
 	 * @return array
 	 */
 	public static function mapToPairs($subject, $keyPropertyPath, $valuePropertyPath)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to by type of array or Traversable.');
 		}
-		if (!is_callable($keyPropertyPath) && !is_string($keyPropertyPath) && !$keyPropertyPath instanceof PropertyPathInterface)
-		{
+		if (!is_callable($keyPropertyPath) && !is_string($keyPropertyPath) && !$keyPropertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $keyPropertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
-		if (!is_callable($valuePropertyPath) && !is_string($valuePropertyPath) && !$valuePropertyPath instanceof PropertyPathInterface)
-		{
+		if (!is_callable($valuePropertyPath) && !is_string($valuePropertyPath) && !$valuePropertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $valuePropertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
 		$output = [];
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$output[PropertyAccess::getValue($item, $keyPropertyPath)] = PropertyAccess::getValue($item, $valuePropertyPath);
 		}
 		return $output;
 	}
 
 	/**
-	 * @param array|Traversable                     $subject
+	 * @param array|Traversable $subject
 	 * @param string|callable|PropertyPathInterface $keyPropertyPath
 	 * @return array
 	 */
 	public static function mapByProperty($subject, $keyPropertyPath)
 	{
-		if (!Arrays::isIterable($subject))
-		{
+		if (!Arrays::isIterable($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to by type of array or Traversable.');
 		}
-		if (!is_callable($keyPropertyPath) && !is_string($keyPropertyPath) && !$keyPropertyPath instanceof PropertyPathInterface)
-		{
+		if (!is_callable($keyPropertyPath) && !is_string($keyPropertyPath) && !$keyPropertyPath instanceof PropertyPathInterface) {
 			throw new InvalidArgumentException('Parameter $keyPropertyPath has to be callable, string or instance of ' . PropertyPathInterface::class . '.');
 		}
 		$output = [];
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$output[PropertyAccess::getValue($item, $keyPropertyPath)] = $item;
 		}
 		return $output;
 	}
 
 	/**
-	 * @param array      $subject
+	 * @param array $subject
 	 * @param string|int $key
-	 * @param mixed      $value
+	 * @param mixed $value
 	 * @param string|int $insertAfterKey
 	 * @return array
 	 */
@@ -790,26 +684,23 @@ class Arrays
 		ParamsChecker::isIntOrString('$insertAfterKey', $insertAfterKey, __METHOD__);
 		$output = [];
 		$inserted = false;
-		foreach ($subject as $i => $item)
-		{
+		foreach ($subject as $i => $item) {
 			$output[$i] = $item;
-			if (!$inserted && $i == $insertAfterKey)
-			{
+			if (!$inserted && $i == $insertAfterKey) {
 				$output[$key] = $value;
 				$inserted = true;
 			}
 		}
-		if (!$inserted)
-		{
+		if (!$inserted) {
 			$output[$key] = $value;
 		}
 		return $output;
 	}
 
 	/**
-	 * @param array      $subject
+	 * @param array $subject
 	 * @param string|int $key
-	 * @param mixed      $value
+	 * @param mixed $value
 	 * @param string|int $insertBeforeKey
 	 * @return array
 	 */
@@ -819,45 +710,38 @@ class Arrays
 		ParamsChecker::isIntOrString('$insertBeforeKey', $insertBeforeKey, __METHOD__);
 		$output = [];
 		$inserted = false;
-		foreach ($subject as $i => $item)
-		{
-			if (!$inserted && $i == $insertBeforeKey)
-			{
+		foreach ($subject as $i => $item) {
+			if (!$inserted && $i == $insertBeforeKey) {
 				$output[$key] = $value;
 				$inserted = true;
 			}
 			$output[$i] = $item;
 		}
-		if (!$inserted)
-		{
+		if (!$inserted) {
 			$output[$key] = $value;
 		}
 		return $output;
 	}
 
 	/**
-	 * @param array  $subject
+	 * @param array $subject
 	 * @param string $keyPath
-	 * @param mixed  $value
+	 * @param mixed $value
 	 * @return boolean
 	 */
 	public static function recursiveGet(array $subject, $keyPath, &$value = null)
 	{
-		if (!is_string($keyPath) || Strings::isNullOrWhiteSpace($keyPath))
-		{
+		if (!is_string($keyPath) || Strings::isNullOrWhiteSpace($keyPath)) {
 			throw new InvalidArgumentException('Parameter $keyPath has to be non empty ("") and non-whitespace string.');
 		}
 		$keys = Strings::split($keyPath, ["[", "]"], true);
 		$count = count($keys);
-		foreach ($keys as $index => $key)
-		{
-			if (!is_array($subject) || !isset($subject[$key]))
-			{
+		foreach ($keys as $index => $key) {
+			if (!is_array($subject) || !isset($subject[$key])) {
 				break;
 			}
 			$subject = $subject[$key];
-			if ($count == $index + 1)
-			{
+			if ($count == $index + 1) {
 				$value = $subject;
 				return true;
 			}
@@ -866,20 +750,18 @@ class Arrays
 	}
 
 	/**
-	 * @param array  $subject
+	 * @param array $subject
 	 * @param string $keyPath
-	 * @param mixed  $value
+	 * @param mixed $value
 	 * @return array
 	 */
 	public static function recursiveSet(array $subject, $keyPath, $value)
 	{
-		if (!is_string($keyPath) || Strings::isNullOrWhiteSpace($keyPath))
-		{
+		if (!is_string($keyPath) || Strings::isNullOrWhiteSpace($keyPath)) {
 			throw new InvalidArgumentException('Parameter $keyPath has to be non empty ("") and non-whitespace string.');
 		}
 		$keys = Strings::split($keyPath, ["[", "]"], true);
-		if (count($keys) == 1)
-		{
+		if (count($keys) == 1) {
 			$subject[$keys[0]] = $value;
 			return $subject;
 		}
@@ -893,20 +775,16 @@ class Arrays
 	/**
 	 * @param array $config
 	 * @param array $defaultConfig
-	 * @param bool  $deep
+	 * @param bool $deep
 	 * @return array
 	 */
 	public static function mergeArrayConfig(array $config, array $defaultConfig, $deep = true)
 	{
 		ParamsChecker::isBool('$deep', $deep, __METHOD__);
-		foreach ($defaultConfig as $option => $value)
-		{
-			if (!isset($config[$option]))
-			{
+		foreach ($defaultConfig as $option => $value) {
+			if (!isset($config[$option])) {
 				$config[$option] = $defaultConfig[$option];
-			}
-			else if ($deep && isset($config[$option]) && is_array($config[$option]) && (empty($config[$option]) || is_string(Arrays::firstKey($config[$option]))))
-			{
+			} else if ($deep && isset($config[$option]) && is_array($config[$option]) && (empty($config[$option]) || is_string(Arrays::firstKey($config[$option])))) {
 				$config[$option] = Arrays::mergeArrayConfig($config[$option], $defaultConfig[$option], $deep);
 			}
 		}
@@ -919,17 +797,16 @@ class Arrays
 	 */
 	public static function firstKey($subject)
 	{
-		if (!is_array($subject))
-		{
+		if (!is_array($subject)) {
 			throw new InvalidArgumentException('Parameter $subject has to be type of array.');
 		}
-		if (empty($subject))
-		{
+		if (empty($subject)) {
 			throw new InvalidArgumentException('Parameter $subject is empty.');
 		}
-		if (function_exists("array_key_first")) return array_key_first($subject);
-		foreach ($subject as $key => $item)
-		{
+		if (function_exists("array_key_first")) {
+			return array_key_first($subject);
+		}
+		foreach ($subject as $key => $item) {
 			return $key;
 		}
 	}
