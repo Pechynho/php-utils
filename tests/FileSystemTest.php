@@ -364,12 +364,32 @@ class FileSystemTest extends TestCase
 	{
 		$zip = FileSystem::zip($this->baseDir . "/var");
 		self::assertEquals(true, FileSystem::isFile($zip));
+		$zip = FileSystem::zip($this->baseDir . "/var/directory_1/file_2.txt");
+		self::assertEquals(true, FileSystem::isFile($zip));
 	}
 
 	public function testUnzip()
 	{
-		$zip = FileSystem::zip($this->baseDir . "/var");
+		$sourceDirectory = $this->baseDir . "/var";
+		$zip = FileSystem::zip($sourceDirectory);
 		$unzip = FileSystem::unzip($zip);
-		self::assertEquals(true, FileSystem::isDirectory($unzip));
+		self::assertEquals(count(FileSystem::scanDirectory($sourceDirectory, FileSystem::SCAN_ALL, true)), count(FileSystem::scanDirectory($unzip, FileSystem::SCAN_ALL, true)));
+		$zip = FileSystem::zip($this->baseDir . "/var/directory_1/file_2.txt");
+		$unzip = FileSystem::unzip($zip);
+		self::assertEquals(1, count(FileSystem::scanDirectory($unzip, FileSystem::SCAN_FILES, true)));
+	}
+
+	public function testCompressFile()
+	{
+		$compressed = FileSystem::compressFile($this->baseDir . "/var/directory_1/file_2.txt");
+		self::assertEquals(true, FileSystem::isFile($compressed));
+	}
+
+	public function testDecompressFile()
+	{
+		$file = $this->baseDir . "/var/directory_1/file_2.txt";
+		$compressed = FileSystem::compressFile($file);
+		$uncompressed = FileSystem::decompressFile($compressed);
+		self::assertSame(FileSystem::readAllText($file), FileSystem::readAllText($uncompressed));
 	}
 }

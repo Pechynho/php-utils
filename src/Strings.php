@@ -6,8 +6,6 @@ namespace Pechynho\Utility;
 
 use InvalidArgumentException;
 use OutOfRangeException;
-use RuntimeException;
-use Transliterator;
 
 /**
  * @author Jan Pech <pechynho@gmail.com>
@@ -68,8 +66,7 @@ class Strings
 	 */
 	public static function trim(string $subject, array $trimChars = Strings::TRIM_WHITE_SPACE_CHARS): string
 	{
-		if (empty($trimChars))
-		{
+		if (empty($trimChars)) {
 			throw new InvalidArgumentException('Parameter $trimChars cannot be empty array.');
 		}
 		return trim($subject, Strings::join($trimChars, ""));
@@ -83,23 +80,18 @@ class Strings
 	 */
 	public static function join(iterable $subject, string $separator, ?string $lastSeparator = null): string
 	{
-		if (is_array($subject))
-		{
-			if (Arrays::isEmpty($subject))
-			{
+		if (is_array($subject)) {
+			if (Arrays::isEmpty($subject)) {
 				return "";
 			}
-			if ($lastSeparator === null || $separator === $lastSeparator)
-			{
+			if ($lastSeparator === null || $separator === $lastSeparator) {
 				return implode($separator, $subject);
 			}
-			if (function_exists("array_key_first"))
-			{
+			if (function_exists("array_key_first")) {
 				$lastKey = array_key_last($subject);
 				$lastValue = $subject[$lastKey];
 				unset($subject[$lastKey]);
-				if (empty($subject))
-				{
+				if (empty($subject)) {
 					return $lastValue;
 				}
 				return implode($separator, $subject) . $lastSeparator . $lastValue;
@@ -107,19 +99,16 @@ class Strings
 		}
 		$parts = [];
 		$partsCount = 0;
-		foreach ($subject as $item)
-		{
+		foreach ($subject as $item) {
 			$parts[] = ["value" => $item, "separator" => $separator];
 			$partsCount++;
 		}
-		if ($partsCount != 0)
-		{
+		if ($partsCount != 0) {
 			$parts[$partsCount - 1]["separator"] = $lastSeparator === null ? $separator : $lastSeparator;
 			$parts[0]["separator"] = Strings::EMPTY_STRING;
 		}
 		$output = Strings::EMPTY_STRING;
-		foreach ($parts as $part)
-		{
+		foreach ($parts as $part) {
 			$output .= $part["separator"] . $part["value"];
 		}
 		return $output;
@@ -134,8 +123,7 @@ class Strings
 	 */
 	public static function compare(string $strA, string $strB, string $type = Strings::COMPARE_CASE_SENSITIVE): int
 	{
-		if (!in_array($type, [Strings::COMPARE_CASE_SENSITIVE, Strings::COMPARE_CASE_INSENSITIVE]))
-		{
+		if (!in_array($type, [Strings::COMPARE_CASE_SENSITIVE, Strings::COMPARE_CASE_INSENSITIVE])) {
 			throw new InvalidArgumentException('Invalid value for argument $type.');
 		}
 		return $type === Strings::COMPARE_CASE_SENSITIVE ? strcmp($strA, $strB) : strcasecmp($strA, $strB);
@@ -149,8 +137,7 @@ class Strings
 	 */
 	public static function contains(string $subject, string $value): bool
 	{
-		if ($value === Strings::EMPTY_STRING)
-		{
+		if ($value === Strings::EMPTY_STRING) {
 			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
 		}
 		return Strings::indexOf($subject, $value) > -1;
@@ -165,16 +152,13 @@ class Strings
 	 */
 	public static function indexOf(string $subject, string $value, int $startIndex = 0): int
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
+		if ($subject === Strings::EMPTY_STRING) {
 			return -1;
 		}
-		if ($value === Strings::EMPTY_STRING)
-		{
+		if ($value === Strings::EMPTY_STRING) {
 			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
 		}
-		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
-		{
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject)) {
 			throw new OutOfRangeException('Parameter $startIndex is out of range.');
 		}
 		$result = mb_strpos($subject, $value, $startIndex);
@@ -198,8 +182,7 @@ class Strings
 	 */
 	public static function endsWith(string $subject, string $value): bool
 	{
-		if (function_exists("str_ends_with"))
-		{
+		if (function_exists("str_ends_with")) {
 			return str_ends_with($subject, $value);
 		}
 		return $value === "" || (($temp = mb_strlen($subject) - mb_strlen($value)) >= 0 && strpos($subject, $value, $temp) !== false);
@@ -213,23 +196,18 @@ class Strings
 	 */
 	public static function indexOfAny(string $subject, iterable $values, int $startIndex = 0): int
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
+		if ($subject === Strings::EMPTY_STRING) {
 			return -1;
 		}
-		if (empty($values))
-		{
+		if (empty($values)) {
 			throw new InvalidArgumentException('Parameter $values cannot be empty array.');
 		}
-		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
-		{
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject)) {
 			throw new OutOfRangeException('Parameter $startIndex is out of range.');
 		}
-		foreach ($values as $value)
-		{
+		foreach ($values as $value) {
 			$index = Strings::indexOf($subject, $value, $startIndex);
-			if ($index > -1)
-			{
+			if ($index > -1) {
 				return $index;
 			}
 		}
@@ -244,16 +222,13 @@ class Strings
 	 */
 	public static function insert(string $subject, string $value, int $startIndex): string
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
+		if ($subject === Strings::EMPTY_STRING) {
 			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
 		}
-		if ($value === Strings::EMPTY_STRING)
-		{
+		if ($value === Strings::EMPTY_STRING) {
 			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
 		}
-		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
-		{
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject)) {
 			throw new OutOfRangeException('Parameter $startIndex is out of range.');
 		}
 		return substr_replace($subject, $value, $startIndex, 0);
@@ -267,23 +242,18 @@ class Strings
 	 */
 	public static function lastIndexOfAny(string $subject, iterable $values, int $startIndex = 0): int
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
+		if ($subject === Strings::EMPTY_STRING) {
 			return -1;
 		}
-		if (empty($values))
-		{
+		if (empty($values)) {
 			throw new InvalidArgumentException('Parameter $values cannot be empty array.');
 		}
-		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
-		{
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject)) {
 			throw new OutOfRangeException('Parameter $startIndex is out of range.');
 		}
-		foreach ($values as $value)
-		{
+		foreach ($values as $value) {
 			$index = Strings::lastIndexOf($subject, $value, $startIndex);
-			if ($index > -1)
-			{
+			if ($index > -1) {
 				return $index;
 			}
 		}
@@ -298,16 +268,13 @@ class Strings
 	 */
 	public static function lastIndexOf(string $subject, string $value, int $startIndex = 0): int
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
+		if ($subject === Strings::EMPTY_STRING) {
 			return -1;
 		}
-		if ($value === Strings::EMPTY_STRING)
-		{
+		if ($value === Strings::EMPTY_STRING) {
 			throw new InvalidArgumentException('Parameter $value cannot be empty string.');
 		}
-		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
-		{
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject)) {
 			throw new OutOfRangeException('Parameter $startIndex is out of range.');
 		}
 		$result = mb_strrpos($subject, $value, $startIndex);
@@ -322,13 +289,11 @@ class Strings
 	 */
 	public static function padLeft(string $subject, int $totalWidth, string $paddingChar = " "): string
 	{
-		if (Strings::length($paddingChar) != 1)
-		{
+		if (Strings::length($paddingChar) != 1) {
 			throw new InvalidArgumentException('Parameter $paddingChar has to be single character.');
 		}
 		$iterations = $totalWidth - Strings::length($subject);
-		for ($i = 0; $i < $iterations; $i++)
-		{
+		for ($i = 0; $i < $iterations; $i++) {
 			$subject = $paddingChar . $subject;
 		}
 		return $subject;
@@ -342,13 +307,11 @@ class Strings
 	 */
 	public static function padRight(string $subject, int $totalWidth, string $paddingChar = " "): string
 	{
-		if (Strings::length($paddingChar) != 1)
-		{
+		if (Strings::length($paddingChar) != 1) {
 			throw new InvalidArgumentException('Parameter $paddingChar has to be single character.');
 		}
 		$iterations = $totalWidth - Strings::length($subject);
-		for ($i = 0; $i < $iterations; $i++)
-		{
+		for ($i = 0; $i < $iterations; $i++) {
 			$subject = $subject . $paddingChar;
 		}
 		return $subject;
@@ -362,17 +325,14 @@ class Strings
 	 */
 	public static function remove(string $subject, int $startIndex, ?int $length = null): string
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
+		if ($subject === Strings::EMPTY_STRING) {
 			throw new InvalidArgumentException('$subject $value cannot be empty string.');
 		}
-		if ($startIndex < 0 || $startIndex >= Strings::length($subject))
-		{
+		if ($startIndex < 0 || $startIndex >= Strings::length($subject)) {
 			throw new OutOfRangeException('Parameter $startIndex is out of range.');
 		}
 		$subjectLength = Strings::length($subject);
-		if ($length !== null && $startIndex + $length > $subjectLength)
-		{
+		if ($length !== null && $startIndex + $length > $subjectLength) {
 			throw new OutOfRangeException('Parameter $length is out of range.');
 		}
 		$part1 = $startIndex == 0 ? Strings::EMPTY_STRING : Strings::substring($subject, 0, $startIndex);
@@ -388,17 +348,14 @@ class Strings
 	 */
 	public static function substring(string $subject, int $startIndex, ?int $length = null): string
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
+		if ($subject === Strings::EMPTY_STRING) {
 			throw new InvalidArgumentException('Parameter $subject cannot be empty string.');
 		}
 		$subjectLength = Strings::length($subject);
-		if ($startIndex < 0 || $startIndex >= $subjectLength)
-		{
+		if ($startIndex < 0 || $startIndex >= $subjectLength) {
 			throw new OutOfRangeException('Parameter $startIndex is out of range.');
 		}
-		if ($length !== null && $startIndex + $length > $subjectLength)
-		{
+		if ($length !== null && $startIndex + $length > $subjectLength) {
 			throw new OutOfRangeException('Parameter $length is out of range.');
 		}
 		return mb_substr($subject, $startIndex, $length);
@@ -412,8 +369,7 @@ class Strings
 	 */
 	public static function replace(string $subject, string $oldValue, string $newValue): string
 	{
-		if ($oldValue === Strings::EMPTY_STRING)
-		{
+		if ($oldValue === Strings::EMPTY_STRING) {
 			throw new InvalidArgumentException('Parameter $oldValue cannot be empty string.');
 		}
 		return str_replace($oldValue, $newValue, $subject);
@@ -427,22 +383,23 @@ class Strings
 	 */
 	public static function split(string $subject, array $separators, bool $removeEmptyEntries = true): array
 	{
-		if (empty($separators))
-		{
+		if (empty($separators)) {
 			throw new InvalidArgumentException('Parameter $separators has to contain at least one value.');
 		}
 		$separatorsCount = count($separators);
 		$replacements = [];
-		for ($i = 0; $i < $separatorsCount; $i++)
-		{
-			if (!is_string($separators[$i]) || $separators[$i] === Strings::EMPTY_STRING)
-			{
+		for ($i = 0; $i < $separatorsCount; $i++) {
+			if (!is_string($separators[$i]) || $separators[$i] === Strings::EMPTY_STRING) {
 				throw new InvalidArgumentException("Value on index '{$i}' cannot be used as a separator.");
 			}
-			if ($i == 0) continue;
+			if ($i == 0) {
+				continue;
+			}
 			$replacements[$separators[$i]] = $separators[0];
 		}
-		if (!empty($replacements)) $subject = Strings::replaceMultiple($subject, $replacements);
+		if (!empty($replacements)) {
+			$subject = Strings::replaceMultiple($subject, $replacements);
+		}
 		$values = $removeEmptyEntries ? array_diff(explode($separators[0], $subject), [Strings::EMPTY_STRING]) : explode($separators[0], $subject);
 		return array_values($values);
 	}
@@ -456,12 +413,10 @@ class Strings
 	{
 		$oldValues = array_keys($replacements);
 		$newValues = array_values($replacements);
-		if (empty($replacements))
-		{
+		if (empty($replacements)) {
 			return $subject;
 		}
-		if (in_array("", $oldValues))
-		{
+		if (in_array("", $oldValues)) {
 			throw new InvalidArgumentException('Keys in parameter $replacements should be non-empty string values which should be replaced.');
 		}
 		return str_replace($oldValues, $newValues, $subject);
@@ -490,8 +445,7 @@ class Strings
 	 */
 	public static function startsWith(string $subject, string $value): bool
 	{
-		if (function_exists("str_starts_with "))
-		{
+		if (function_exists("str_starts_with ")) {
 			return str_starts_with($subject, $value);
 		}
 		return $value === "" || strncmp($subject, $value, mb_strlen($value)) === 0;
@@ -504,8 +458,7 @@ class Strings
 	 */
 	public static function trimStart(string $subject, array $trimChars = Strings::TRIM_WHITE_SPACE_CHARS): string
 	{
-		if (empty($trimChars))
-		{
+		if (empty($trimChars)) {
 			throw new InvalidArgumentException('Parameter $trimChars cannot be empty array.');
 		}
 		return ltrim($subject, Strings::join($trimChars, ""));
@@ -518,8 +471,7 @@ class Strings
 	 */
 	public static function trimEnd(string $subject, array $trimChars = Strings::TRIM_WHITE_SPACE_CHARS): string
 	{
-		if (empty($trimChars))
-		{
+		if (empty($trimChars)) {
 			throw new InvalidArgumentException('Parameter $trimChars cannot be empty array.');
 		}
 		return rtrim($subject, Strings::join($trimChars, ""));
@@ -531,12 +483,10 @@ class Strings
 	 */
 	public static function firstToUpper(string $subject): string
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
+		if ($subject === Strings::EMPTY_STRING) {
 			return $subject;
 		}
-		if (Strings::length($subject) === 1)
-		{
+		if (Strings::length($subject) === 1) {
 			return Strings::toUpper($subject);
 		}
 		return Strings::toUpper(Strings::substring($subject, 0, 1)) . Strings::substring($subject, 1);
@@ -558,12 +508,10 @@ class Strings
 	 */
 	public static function truncate(string $subject, int $maximumLength): string
 	{
-		if ($maximumLength < 4)
-		{
+		if ($maximumLength < 4) {
 			throw new InvalidArgumentException('Parameter $maximumLength has to be greater than 3.');
 		}
-		if (Strings::length($subject) > $maximumLength)
-		{
+		if (Strings::length($subject) > $maximumLength) {
 			$subject = Strings::substring($subject, 0, $maximumLength - 3) . '...';
 		}
 		return $subject;
@@ -588,8 +536,7 @@ class Strings
 	private static function convertToCase(string $subject, string $separator, string $caseType = Strings::CASE_PASCAL): string
 	{
 		$result = str_replace(' ', '', mb_convert_case(str_replace($separator, ' ', $subject), MB_CASE_TITLE));
-		if ($caseType === Strings::CASE_CAMEL)
-		{
+		if ($caseType === Strings::CASE_CAMEL) {
 			$result = Strings::firstToLower($result);
 		}
 
@@ -602,12 +549,10 @@ class Strings
 	 */
 	public static function firstToLower(string $subject): string
 	{
-		if ($subject === Strings::EMPTY_STRING)
-		{
+		if ($subject === Strings::EMPTY_STRING) {
 			return $subject;
 		}
-		if (Strings::length($subject) === 1)
-		{
+		if (Strings::length($subject) === 1) {
 			return Strings::toLower($subject);
 		}
 		return Strings::toLower(Strings::substring($subject, 0, 1)) . Strings::substring($subject, 1);
@@ -669,12 +614,10 @@ class Strings
 	 */
 	public static function slugify(string $subject, string $separator = "-", string $slugifyType = Strings::SLUGIFY_NORMAL, bool $toLower = true): string
 	{
-		if (!in_array($slugifyType, [Strings::SLUGIFY_NORMAL, Strings::SLUGIFY_FILENAME, Strings::SLUGIFY_URL]))
-		{
+		if (!in_array($slugifyType, [Strings::SLUGIFY_NORMAL, Strings::SLUGIFY_FILENAME, Strings::SLUGIFY_URL])) {
 			throw new InvalidArgumentException('Invalid value passed to parameter $slugifyType.');
 		}
-		if (Strings::length($separator) != 1)
-		{
+		if (Strings::length($separator) != 1) {
 			throw new InvalidArgumentException('Parameter $separator has to be single character.');
 		}
 		$config = [
@@ -682,8 +625,7 @@ class Strings
 			Strings::SLUGIFY_FILENAME => '/[\/\\?%*:|"<>. ]+/',
 			Strings::SLUGIFY_URL => '/[!*\'%();:@&=+,?#\[\]\/]+/'
 		];
-		if ($toLower)
-		{
+		if ($toLower) {
 			$subject = Strings::toLower($subject);
 		}
 		$subject = Strings::toAscii($subject);
@@ -814,21 +756,16 @@ class Strings
 		$output = Strings::EMPTY_STRING;
 		$characters = Strings::toCharArray($subject);
 		$length = count($characters);
-		for ($i = 0; $i < $length; $i++)
-		{
+		for ($i = 0; $i < $length; $i++) {
 			$char = $characters[$i];
-			if ($char == "<")
-			{
+			if ($char == "<") {
 				$inside = true;
 				continue;
-			}
-			else if ($char == ">")
-			{
+			} else if ($char == ">") {
 				$inside = false;
 				continue;
 			}
-			if ($inside)
-			{
+			if ($inside) {
 				continue;
 			}
 			$output .= $char;
@@ -862,14 +799,10 @@ class Strings
 	{
 		$iconv = defined('ICONV_IMPL') ? trim(ICONV_IMPL, '"\'') : null;
 		$transliterator = null;
-		if ($transliterator === null)
-		{
-			if (class_exists('Transliterator', false))
-			{
-				$transliterator = Transliterator::create('Any-Latin; Latin-ASCII');
-			}
-			else
-			{
+		if ($transliterator === null) {
+			if (class_exists('Transliterator', false)) {
+				$transliterator = \Transliterator::create('Any-Latin; Latin-ASCII');
+			} else {
 				trigger_error(__METHOD__ . "(): it is recommended to enable PHP extensions 'intl'.", E_USER_NOTICE);
 				$transliterator = false;
 			}
@@ -878,36 +811,26 @@ class Strings
 		$subject = preg_replace('#[^\x09\x0A\x0D\x20-\x7E\xA0-\x{2FF}\x{370}-\x{10FFFF}]#u', '', $subject);
 		// transliteration (by Transliterator and iconv) is not optimal, replace some characters directly
 		$subject = strtr($subject, ["\u{201E}" => '"', "\u{201C}" => '"', "\u{201D}" => '"', "\u{201A}" => "'", "\u{2018}" => "'", "\u{2019}" => "'", "\u{B0}" => '^', "\u{42F}" => 'Ya', "\u{44F}" => 'ya', "\u{42E}" => 'Yu', "\u{44E}" => 'yu', "\u{c4}" => 'Ae', "\u{d6}" => 'Oe', "\u{dc}" => 'Ue', "\u{1e9e}" => 'Ss', "\u{e4}" => 'ae', "\u{f6}" => 'oe', "\u{fc}" => 'ue', "\u{df}" => 'ss']); // „ “ ” ‚ ‘ ’ ° Я я Ю ю Ä Ö Ü ẞ ä ö ü ß
-		if ($iconv !== 'libiconv')
-		{
+		if ($iconv !== 'libiconv') {
 			$subject = strtr($subject, ["\u{AE}" => '(R)', "\u{A9}" => '(c)', "\u{2026}" => '...', "\u{AB}" => '<<', "\u{BB}" => '>>', "\u{A3}" => 'lb', "\u{A5}" => 'yen', "\u{B2}" => '^2', "\u{B3}" => '^3', "\u{B5}" => 'u', "\u{B9}" => '^1', "\u{BA}" => 'o', "\u{BF}" => '?', "\u{2CA}" => "'", "\u{2CD}" => '_', "\u{2DD}" => '"', "\u{1FEF}" => '', "\u{20AC}" => 'EUR', "\u{2122}" => 'TM', "\u{212E}" => 'e', "\u{2190}" => '<-', "\u{2191}" => '^', "\u{2192}" => '->', "\u{2193}" => 'V', "\u{2194}" => '<->']); // ® © … « » £ ¥ ² ³ µ ¹ º ¿ ˊ ˍ ˝ ` € ™ ℮ ← ↑ → ↓ ↔
 		}
-		if ($transliterator)
-		{
+		if ($transliterator) {
 			$subject = $transliterator->transliterate($subject);
 			// use iconv because The transliterator leaves some characters out of ASCII, eg → ʾ
-			if ($iconv === 'glibc')
-			{
+			if ($iconv === 'glibc') {
 				$subject = strtr($subject, '?', "\x01"); // temporarily hide ? to distinguish them from the garbage that iconv creates
 				$subject = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $subject);
 				$subject = str_replace(['?', "\x01"], ['', '?'], $subject); // remove garbage and restore ? characters
-			}
-			else if ($iconv === 'libiconv')
-			{
+			} else if ($iconv === 'libiconv') {
 				$subject = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $subject);
-			}
-			else
-			{
+			} else {
 				// null or 'unknown' (#216)
 				$subject = preg_replace('#[^\x00-\x7F]++#', '', $subject); // remove non-ascii chars
 			}
-		}
-		else if ($iconv === 'glibc' || $iconv === 'libiconv')
-		{
+		} else if ($iconv === 'glibc' || $iconv === 'libiconv') {
 			// temporarily hide these characters to distinguish them from the garbage that iconv creates
 			$subject = strtr($subject, '`\'"^~?', "\x01\x02\x03\x04\x05\x06");
-			if ($iconv === 'glibc')
-			{
+			if ($iconv === 'glibc') {
 				// glibc implementation is very limited. transliterate into Windows-1250 and then into ASCII, so most Eastern European characters are preserved
 				$subject = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT//IGNORE', $subject);
 				$subject = strtr(
@@ -916,18 +839,14 @@ class Strings
 					'ALLSSSSTZZZallssstzzzRAAAALCCCEEEEIIDDNNOOOOxRUUUUYTsraaaalccceeeeiiddnnooooruuuuyt- <->|-.'
 				);
 				$subject = preg_replace('#[^\x00-\x7F]++#', '', $subject);
-			}
-			else
-			{
+			} else {
 				$subject = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $subject);
 			}
 			// remove garbage that iconv creates during transliteration (eg Ý -> Y')
 			$subject = str_replace(['`', "'", '"', '^', '~', '?'], '', $subject);
 			// restore temporarily hidden characters
 			$subject = strtr($subject, "\x01\x02\x03\x04\x05\x06", '`\'"^~?');
-		}
-		else
-		{
+		} else {
 			$subject = preg_replace('#[^\x00-\x7F]++#', '', $subject);
 		}
 		return $subject;
