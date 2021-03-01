@@ -27,6 +27,9 @@ class FileSystem
 	/** @var string */
 	const SCAN_DIRECTORIES = "SCAN_DIRECTORIES";
 
+	/** @var string[] */
+	private static $imageFunctionSuffixes = ["jpeg", "webp", "png", "gif", "bmp", "gd", "wbmp", "xbm", "xpn", "gd2", "gd2part"];
+
 	/**
 	 * @param string $source
 	 * @param string $destination
@@ -617,7 +620,7 @@ class FileSystem
 			throw new InvalidArgumentException('Parameter $filter has to be type of callable or NULL.');
 		}
 		if (!$overwrite && $destination !== null && self::exists($destination)) {
-			throw new RuntimeException(sprintf("Destination %s already exists.", $destination));
+			throw new InvalidArgumentException(sprintf("Destination %s already exists.", $destination));
 		}
 		if (!self::exists($source)) {
 			throw new InvalidArgumentException(sprintf("Source %s does not exist.", $source));
@@ -682,7 +685,7 @@ class FileSystem
 			throw new InvalidArgumentException('Parameter $overwrite has to be type of boolean.');
 		}
 		if (!$overwrite && $destination !== null && self::exists($destination)) {
-			throw new RuntimeException(sprintf("Destination %s already exists.", $destination));
+			throw new InvalidArgumentException(sprintf("Destination %s already exists.", $destination));
 		}
 		if (!self::exists($source)) {
 			throw new InvalidArgumentException(sprintf("Source %s does not exist.", $source));
@@ -706,7 +709,15 @@ class FileSystem
 		return $destination;
 	}
 
-	public static function compressFile($source, $destination = null, $overwrite = false, $compressionLevel = 9, $bufferSize = 512)
+	/**
+	 * @param string $source
+	 * @param string|null $destination
+	 * @param bool $overwrite
+	 * @param int $compressionLevel
+	 * @param int $bufferSize
+	 * @return string
+	 */
+	public static function compressFile($source, $destination = null, $overwrite = false, $compressionLevel = 9, $bufferSize = 1024 * 512)
 	{
 		if (!extension_loaded("zlib")) {
 			throw new RuntimeException("You have to enable zlib extension to use this function.");
@@ -727,7 +738,7 @@ class FileSystem
 			throw new InvalidArgumentException('Parameter $bufferSize has to be type of integer.');
 		}
 		if (!$overwrite && $destination !== null && self::exists($destination)) {
-			throw new RuntimeException(sprintf("Destination %s already exists.", $destination));
+			throw new InvalidArgumentException(sprintf("Destination %s already exists.", $destination));
 		}
 		if (!self::isFile($source)) {
 			throw new InvalidArgumentException(sprintf("Source %s does not exits.", $source));
@@ -736,7 +747,7 @@ class FileSystem
 			throw new InvalidArgumentException(sprintf('Parameter $compressionLevel has to be between 1 and 9.'));
 		}
 		if ($bufferSize < 1) {
-			throw new RuntimeException(sprintf('Parameter $bufferSize has to be greater than 1.'));
+			throw new InvalidArgumentException(sprintf('Parameter $bufferSize has to be greater than 1.'));
 		}
 		if ($destination !== null && self::exists($destination)) {
 			self::delete($destination);
@@ -750,7 +761,7 @@ class FileSystem
 			throw new RuntimeException(sprintf("Function fopen('%s', '%s') has failed.", $source, "rb"));
 		}
 		while (!feof($sourceResource)) {
-			$chunk = fread($sourceResource, 1024 * $bufferSize);
+			$chunk = fread($sourceResource,   $bufferSize);
 			if ($chunk === false) {
 				throw new RuntimeException("Could not read chunk from file {$source}.");
 			}
@@ -765,7 +776,14 @@ class FileSystem
 		return $destination;
 	}
 
-	public static function decompressFile($source, $destination = null, $overwrite = false, $bufferSize = 512)
+	/**
+	 * @param string $source
+	 * @param string|null $destination
+	 * @param bool $overwrite
+	 * @param int $bufferSize
+	 * @return string
+	 */
+	public static function decompressFile($source, $destination = null, $overwrite = false, $bufferSize = 1024 * 512)
 	{
 		if (!extension_loaded("zlib")) {
 			throw new RuntimeException("You have to enable zlib extension to use this function.");
@@ -783,13 +801,13 @@ class FileSystem
 			throw new InvalidArgumentException('Parameter $bufferSize has to be type of integer.');
 		}
 		if (!$overwrite && $destination !== null && self::exists($destination)) {
-			throw new RuntimeException(sprintf("Destination %s already exists.", $destination));
+			throw new InvalidArgumentException(sprintf("Destination %s already exists.", $destination));
 		}
 		if (!self::isFile($source)) {
 			throw new InvalidArgumentException(sprintf("Source %s does not exits.", $source));
 		}
 		if ($bufferSize < 1) {
-			throw new RuntimeException(sprintf('Parameter $bufferSize has to be greater than 1.'));
+			throw new InvalidArgumentException(sprintf('Parameter $bufferSize has to be greater than 1.'));
 		}
 		if ($overwrite && $destination !== null && self::exists($destination)) {
 			self::delete($destination);
@@ -804,7 +822,7 @@ class FileSystem
 			throw new RuntimeException(sprintf("Function fopen('%s', 'wb') has failed.", $destination));
 		}
 		while (!gzeof($sourceResource)) {
-			fwrite($destinationResource, gzread($sourceResource, 1024 * $bufferSize));
+			fwrite($destinationResource, gzread($sourceResource, $bufferSize));
 		}
 		if (gzclose($sourceResource) === false) {
 			throw new RuntimeException("Could not close file {$source}.");
@@ -812,6 +830,217 @@ class FileSystem
 		if (fclose($destinationResource) === false) {
 			throw new RuntimeException("Could not close file {$destination}.");
 		}
+		return $destination;
+	}
+
+	/**
+	 * @param string $source
+	 * @param int $targetSize
+	 * @param string|null $destination
+	 * @param bool $overwrite
+	 * @param string|null $inputFormat
+	 * @param string|null $outputFormat
+	 * @return string
+	 */
+	public static function compressImageToSize($source, $targetSize, $destination = null, $overwrite = false, $inputFormat = null, $outputFormat = null)
+	{
+		if (!is_string($source)) {
+			throw new InvalidArgumentException('Parameter $source has to be type of string.');
+		}
+		if (!is_int($targetSize)) {
+			throw new InvalidArgumentException('Parameter $targetSize has to be type of integer.');
+		}
+		if (!is_string($destination) && !is_null($destination)) {
+			throw new InvalidArgumentException('Parameter $destination has to be type of string or NULL.');
+		}
+		if (!is_bool($overwrite)) {
+			throw new InvalidArgumentException('Parameter $overwrite has to be type of boolean.');
+		}
+		if (!is_string($inputFormat)) {
+			throw new InvalidArgumentException('Parameter $inputFormat has to be type of string.');
+		}
+		if (!is_string($outputFormat)) {
+			throw new InvalidArgumentException('Parameter $outputFormat has to be type of string.');
+		}
+		if (!$overwrite && $destination !== null && self::exists($destination)) {
+			throw new RuntimeException(sprintf("Destination %s already exists.", $destination));
+		}
+		if (!self::isFile($source)) {
+			throw new InvalidArgumentException(sprintf("Source %s does not exits.", $source));
+		}
+		if ($targetSize < 1) {
+			throw new RuntimeException(sprintf('Parameter $targetSize has to be greater than 1.'));
+		}
+		if ($inputFormat !== null && !function_exists("imagecreatefrom{$inputFormat}")) {
+			throw new InvalidArgumentException(sprintf("Unknown format %s. This function tried to use imagecreatefrom%s function.", $inputFormat, $inputFormat));
+		}
+		if ($outputFormat !== null && !function_exists("image{$outputFormat}")) {
+			throw new InvalidArgumentException(sprintf("Unknown format %s. This function tried to use image%s function.", $outputFormat, $outputFormat));
+		}
+		if ($overwrite && $destination !== null && self::exists($destination)) {
+			self::delete($destination);
+		}
+		if ($destination === null) {
+			$destination = self::generateFilename();
+		}
+		if (self::size($source) <= $targetSize) {
+			self::copy($source, $destination);
+			return $destination;
+		}
+		if ($inputFormat !== null) {
+			$function = "imagecreatefrom{$inputFormat}";
+			$sourceImage = $function($source);
+			if ($sourceImage === false) {
+				throw new RuntimeException(sprintf("Function %s('%s') has failed.", $function, $source));
+			}
+		} else {
+			$sourceImage = null;
+			foreach (self::$imageFunctionSuffixes as $suffix) {
+				$function = "imagecreatefrom{$suffix}";
+				$sourceImage = $function($source);
+				if ($sourceImage !== false) {
+					break;
+				}
+			}
+			if ($sourceImage === false) {
+				throw new RuntimeException(sprintf("Could not autodetect function which could open %s.", $source));
+			}
+		}
+		if ($outputFormat === null) {
+			$outputFormat = function_exists("imagewebp") ? "webp" : "jpeg";
+		}
+		$outputFunction = "image{$outputFormat}";
+		$cleanup = function ($cleanDestination = false) use (&$sourceImage, $destination) {
+			if (function_exists("imagedestroy")) {
+				imagedestroy($sourceImage);
+			}
+			unset($sourceImage);
+			if ($cleanDestination && self::exists($destination)) {
+				self::delete($destination);
+			}
+		};
+		$min = 0;
+		$max = 100;
+		$acceptableQualities = [];
+		while ($min <= $max) {
+			$mid = floor(($min + $max) / 2);
+			if ($outputFunction($sourceImage, $destination, $mid) === false) {
+				$cleanup(true);
+				throw new RuntimeException(sprintf("Function %s('%s', '%s', %s) has failed.", $outputFunction, $source, $destination, $mid));
+			}
+			$size = filesize($destination);
+			if ($size === false) {
+				$cleanup(true);
+				throw new RuntimeException(sprintf("Could not read file size of %s.", $destination));
+			}
+			clearstatcache(true, $destination);
+			if ($size <= $targetSize) {
+				$acceptableQualities[$size] = $mid;
+				$min = $mid + 1;
+			} else {
+				$max = $mid - 1;
+			}
+		}
+		if (empty($acceptableQualities)) {
+			$cleanup(true);
+			throw new RuntimeException(sprintf("Could not compress image to target size."));
+		}
+		$quality = $acceptableQualities[max(array_keys($acceptableQualities))];
+		if ($outputFunction($sourceImage, $destination, $quality) === false) {
+			$cleanup(true);
+			throw new RuntimeException(sprintf("Function %s('%s', '%s', %s) has failed.", $outputFunction, $source, $destination, $quality));
+		}
+		$cleanup(false);
+		return $destination;
+	}
+
+	/**
+	 * @param string $source
+	 * @param int $quality
+	 * @param string|null $destination
+	 * @param bool $overwrite
+	 * @param string|null $inputFormat
+	 * @param string|null $outputFormat
+	 * @return string
+	 */
+	public static function compressImageToQuality($source, $quality, $destination = null, $overwrite = false, $inputFormat = null, $outputFormat = null)
+	{
+		if (!is_string($source)) {
+			throw new InvalidArgumentException('Parameter $source has to be type of string.');
+		}
+		if (!is_int($quality)) {
+			throw new InvalidArgumentException('Parameter $quality has to be type of integer.');
+		}
+		if (!is_string($destination) && !is_null($destination)) {
+			throw new InvalidArgumentException('Parameter $destination has to be type of string or NULL.');
+		}
+		if (!is_bool($overwrite)) {
+			throw new InvalidArgumentException('Parameter $overwrite has to be type of boolean.');
+		}
+		if (!is_string($inputFormat)) {
+			throw new InvalidArgumentException('Parameter $inputFormat has to be type of string.');
+		}
+		if (!is_string($outputFormat)) {
+			throw new InvalidArgumentException('Parameter $outputFormat has to be type of string.');
+		}
+		if (!$overwrite && $destination !== null && self::exists($destination)) {
+			throw new RuntimeException(sprintf("Destination %s already exists.", $destination));
+		}
+		if (!self::isFile($source)) {
+			throw new InvalidArgumentException(sprintf("Source %s does not exits.", $source));
+		}
+		if ($quality < 0 || $quality > 100) {
+			throw new InvalidArgumentException(sprintf('Parameter $quality is expected to be between 0 and 100.'));
+		}
+		if ($inputFormat !== null && !function_exists("imagecreatefrom{$inputFormat}")) {
+			throw new InvalidArgumentException(sprintf("Unknown format %s. This function tried to use imagecreatefrom%s function.", $inputFormat, $inputFormat));
+		}
+		if ($outputFormat !== null && !function_exists("image{$outputFormat}")) {
+			throw new InvalidArgumentException(sprintf("Unknown format %s. This function tried to use image%s function.", $outputFormat, $outputFormat));
+		}
+		if ($overwrite && $destination !== null && self::exists($destination)) {
+			self::delete($destination);
+		}
+		if ($destination === null) {
+			$destination = self::generateFilename();
+		}
+		if ($inputFormat !== null) {
+			$function = "imagecreatefrom{$inputFormat}";
+			$sourceImage = $function($source);
+			if ($sourceImage === false) {
+				throw new RuntimeException(sprintf("Function %s('%s') has failed.", $function, $source));
+			}
+		} else {
+			$sourceImage = null;
+			foreach (self::$imageFunctionSuffixes as $suffix) {
+				$function = "imagecreatefrom{$suffix}";
+				$sourceImage = $function($source);
+				if ($sourceImage !== false) {
+					break;
+				}
+			}
+			if ($sourceImage === false) {
+				throw new RuntimeException(sprintf("Could not autodetect function which could open %s.", $source));
+			}
+		}
+		if ($outputFormat === null) {
+			$outputFormat = function_exists("imagewebp") ? "webp" : "jpeg";
+		}
+		$outputFunction = "image{$outputFormat}";
+		$cleanup = function ($cleanDestination = false) use (&$sourceImage, $destination) {
+			if (function_exists("imagedestroy")) {
+				imagedestroy($sourceImage);
+			}
+			unset($sourceImage);
+			if ($cleanDestination && self::exists($destination)) {
+				self::delete($destination);
+			}
+		};
+		if ($outputFunction($sourceImage, $destination, $quality) === false) {
+			$cleanup(true);
+			throw new RuntimeException(sprintf("Function %s('%s', '%s', %s) has failed.", $outputFunction, $source, $destination, $quality));
+		}
+		$cleanup(false);
 		return $destination;
 	}
 }
