@@ -91,4 +91,16 @@ class DatesTest extends TestCase
 		self::assertSame(false, Dates::tryParse("adfafdadf", $result));
 		self::assertSame(true, Dates::tryParse("2000-01-01", $result));
 	}
+
+	public function testSetMinTime()
+	{
+		$date = Dates::parse("2020-01-01 15:18");
+		self::assertSame(Dates::setMinTime($date)->format("H:i:s"), "00:00:00");
+	}
+
+	public function testSetMaxTime()
+	{
+		$date = Dates::parse("2020-01-01 15:18");
+		self::assertSame(Dates::setMaxTime($date)->format("H:i:s"), "23:59:59");
+	}
 }

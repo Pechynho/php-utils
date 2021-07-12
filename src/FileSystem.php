@@ -5,6 +5,7 @@ namespace Pechynho\Utility;
 
 
 use DirectoryIterator;
+use Exception;
 use FilesystemIterator;
 use Generator;
 use InvalidArgumentException;
@@ -79,6 +80,27 @@ class FileSystem
 	}
 
 	/**
+	 * @param string $source
+	 * @param string $destination
+	 */
+	public static function mirror($source, $destination)
+	{
+		if (!is_string($source)) {
+			throw new InvalidArgumentException('Parameter $source has to be type of string.');
+		}
+		if (!is_string($destination)) {
+			throw new InvalidArgumentException('Parameter $destination has to be type of string.');
+		}
+		if ($source === $destination) {
+			throw new InvalidArgumentException('Values passed to arguments $source and $destination are same.');
+		}
+		if (FileSystem::exists($destination)) {
+			FileSystem::delete($destination);
+		}
+		FileSystem::copy($source, $destination);
+	}
+
+	/**
 	 * @param string $filename
 	 * @return bool
 	 */
@@ -122,7 +144,7 @@ class FileSystem
 	}
 
 	/**
-	 * @param string[] ...$paths
+	 * @param string ...$paths
 	 * @return string
 	 */
 	public static function combinePath(...$paths)
