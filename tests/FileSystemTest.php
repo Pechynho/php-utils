@@ -132,6 +132,14 @@ class FileSystemTest extends TestCase
 		self::assertException(function () { FileSystem::copy($this->baseDir . "/var/directory_4", ""); }, InvalidArgumentException::class);
 	}
 
+	public function testMirror()
+	{
+		$source = $this->baseDir . "/var/directory_1";
+		$destination = $this->baseDir . "/var/copied_directory_1";
+		FileSystem::mirror($source, $destination);
+		self::assertSameSize(FileSystem::scanDirectory($source, FileSystem::SCAN_ALL, true), FileSystem::scanDirectory($destination, FileSystem::SCAN_ALL, true));
+	}
+
 	public function testAppend()
 	{
 		$filename = $this->baseDir . "/var/directory_1/file_2.txt";

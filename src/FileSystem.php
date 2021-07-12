@@ -70,6 +70,21 @@ class FileSystem
 	}
 
 	/**
+	 * @param string $source
+	 * @param string $destination
+	 */
+	public static function mirror(string $source, string $destination): void
+	{
+		if ($source === $destination) {
+			throw new InvalidArgumentException('Values passed to arguments $source and $destination are same.');
+		}
+		if (FileSystem::exists($destination)) {
+			FileSystem::delete($destination);
+		}
+		FileSystem::copy($source, $destination);
+	}
+
+	/**
 	 * @param string $filename
 	 * @return bool
 	 */
@@ -104,7 +119,7 @@ class FileSystem
 	}
 
 	/**
-	 * @param string[] ...$paths
+	 * @param string ...$paths
 	 * @return string
 	 */
 	public static function combinePath(...$paths): string
