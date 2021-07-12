@@ -28,11 +28,43 @@ class Dates
 	{
 		$today = Dates::now();
 		if ($maximumTime) {
-			$today->setTime(23, 59, 59);
+			self::setMaxTime($today);
 		} else {
-			$today->setTime(0, 0);
+			self::setMinTime($today);
 		}
 		return $today;
+	}
+
+	/**
+	 * @param DateTime $dateTime
+	 * @param bool $useAsReference
+	 * @return DateTime
+	 */
+	public static function setMaxTime(DateTime $dateTime, bool $useAsReference = true): DateTime
+	{
+		$subject = $useAsReference ? $dateTime : clone $dateTime;
+		if (version_compare(phpversion(), "7.1.0", ">=")) {
+			$subject->setTime(23, 59, 59, 999999);
+		} else {
+			$subject->setTime(23, 59, 59);
+		}
+		return $subject;
+	}
+
+	/**
+	 * @param DateTime $dateTime
+	 * @param bool $useAsReference
+	 * @return DateTime
+	 */
+	public static function setMinTime(DateTime $dateTime, bool $useAsReference = true): DateTime
+	{
+		$subject = $useAsReference ? $dateTime : clone $dateTime;
+		if (version_compare(phpversion(), "7.1.0", ">=")) {
+			$subject->setTime(0, 0, 0, 0);
+		} else {
+			$subject->setTime(0, 0, 0);
+		}
+		return $subject;
 	}
 
 	/**
