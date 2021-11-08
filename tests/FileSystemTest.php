@@ -6,11 +6,11 @@ use InvalidArgumentException;
 use Pechynho\Utility\FileSystem;
 use Pechynho\Utility\Strings;
 use PHPUnit\Framework\TestCase;
-use VladaHejda\AssertException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 
 class FileSystemTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	private $baseDir = ".";
 
@@ -24,7 +24,7 @@ class FileSystemTest extends TestCase
 	/**
 	 * @inheritDoc
 	 */
-	protected function setUp()
+	protected function setUp(): void
 	{
 		$this->prepareEnvironment();
 	}
@@ -94,7 +94,7 @@ class FileSystemTest extends TestCase
 	/**
 	 * @inheritDoc
 	 */
-	protected function tearDown()
+	protected function tearDown(): void
 	{
 		$this->destroyEnvironment();
 	}

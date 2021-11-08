@@ -7,11 +7,11 @@ use Pechynho\Test\Model\MyAnnotation;
 use Pechynho\Test\Model\Worker;
 use Pechynho\Utility\Annotations;
 use PHPUnit\Framework\TestCase;
-use VladaHejda\AssertException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 
 class AnnotationsTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function testGetMethodAnnotation()
 	{

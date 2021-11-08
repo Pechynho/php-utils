@@ -5,11 +5,11 @@ namespace Pechynho\Test;
 use InvalidArgumentException;
 use Pechynho\Utility\Formatting;
 use PHPUnit\Framework\TestCase;
-use VladaHejda\AssertException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 
 class FormattingTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function testFormatFileSize()
 	{
@@ -27,9 +27,7 @@ class FormattingTest extends TestCase
 		self::assertEquals("10 000", Formatting::formatNumber(10000, 2, ".", " ", true));
 		self::assertEquals("10,000.56", Formatting::formatNumber(10000.56, 2, ".", ",", true));
 		self::assertEquals("10,000.5", Formatting::formatNumber(10000.50, 2, ".", ",", true));
-		self::assertEquals("10,000.50", Formatting::formatNumber(10000.50, 2, ".", ",", false));
-		self::assertException(function () { Formatting::formatNumber("vole"); }, InvalidArgumentException::class);
-		self::assertException(function () { Formatting::formatNumber(50, 2, ",,"); }, InvalidArgumentException::class);
+		self::assertEquals("10,000.50", Formatting::formatNumber(10000.50, 2, ".", ",", false));self::assertException(function () { Formatting::formatNumber(50, 2, ",,"); }, InvalidArgumentException::class);
 		self::assertException(function () { Formatting::formatNumber(50, 2, ",", "  "); }, InvalidArgumentException::class);
 	}
 }

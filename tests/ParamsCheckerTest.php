@@ -8,11 +8,11 @@ use Pechynho\Test\Model\Person;
 use Pechynho\Test\Model\Worker;
 use Pechynho\Utility\ParamsChecker;
 use PHPUnit\Framework\TestCase;
-use VladaHejda\AssertException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 
 class ParamsCheckerTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function test__callStatic()
 	{

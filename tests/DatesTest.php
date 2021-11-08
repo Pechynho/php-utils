@@ -7,11 +7,11 @@ use InvalidArgumentException;
 use Pechynho\Utility\Dates;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use VladaHejda\AssertException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 
 class DatesTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function testFromTimestamp()
 	{
@@ -75,14 +75,12 @@ class DatesTest extends TestCase
 	public function testGetLastDayOfMonth()
 	{
 		self::assertEquals(31, Dates::getLastDayOfMonth(10, 2020));
-		self::assertException(function () { Dates::getLastDayOfMonth(null, 2020); }, InvalidArgumentException::class);
 		self::assertException(function () { Dates::getLastDayOfMonth(0, 2020); }, InvalidArgumentException::class);
 	}
 
 	public function testGetLastDateOfMonth()
 	{
 		self::assertSame("31.10.2020", Dates::getLastDateOfMonth(10, 2020)->format("d.m.Y"));
-		self::assertException(function () { Dates::getLastDateOfMonth(null, 2020); }, InvalidArgumentException::class);
 		self::assertException(function () { Dates::getLastDateOfMonth(0, 2020); }, InvalidArgumentException::class);
 	}
 

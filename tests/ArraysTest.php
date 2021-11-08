@@ -4,14 +4,14 @@ namespace Pechynho\Test;
 
 use InvalidArgumentException;
 use Pechynho\Test\Model\Person;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 use Pechynho\Utility\Arrays;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use VladaHejda\AssertException;
 
 class ArraysTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	/** @var Person[] */
 	private $persons;
@@ -31,7 +31,7 @@ class ArraysTest extends TestCase
 	/**
 	 * @inheritDoc
 	 */
-	protected function setUp()
+	protected function setUp(): void
 	{
 		foreach ($this->forenames as $key => $forename)
 		{
@@ -53,7 +53,6 @@ class ArraysTest extends TestCase
 		self::assertEquals(351, Arrays::sum($this->numbers));
 		self::assertEquals(351, Arrays::sum($this->numbersOrdered));
 		self::assertException(function () { Arrays::sum([]); }, InvalidArgumentException::class);
-		self::assertException(function () { Arrays::sum($this->numbers, 5); }, InvalidArgumentException::class);
 		self::assertEquals(2214, Arrays::sum($this->persons, "height"));
 	}
 
@@ -87,13 +86,11 @@ class ArraysTest extends TestCase
 		self::assertEquals([1], Arrays::itemsWithMin($this->numbers));
 		self::assertEquals([$this->persons[Arrays::count($this->persons) - 1]], Arrays::itemsWithMin($this->persons, "height"));
 		self::assertEquals([], Arrays::itemsWithMin([]));
-		self::assertException(function () { Arrays::itemsWithMin($this->numbers, 5); }, InvalidArgumentException::class);
 	}
 
 	public function testGroupBy()
 	{
 		self::assertEquals([$this->persons[0]], Arrays::groupBy($this->persons, "height")[190]);
-		self::assertException(function () { Arrays::groupBy($this->persons, null); }, InvalidArgumentException::class);
 	}
 
 	public function testFirstOrDefault()
@@ -107,7 +104,6 @@ class ArraysTest extends TestCase
 		self::assertEquals([26], Arrays::itemsWithMax($this->numbers));
 		self::assertEquals([$this->persons[0]], Arrays::itemsWithMax($this->persons, "height"));
 		self::assertEquals([], Arrays::itemsWithMax([]));
-		self::assertException(function () { Arrays::itemsWithMax($this->numbers, 5); }, InvalidArgumentException::class);
 	}
 
 	public function testFirstKey()
@@ -150,8 +146,6 @@ class ArraysTest extends TestCase
 		self::assertEquals($persons, Arrays::orderBy($this->persons, Arrays::ORDER_DIRECTION_ASCENDING, "forename"));
 		self::assertEquals($persons, Arrays::orderBy($this->persons, Arrays::ORDER_DIRECTION_ASCENDING, "forename", function (string $forenameA, string $forenameB) { return strcmp($forenameA, $forenameB); }));
 		self::assertException(function () { Arrays::orderBy($this->numbers, "something"); }, InvalidArgumentException::class);
-		self::assertException(function () { Arrays::orderBy($this->numbers, Arrays::ORDER_DIRECTION_ASCENDING, 5); }, InvalidArgumentException::class);
-		self::assertException(function () { Arrays::orderBy($this->numbers, Arrays::ORDER_DIRECTION_ASCENDING, null, 5); }, InvalidArgumentException::class);
 	}
 
 	public function testIsIterable()
@@ -195,7 +189,6 @@ class ArraysTest extends TestCase
 		self::assertEquals(1, Arrays::min($this->numbers));
 		self::assertEquals(179, Arrays::min($this->persons, "height"));
 		self::assertException(function () { Arrays::min([]); }, InvalidArgumentException::class);
-		self::assertException(function () { Arrays::min($this->numbers, 5); }, InvalidArgumentException::class);
 	}
 
 	public function testContains()
@@ -209,7 +202,6 @@ class ArraysTest extends TestCase
 		self::assertEquals(13.5, Arrays::average($this->numbers));
 		self::assertEquals(13.5, Arrays::average($this->numbersOrdered));
 		self::assertException(function () { Arrays::average([]); }, InvalidArgumentException::class);
-		self::assertException(function () { Arrays::average($this->numbers, 5); }, InvalidArgumentException::class);
 		self::assertEquals(184.5, Arrays::average($this->persons, "height"));
 	}
 
@@ -218,7 +210,6 @@ class ArraysTest extends TestCase
 		self::assertEquals(26, Arrays::max($this->numbers));
 		self::assertEquals(190, Arrays::max($this->persons, "height"));
 		self::assertException(function () { Arrays::max([]); }, InvalidArgumentException::class);
-		self::assertException(function () { Arrays::max($this->numbers, 5); }, InvalidArgumentException::class);
 	}
 
 	public function testCount()
@@ -231,7 +222,6 @@ class ArraysTest extends TestCase
 	{
 		self::assertEquals($this->surnames, Arrays::select($this->persons, "surname"));
 		self::assertEquals($this->surnames, Arrays::select($this->persons, "surname", true));
-		self::assertException(function () { Arrays::select($this->persons, 5); }, InvalidArgumentException::class);
 	}
 
 	public function testFlip()
@@ -247,8 +237,6 @@ class ArraysTest extends TestCase
 			$testCase[$person->getHeight()] = $person->getSurname();
 		}
 		self::assertEquals($testCase, Arrays::mapToPairs($this->persons, "height", "surname"));
-		self::assertException(function () { Arrays::mapToPairs($this->persons, null, "surname"); }, InvalidArgumentException::class);
-		self::assertException(function () { Arrays::mapToPairs($this->persons, "height", null); }, InvalidArgumentException::class);
 	}
 
 	public function testMapByProperty()
@@ -259,7 +247,6 @@ class ArraysTest extends TestCase
 			$testCase[$person->getHeight()] = $person;
 		}
 		self::assertEquals($testCase, Arrays::mapByProperty($this->persons, "height"));
-		self::assertException(function () { Arrays::mapByProperty($this->persons, null); }, InvalidArgumentException::class);
 	}
 
 	public function testMergeArrayConfig()
@@ -308,8 +295,6 @@ class ArraysTest extends TestCase
 		$target = [1 => 1, 3 => 3];
 		self::assertEquals([1 => 1, 2 => 2, 3 => 3], Arrays::insertAfter($target, 2, 2, 1));
 		self::assertEquals([1 => 1], Arrays::insertAfter([], 1, 1, "one"));
-		self::assertException(function () use ($target) { Arrays::insertAfter($target, null, 2, "one"); }, InvalidArgumentException::class);
-		self::assertException(function () use ($target) { Arrays::insertAfter($target, 2, 2, null); }, InvalidArgumentException::class);
 	}
 
 	public static function testInsertBefore()
@@ -320,7 +305,5 @@ class ArraysTest extends TestCase
 		$target = [1 => 1, 3 => 3];
 		self::assertEquals([1 => 1, 2 => 2, 3 => 3], Arrays::insertBefore($target, 2, 2, 3));
 		self::assertEquals([1 => 1], Arrays::insertBefore([], 1, 1, "one"));
-		self::assertException(function () use ($target) { Arrays::insertBefore($target, null, 2, "one"); }, InvalidArgumentException::class);
-		self::assertException(function () use ($target) { Arrays::insertBefore($target, 2, 2, null); }, InvalidArgumentException::class);
 	}
 }

@@ -7,11 +7,11 @@ use Pechynho\Test\Model\Person;
 use Pechynho\Utility\Scalars;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use VladaHejda\AssertException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 
 class ScalarsTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function testIsScalarTypeValid()
 	{
@@ -35,7 +35,6 @@ class ScalarsTest extends TestCase
 		self::assertSame(true, Scalars::parse("true", Scalars::BOOLEAN));
 		self::assertSame(true, Scalars::parse("true", "bool"));
 		self::assertSame(false, Scalars::parse("false", Scalars::BOOLEAN));
-		self::assertException(function () { Scalars::parse(new Person("John", "Doe", 18, 180), Scalars::INTEGER); }, InvalidArgumentException::class);
 		self::assertException(function () { Scalars::parse("true", "date"); }, InvalidArgumentException::class);
 		self::assertException(function () { Scalars::parse("true", Scalars::INTEGER); }, RuntimeException::class);
 	}

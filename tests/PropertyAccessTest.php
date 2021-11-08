@@ -6,11 +6,11 @@ use Pechynho\Test\Model\Person;
 use Pechynho\Utility\PropertyAccess;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use VladaHejda\AssertException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 
 class PropertyAccessTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	/** @var Person */
 	private $person;
@@ -18,7 +18,7 @@ class PropertyAccessTest extends TestCase
 	/**
 	 * @inheritDoc
 	 */
-	protected function setUp()
+	protected function setUp(): void
 	{
 		$this->person = new Person("Joe", "Doe", 30, 180);
 	}

@@ -11,11 +11,11 @@ use ReflectionMethod;
 use ReflectionObject;
 use ReflectionProperty;
 use RuntimeException;
-use VladaHejda\AssertException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 
 class ReflectionsTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function testGetMethod()
 	{
@@ -38,8 +38,6 @@ class ReflectionsTest extends TestCase
 	{
 		$worker = new Worker("Joe", "Doe", 30, 180, "Cook");
 		self::assertInstanceOf(ReflectionObject::class, Reflections::createReflectionObject($worker));
-		self::assertException(function () { Reflections::createReflectionObject(Worker::class); }, InvalidArgumentException::class);
-		self::assertException(function () { Reflections::createReflectionObject(null); }, InvalidArgumentException::class);
 	}
 
 	public function testGetProperty()

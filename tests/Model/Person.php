@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Pechynho\Test\Model;
 
 /**

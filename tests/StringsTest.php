@@ -6,11 +6,11 @@ use InvalidArgumentException;
 use OutOfRangeException;
 use Pechynho\Utility\Strings;
 use PHPUnit\Framework\TestCase;
-use VladaHejda\AssertException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 
 class StringsTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function testCompare()
 	{
