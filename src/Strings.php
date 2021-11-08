@@ -127,6 +127,9 @@ class Strings
      */
     public static function contains(string $subject, string $value): bool
     {
+        if (function_exists('str_contains')) {
+            return str_contains($subject, $value);
+        }
         if ($value === Strings::EMPTY_STRING) {
             throw new InvalidArgumentException('Parameter $value cannot be empty string.');
         }

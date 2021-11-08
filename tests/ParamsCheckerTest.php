@@ -63,7 +63,7 @@ class ParamsCheckerTest extends TestCase
 		$value = function () { };
 		ParamsChecker::type('value', $value, "callable");
 		self::assertException(function () {
-			ParamsChecker::type('value', $value, "string");;
+			ParamsChecker::type('value', $value, "string");
 		}, InvalidArgumentException::class);
 	}
 
