@@ -3,14 +3,14 @@
 namespace Pechynho\Test;
 
 use InvalidArgumentException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 use Pechynho\Utility\FileSystem;
 use Pechynho\Utility\Strings;
 use PHPUnit\Framework\TestCase;
-use VladaHejda\AssertException;
 
 class FileSystemTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	private $baseDir = ".";
 

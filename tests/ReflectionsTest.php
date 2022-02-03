@@ -4,6 +4,7 @@ namespace Pechynho\Test;
 
 use InvalidArgumentException;
 use Pechynho\Test\Model\Worker;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 use Pechynho\Utility\Reflections;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -11,11 +12,10 @@ use ReflectionMethod;
 use ReflectionObject;
 use ReflectionProperty;
 use RuntimeException;
-use VladaHejda\AssertException;
 
 class ReflectionsTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function testGetMethod()
 	{

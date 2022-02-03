@@ -1,21 +1,21 @@
 <?php
 
-
 namespace Pechynho\Utility;
 
-
-use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use ReflectionMethod;
 use ReflectionProperty;
 use RuntimeException;
+use Throwable;
 
 /**
  * @author Jan Pech <pechynho@gmail.com>
  */
 class Annotations
 {
+    private static ?AnnotationReader $annotationReader = null;
+
 	/**
 	 * @param string $class
 	 * @param string $property
@@ -32,21 +32,36 @@ class Annotations
 		return $annotation;
 	}
 
-	/**
-	 * @return AnnotationReader
-	 */
-	public static function createAnnotationReader(): AnnotationReader
-	{
-		try {
-			if (method_exists(AnnotationRegistry::class, "registerLoader")) {
-				AnnotationRegistry::registerLoader("class_exists");
-			}
-			return new AnnotationReader();
-		}
-		catch (AnnotationException $exception) {
-			throw new RuntimeException(sprintf("Creating new instance of '%s' class was not successful.", AnnotationReader::class));
-		}
-	}
+    /**
+     * @return AnnotationReader
+     */
+    public static function createAnnotationReader(): AnnotationReader
+    {
+        if (self::$annotationReader !== null) {
+            return self::$annotationReader;
+        }
+        if (!class_exists(AnnotationReader::class)) {
+            throw new RuntimeException(
+                sprintf(
+                    '%s is required to use this library. Please run composer require doctrine/annotations.',
+                    AnnotationReader::class
+                )
+            );
+        }
+        try {
+            if (class_exists(AnnotationRegistry::class) && method_exists(AnnotationRegistry::class, 'registerLoader')) {
+                AnnotationRegistry::registerLoader('class_exists');
+            }
+            self::$annotationReader = new AnnotationReader();
+            return self::$annotationReader;
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                sprintf('Creating new instance of %s was not successful.', AnnotationReader::class),
+                (int)$e->getCode(),
+                $e
+            );
+        }
+    }
 
 	/**
 	 * @param string $class

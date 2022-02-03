@@ -4,14 +4,14 @@ namespace Pechynho\Test;
 
 use InvalidArgumentException;
 use Pechynho\Test\Model\Person;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 use Pechynho\Utility\Arrays;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use VladaHejda\AssertException;
 
 class ArraysTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	/** @var Person[] */
 	private $persons;

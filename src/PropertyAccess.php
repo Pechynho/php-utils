@@ -1,21 +1,21 @@
 <?php
 
-
 namespace Pechynho\Utility;
-
 
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
+use Symfony\Component\PropertyAccess\PropertyAccess as SymfonyPropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Throwable;
 
 /**
  * @author Jan Pech <pechynho@gmail.com>
  */
 class PropertyAccess
 {
-	private static ?PropertyAccessorInterface $propertyAccessor = null;
+    private static ?PropertyAccessorInterface $propertyAccessor = null;
 
 	/**
 	 * @param object|array $objectOrArray
@@ -77,16 +77,33 @@ class PropertyAccess
 		}
 	}
 
-	/**
-	 * @return PropertyAccessorInterface
-	 */
-	private static function getPropertyAccessor(): PropertyAccessorInterface
-	{
-		if (self::$propertyAccessor === null) {
-			self::$propertyAccessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
-		}
-		return self::$propertyAccessor;
-	}
+    /**
+     * @return PropertyAccessorInterface
+     */
+    private static function getPropertyAccessor(): PropertyAccessorInterface
+    {
+        if (self::$propertyAccessor !== null) {
+            return self::$propertyAccessor;
+        }
+        if (!class_exists(SymfonyPropertyAccess::class)) {
+            throw new RuntimeException(
+                sprintf(
+                    '%s is required to use this library. Please run composer require symfony/property-access.',
+                    SymfonyPropertyAccess::class
+                )
+            );
+        }
+        try {
+            self::$propertyAccessor = SymfonyPropertyAccess::createPropertyAccessor();
+            return self::$propertyAccessor;
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                sprintf('Calling %s::createPropertyAccessor was not successful.', SymfonyPropertyAccess::class),
+                (int)$e->getCode(),
+                $e
+            );
+        }
+    }
 
 	/**
 	 * @param object|array $objectOrArray

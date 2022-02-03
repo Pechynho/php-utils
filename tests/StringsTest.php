@@ -4,13 +4,13 @@ namespace Pechynho\Test;
 
 use InvalidArgumentException;
 use OutOfRangeException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 use Pechynho\Utility\Strings;
 use PHPUnit\Framework\TestCase;
-use VladaHejda\AssertException;
 
 class StringsTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function testCompare()
 	{

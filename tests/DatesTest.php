@@ -4,14 +4,14 @@ namespace Pechynho\Test;
 
 use DateTime;
 use InvalidArgumentException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 use Pechynho\Utility\Dates;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use VladaHejda\AssertException;
 
 class DatesTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function testFromTimestamp()
 	{

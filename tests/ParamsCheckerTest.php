@@ -6,13 +6,13 @@ use DateTime;
 use InvalidArgumentException;
 use Pechynho\Test\Model\Person;
 use Pechynho\Test\Model\Worker;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 use Pechynho\Utility\ParamsChecker;
 use PHPUnit\Framework\TestCase;
-use VladaHejda\AssertException;
 
 class ParamsCheckerTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function test__callStatic()
 	{

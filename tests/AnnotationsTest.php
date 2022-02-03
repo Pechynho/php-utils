@@ -5,13 +5,13 @@ namespace Pechynho\Test;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Pechynho\Test\Model\MyAnnotation;
 use Pechynho\Test\Model\Worker;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 use Pechynho\Utility\Annotations;
 use PHPUnit\Framework\TestCase;
-use VladaHejda\AssertException;
 
 class AnnotationsTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function testGetMethodAnnotation()
 	{

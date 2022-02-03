@@ -3,13 +3,13 @@
 namespace Pechynho\Test;
 
 use InvalidArgumentException;
+use Pechynho\Test\Traits\AssertExceptionTrait;
 use Pechynho\Utility\Formatting;
 use PHPUnit\Framework\TestCase;
-use VladaHejda\AssertException;
 
 class FormattingTest extends TestCase
 {
-	use AssertException;
+	use AssertExceptionTrait;
 
 	public function testFormatFileSize()
 	{
